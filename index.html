@@ -706,33 +706,42 @@
       reader.readAsText(file);
     });
 
-    // Remote JSON loading (GitHub Pages / Cloudflare)
-    async function loadFromUrl(url){
-      try{
-        const res = await fetch(url, {cache:'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const json = await res.json();
-        if(json.roles) state.roles = json.roles;
-        if(json.scenes) state.scenes = json.scenes;
-        saveState(); refreshSelectors(); buildScriptList(); startPractice();
-        alert('Script geladen aus:
-'+url);
-      }catch(err){ alert('Laden fehlgeschlagen: '+err.message+'
-URL: '+url); }
-    }
+   // Automatisches Laden der Script-Daten
+async function loadFromUrl(url) {
+  try {
+    const res = await fetch(url, {cache: 'no-store'});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
 
-    function detectDataUrl(){
-      const qs = new URLSearchParams(location.search);
-      const hs = new URLSearchParams(location.hash.replace(/^#/, ''));
-      return qs.get('data') || hs.get('data') || state.meta.dataUrl || '';
-    }
+    if (json.roles) state.roles = json.roles;
+    if (json.scenes) state.scenes = json.scenes;
+    if (json.songs) state.songs = json.songs;
 
-    setDataUrlBtn.addEventListener('click',()=>{
-      const current = state.meta.dataUrl || '';
-      const url = prompt('Daten-URL eingeben (z.B. https:\/\/USERNAME.github.io\/REPO\/horrorladen_script.json)', current);
-      if(url){ state.meta.dataUrl = url.trim(); saveState(); }
-    });
-    loadGithubBtn.addEventListener('click',()=>{ const u = detectDataUrl(); if(u) loadFromUrl(u); else alert('Keine Daten-URL gesetzt. Klicke zuerst auf "Daten‑URL".'); });
+    saveState();
+    refreshSelectors();
+    buildScriptList();
+    startPractice();
+  } catch (err) {
+    alert('Konnte Script nicht laden: ' + err.message + '\nURL: ' + url);
+  }
+}
+
+// Prüfe, ob ?data= oder #data= in der URL steht, sonst Fallback auf Repo-Datei
+function detectDataUrl() {
+  const qs = new URLSearchParams(location.search);
+  const hs = new URLSearchParams(location.hash.replace(/^#/, ''));
+  return (
+    qs.get('data') ||
+    hs.get('data') ||
+    'horrorladen_script.json'   // Standard-Datei im Repo
+  );
+}
+
+// Lade beim Start automatisch
+window.addEventListener('DOMContentLoaded', () => {
+  const url = detectDataUrl();
+  loadFromUrl(url);
+});
 
     // Selector change wiring
     roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveState(); startPractice(); });
