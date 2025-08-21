@@ -3,135 +3,87 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HorrorLaden Line Coach (Beta)</title>
-  <meta name="description" content="Duolingo-ähnlicher Trainer zum Textlernen für 'Der kleine Horrorladen'. Läuft offline auf GitHub Pages." />
+  <meta name="theme-color" content="#0b0f17" />
+  <title>HorrorLaden Line Coach (Auto‑Load)</title>
+  <meta name="description" content="Duolingo-ähnlicher Trainer für 'Der kleine Horrorladen' – lädt automatisch horrorladen_script.json aus dem Repo. Mobile‑ready & share‑friendly." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg: #0b0f17;
-      --panel: rgba(255,255,255,0.08);
-      --panel-strong: rgba(255,255,255,0.14);
-      --text: #eaf0ff;
-      --muted: #a5b0c2;
-      --brand: #7c9cff;
-      --ok: #55e39f;
-      --warn: #ffd166;
-      --bad: #ff6b6b;
-      --accent: #b388ff;
-      --chip: rgba(255,255,255,0.12);
-      --shadow: 0 10px 30px rgba(0,0,0,0.35);
-      --glass: blur(16px) saturate(120%);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 10% -10%, #2a2c7a44, transparent),
-        radial-gradient(900px 400px at 110% 0%, #7a2a7a44, transparent),
-        radial-gradient(900px 500px at 50% 120%, #1b7a7a33, transparent),
-        var(--bg);
-    }
-    header{
-      position:sticky; top:0; z-index:20; backdrop-filter:var(--glass); background:linear-gradient(180deg, rgba(12,14,20,0.8), rgba(12,14,20,0));
-      border-bottom:1px solid rgba(255,255,255,0.08);
-    }
-    .wrap{max-width:1100px; margin:0 auto; padding:16px 20px}
-    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-    h1{margin:0; font-size:1.25rem; letter-spacing:0.3px}
-    .badge{font-size:0.8rem; color:#cbd7ff; background:var(--chip); padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.12)}
-    main{max-width:1100px; margin:22px auto; padding:0 20px; display:grid; grid-template-columns: 1.6fr 1fr; gap:18px}
-    @media (max-width: 900px){ main{ grid-template-columns: 1fr; } }
-    .card{background:var(--panel); border:1px solid rgba(255,255,255,0.12); border-radius:20px; box-shadow:var(--shadow); padding:18px; backdrop-filter:var(--glass)}
-    .title{display:flex; align-items:center; justify-content:space-between}
-    .title h2{margin:0; font-size:1.1rem}
-    .controls{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-top:12px}
-    @media (max-width: 800px){ .controls{ grid-template-columns: repeat(2, minmax(0,1fr)); } button{padding:12px 16px} .line{font-size:1.2rem} .cue{padding:14px} }
-    label{font-size:0.8rem; color:var(--muted)}
-    select, input[type="text"], textarea{
-      width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.18);
-      background:rgba(255,255,255,0.06); color:var(--text);
-    }
-    .toggle{display:flex; gap:8px; flex-wrap:wrap}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:var(--chip);
-      border:1px solid rgba(255,255,255,0.12); cursor:pointer; user-select:none
-    }
-    .chip input{accent-color: var(--brand)}
-    .status-legend{display:flex; gap:10px; flex-wrap:wrap; font-size:0.8rem; color:var(--muted)}
-    .dot{display:inline-block; width:10px; height:10px; border-radius:50%}
-    .dot.keep{background:var(--ok)}
-    .dot.optional{background:var(--warn)}
-    .dot.cut{background:#66ff66}
-    .practice{display:flex; flex-direction:column; gap:12px;}
-    .cue{font-size:0.95rem; color:#d4defa; background:var(--panel-strong); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12)}
-    .cue .speaker{font-weight:700; text-transform:uppercase; font-size:0.8rem; color:#9db1ff}
-    .line{font-size:1.15rem; line-height:1.6}
+    :root{ --bg:#0b0f17; --panel:rgba(255,255,255,0.08); --panel-strong:rgba(255,255,255,0.14); --text:#eaf0ff; --muted:#a5b0c2; --brand:#7c9cff; --ok:#55e39f; --warn:#ffd166; --bad:#ff6b6b; --chip:rgba(255,255,255,0.12); --shadow:0 10px 30px rgba(0,0,0,0.35); --glass:blur(16px) saturate(120%); }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans';color:var(--text);
+      background: radial-gradient(1200px 600px at 10% -10%, #2a2c7a44, transparent), radial-gradient(900px 400px at 110% 0%, #7a2a7a44, transparent), radial-gradient(900px 500px at 50% 120%, #1b7a7a33, transparent), var(--bg);}
+    header{position:sticky;top:0;z-index:30;backdrop-filter:var(--glass);background:linear-gradient(180deg, rgba(12,14,20,0.9), rgba(12,14,20,0));border-bottom:1px solid rgba(255,255,255,0.08)}
+    .wrap{max-width:1100px;margin:0 auto;padding:14px 18px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    h1{margin:0;font-size:1.2rem;letter-spacing:.3px}
+    .badge{font-size:.8rem;color:#cbd7ff;background:var(--chip);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.12)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+    .tab{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .tab.active{background:var(--brand);color:#091120}
+
+    main{max-width:1100px;margin:18px auto;padding:0 18px;display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+    @media (max-width:900px){ main{grid-template-columns:1fr} }
+    .card{background:var(--panel);border:1px solid rgba(255,255,255,0.12);border-radius:18px;box-shadow:var(--shadow);padding:16px;backdrop-filter:var(--glass)}
+    .title{display:flex;align-items:center;justify-content:space-between}
+    .title h2{margin:0;font-size:1.05rem}
+    .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+    @media (max-width:800px){ .controls{grid-template-columns:repeat(2,minmax(0,1fr));} button{padding:12px 16px} .line{font-size:1.2rem} .cue{padding:14px} }
+    label{font-size:.8rem;color:var(--muted)}
+    select,input[type="text"],textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:var(--text)}
+    .toggle{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--chip);border:1px solid rgba(255,255,255,0.12);user-select:none}
+    .chip input{accent-color:var(--brand)}
+    .status-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+    .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+    .dot.keep{background:var(--ok)} .dot.optional{background:var(--warn)} .dot.cut{background:#66ff66}
+
+    .practice{display:flex;flex-direction:column;gap:12px}
+    .cue{font-size:.95rem;color:#d4defa;background:var(--panel-strong);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12)}
+    .cue .speaker{font-weight:700;text-transform:uppercase;font-size:.8rem;color:#9db1ff}
+    .line{font-size:1.12rem;line-height:1.6}
     .muted{color:var(--muted)}
-    .btns{display:flex; gap:10px; flex-wrap:wrap}
-    button{
-      border:none; border-radius:12px; padding:10px 14px; cursor:pointer; font-weight:600; color:#0b0f17; background:var(--brand);
-      box-shadow: 0 6px 14px rgba(124,156,255,0.3);
-    }
-    button.secondary{background:#a9b8ff; color:#051428}
-    button.ghost{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.18)}
-    button.warn{background:var(--warn);}
-    button.good{background:var(--ok);}
-    .answerBox{display:flex; gap:10px}
-    .answerBox input{flex:1}
-    .progress{display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px; margin-top:8px}
-    .hearts{display:flex; gap:6px}
-    .heart{width:18px; height:18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4))}
-    .xp{font-weight:700; color:#b9c7ff}
-    .pill{background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); padding:6px 10px; border-radius:999px}
-    .script-list{max-height:60vh; overflow:auto; display:flex; flex-direction:column; gap:10px}
-    .script-item{padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05)}
-    .script-item .meta{display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:0.8rem}
-    .status.keep{outline:2px solid var(--ok)}
-    .status.optional{outline:2px solid var(--warn)}
-    .status.cut{outline:2px solid #66ff66; opacity:0.6}
-    .toolbar{display:flex; gap:8px; flex-wrap:wrap}
-    .editor{position:fixed; inset:0; background:rgba(5,8,14,0.6); backdrop-filter: blur(6px); display:none; align-items:center; justify-content:center}
-    .editor .panel{width:min(980px, 94vw); max-height:86vh; overflow:auto; background:var(--panel); border:1px solid rgba(255,255,255,0.18); border-radius:18px; padding:16px}
-    .editor table{width:100%; border-collapse:collapse; font-size:0.9rem}
-    .editor th,.editor td{border-bottom:1px solid rgba(255,255,255,0.12); padding:8px 6px; vertical-align:top}
-    .editor .row-actions{display:flex; gap:6px}
-    .hint{font-size:0.85rem; color:var(--muted)}
-    .sr-only{position:absolute; left:-9999px}
-    .hidden{display:none}
-    .small{font-size:0.85rem}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;color:#0b0f17;background:var(--brand);box-shadow:0 6px 14px rgba(124,156,255,0.3)}
+    button.secondary{background:#a9b8ff;color:#051428} button.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.18)}
+    .progress{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed rgba(255,255,255,0.1);padding-top:10px;margin-top:8px}
+    .hearts{display:flex;gap:6px} .heart{width:18px;height:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4))}
+    .xp{font-weight:700;color:#b9c7ff} .pill{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:6px 10px;border-radius:999px}
+
+    .script-list{max-height:60vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+    .script-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05)}
+    .script-item .meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.8rem}
+    .status.keep{outline:2px solid var(--ok)} .status.optional{outline:2px solid var(--warn)} .status.cut{outline:2px solid #66ff66;opacity:.6}
+
+    .sr-only{position:absolute;left:-9999px}
+    .hint{font-size:.85rem;color:var(--muted)}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap row">
       <h1>HorrorLaden Line Coach</h1>
-      <span class="badge">Beta · Offline · GitHub Pages ready</span>
-      <span class="badge">Duolingo‑Style Training</span>
+      <span class="badge">Auto‑Load JSON</span>
+      <span class="badge">Mobile‑ready</span>
+      <div class="tabs">
+        <button class="tab active" data-tab="trainer">Trainer</button>
+        <button class="tab" data-tab="songs">Songs</button>
+        <button class="tab" data-tab="script">Skript</button>
+      </div>
     </div>
   </header>
 
   <main>
-    <!-- Left: Trainer -->
-    <section class="card" aria-labelledby="trainerTitle">
+    <!-- Left: Trainer / Songs -->
+    <section class="card" id="leftCard">
       <div class="title">
-        <h2 id="trainerTitle">Trainer</h2>
-        <div class="toolbar">
-          <button class="ghost small" id="openEditorBtn" title="Skript-Editor öffnen">Editor</button>
-          <button class="ghost small" id="setDataUrlBtn" title="GitHub/Cloudflare JSON laden">Daten‑URL</button>
-          <button class="ghost small" id="loadGithubBtn" title="Jetzt von URL laden">von URL laden</button>
-          <button class="ghost small" id="exportBtn" title="Daten exportieren">Export</button>
-          <label class="ghost small" style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.18); cursor:pointer">
-            <input id="importFile" type="file" accept="application/json" class="sr-only" />
-            <span>Import</span>
-          </label>
-        </div>
+        <h2 id="leftTitle">Trainer</h2>
+        <div class="hint">Die App lädt automatisch <code>horrorladen_script.json</code> aus deinem Repo. Optional: <code>?data=URL</code>.</div>
       </div>
 
-      <div class="controls" style="margin-bottom:6px">
+      <!-- Trainer Controls -->
+      <div id="trainerControls" class="controls" style="margin-bottom:6px">
         <div>
           <label for="roleSel">Meine Rolle</label>
           <select id="roleSel"></select>
@@ -158,137 +110,104 @@
         </div>
       </div>
 
-      <div class="toggle" style="margin-bottom:8px">
+      <div id="trainerToggles" class="toggle" style="margin-bottom:8px">
         <label class="chip"><input type="checkbox" id="hideCuts" checked> Sichere Striche (grün) ausblenden</label>
         <label class="chip"><input type="checkbox" id="includeOptional" checked> Optionale Striche (gelb/orange) einbeziehen</label>
         <label class="chip"><input type="checkbox" id="quizPartner"> Partner-Text mitlernen</label>
         <label class="chip"><input type="checkbox" id="ttsOther" checked> Andere Rollen vorlesen (TTS)</label>
         <label class="chip"><input type="checkbox" id="autoAdvance"> Auto‑Weiter (TTS Ende)</label>
+        <label class="chip"><input type="checkbox" id="excludeSongs" checked> Songs aus Trainer ausschließen</label>
       </div>
+
       <div class="status-legend" aria-hidden="true">
         <span><span class="dot keep"></span> behalten</span>
         <span><span class="dot optional"></span> optional</span>
         <span><span class="dot cut"></span> gestrichen</span>
       </div>
 
+      <!-- Trainer Practice Area -->
       <div class="practice" id="practiceArea" aria-live="polite"></div>
-
       <div class="progress">
         <div class="hearts" id="hearts"></div>
         <div class="xp" id="xp">XP: 0</div>
         <div class="pill" id="streak">🔥 Streak 0</div>
       </div>
+
+      <!-- Songs Panel -->
+      <div id="songsPanel" class="hidden">
+        <div class="controls" style="margin-top:4px">
+          <div>
+            <label for="songSel">Song</label>
+            <select id="songSel"></select>
+          </div>
+          <div>
+            <label for="songModeSel">Song‑Modus</label>
+            <select id="songModeSel">
+              <option value="reveal">Reveal (Zeilen aufdecken)</option>
+              <option value="cloze">Cloze (Lücken füllen)</option>
+              <option value="firstletters">Erste Buchstaben</option>
+            </select>
+          </div>
+          <div>
+            <label for="clozeEvery">Cloze: jedes n‑te Wort</label>
+            <input id="clozeEvery" type="range" min="3" max="8" value="5" />
+          </div>
+          <div>
+            <label for="songContextSel">Kontext-Zeilen</label>
+            <select id="songContextSel">
+              <option value="0">0</option>
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle" style="margin:8px 0">
+          <label class="chip"><input type="checkbox" id="songTtsOther" checked> Andere Rollen vorlesen (TTS)</label>
+          <label class="chip"><input type="checkbox" id="songQuizPartner"> Partner‑Text mitlernen</label>
+        </div>
+        <div class="practice" id="songPractice"></div>
+        <div class="progress">
+          <div class="pill" id="songProgress">0 / 0</div>
+          <div class="pill" id="songXP">🎵 XP: 0</div>
+        </div>
+      </div>
     </section>
 
-    <!-- Right: Skript-Ansicht -->
+    <!-- Right Column: Script/Songs list -->
     <aside class="card" aria-labelledby="scriptTitle">
       <div class="title">
-        <h2 id="scriptTitle">Skript & Kontext</h2>
-        <div class="hint">Klicke auf eine Zeile, um im Trainer dorthin zu springen.</div>
+        <h2 id="scriptTitle">Skript & Inhalte</h2>
+        <div class="hint">Klicke auf eine Zeile bzw. Songzeile, um im Trainer dorthin zu springen. Songs sind separat markiert.</div>
       </div>
       <div id="scriptList" class="script-list" role="list"></div>
     </aside>
   </main>
 
-  <!-- Editor Modal -->
-  <div class="editor" id="editor">
-    <div class="panel">
-      <div class="row" style="justify-content:space-between; margin-bottom:8px">
-        <h3 style="margin:6px 0">Skript-Editor</h3>
-        <div class="toolbar">
-          <button class="ghost small" id="closeEditorBtn">Schließen</button>
-          <button class="secondary small" id="addLineBtn">Zeile hinzufügen</button>
-          <button class="good small" id="saveEditorBtn">Speichern</button>
-        </div>
-      </div>
-      <div class="hint">Status: <b>grün = sicher gestrichen</b>, <b>gelb/orange = optional</b>, leer = behalten. Du kannst Szenen, Sprecher und Text hier bearbeiten. Änderungen werden lokal gespeichert (localStorage) und beim Export als JSON heruntergeladen.</div>
-      <div style="overflow:auto">
-        <table id="editorTable" aria-label="Skript bearbeiten">
-          <thead>
-            <tr>
-              <th style="width:90px">Szene</th>
-              <th style="width:150px">Sprecher</th>
-              <th>Text</th>
-              <th style="width:130px">Status</th>
-              <th style="width:120px">Aktionen</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <details style="margin-top:10px">
-        <summary>Batch-Import (einfaches Text-Format)</summary>
-        <div class="hint">Format: Jede Zeile = <code>Szene|SPRECHER: Text [status]</code>. Status optional: <code>optional</code> oder <code>cut</code>. Beispiel: <em>1|MUSHNIK: Was haben Sie zerdeppert? cut</em></div>
-        <textarea id="batchInput" rows="6" placeholder="1|MUSHNIK: Was haben Sie jetzt wieder zerdeppert, Krelbourn? cut
-1|SEYMOUR: Nichts, Mr. Mushnik."></textarea>
-        <div class="row" style="justify-content:flex-end; margin-top:8px">
-          <button class="secondary small" id="batchParseBtn">Importieren</button>
-        </div>
-      </details>
-    </div>
-  </div>
-
   <script>
     /* ----------------------------- Data Model ----------------------------- */
-    const STORAGE_KEY = 'horrorcoach_state_v1_1';
+    const STORAGE_KEY = 'horrorcoach_state_auto_v1';
     const DEFAULT_DATA = {
       title: 'Der kleine Horrorladen',
-      roles: ['STIMME','GIRLS','CRYSTAL','RONETTE','CHIFFON','SEYMOUR','AUDREY','MUSHNIK','ORIN','PFLANZE','PENNER 1','PENNER 2','KUNDE','PATIENT','MRS. LUCE','MRS. BERNSTEIN','MR. MARTIN'],
-      scenes: [
-        {
-          id:'1', name:'1. Szene – Skid Row / Mushniks Laden',
-          lines:[
-            {speaker:'MUSHNIK', text:'Was haben Sie jetzt wieder zerdeppert, Krelbourn?', status:'keep'},
-            {speaker:'SEYMOUR', text:'Nichts, Mr. Mushnik.', status:'keep'},
-            {speaker:'MUSHNIK', text:'Cholera jasna! (Heilige Scheiße!)', status:'keep'},
-            {speaker:'AUDREY', text:'Ding Dong.', status:'keep'},
-            {speaker:'MUSHNIK', text:'Entzückend. Die gnädige Dame geruhen zur Arbeit zu kommen.', status:'optional'},
-            {speaker:'AUDREY', text:'Guten Morgen, Mr. Mushnik.', status:'keep'},
-            {speaker:'MUSHNIK', text:'Morgen? Es ist zwei Uhr nach Mittag. Nicht, dass wir einen Kunden gehabt hätten. Für einen Blumenladen im Pennerviertel gibt´s keine Kunden nicht.', status:'keep'},
-            {speaker:'AUDREY', text:'´tschuldigung.', status:'keep'},
-            {speaker:'MUSHNIK', text:'Seymour! Pierdowalosu! (Du Trottel!)', status:'keep'},
-            {speaker:'SEYMOUR', text:'Aaah!', status:'keep'},
-            {speaker:'MUSHNIK', text:'Was ist denn los da hinten?', status:'keep'},
-            {speaker:'SEYMOUR', text:'Och, nichts Besonderes, Mr. Mushnik!', status:'keep'},
-            {speaker:'MUSHNIK', text:'Audrey. Gehen Sie lieber mal nach hinten...', status:'cut'},
-            {speaker:'AUDREY', text:'Veilchen?', status:'optional'}
-          ]
-        },
-        {
-          id:'2', name:'2. Szene – Radio & Laden',
-          lines:[
-            {speaker:'INTERVIEWER', text:'Und damit beenden wir unser Gespräch mit Seymour Krelbourn... Nähren Sie Ihre Pflanze mit irgendetwas Besonderem?', status:'keep'},
-            {speaker:'SEYMOUR', text:'Mit was Besonderem? Äh – nein. Mit einer geheim gehaltenen Flüssigkeit...', status:'keep'},
-            {speaker:'MUSHNIK', text:'Die Adresse, die Adresse!', status:'keep'}
-          ]
-        }
-      ],
-      prefs: { role:'SEYMOUR', sceneId:'1', mode:'read', hidCuts:true, includeOptional:true, quizPartner:false, ttsOther:true, context:2, autoAdvance:false },
-      meta: { xp:0, hearts:3, streak:0, dataUrl:'' }
+      roles: [],
+      scenes: [],
+      songs: [],
+      prefs: { tab:'trainer', role:'', sceneId:'', mode:'read', context:2, hidCuts:true, includeOptional:true, quizPartner:false, ttsOther:true, autoAdvance:false, excludeSongs:true,
+               songId:'', songMode:'reveal', songContext:1, songTtsOther:true, songQuizPartner:false },
+      meta: { xp:0, hearts:3, streak:0, songXP:0 }
     };
 
     let state = loadState();
 
-    function loadState(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw){ return structuredClone(DEFAULT_DATA); }
-        const parsed = JSON.parse(raw);
-        // merge defaults (so updates don’t break)
-        return deepMerge(structuredClone(DEFAULT_DATA), parsed);
-      }catch(e){ console.warn('loadState failed', e); return structuredClone(DEFAULT_DATA); }
-    }
+    function loadState(){ try{ const raw=localStorage.getItem(STORAGE_KEY); const base=structuredClone(DEFAULT_DATA); if(!raw) return base; const parsed=JSON.parse(raw); return deepMerge(base, parsed);}catch(e){ return structuredClone(DEFAULT_DATA);} }
     function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    function deepMerge(base, patch){
-      for(const k in patch){
-        if(Array.isArray(patch[k])) base[k] = patch[k];
-        else if(patch[k] && typeof patch[k]==='object') base[k] = deepMerge(base[k]||{}, patch[k]);
-        else base[k] = patch[k];
-      }
-      return base;
-    }
+    function deepMerge(base, patch){ for(const k in patch){ if(Array.isArray(patch[k])) base[k]=patch[k]; else if(patch[k] && typeof patch[k]==='object') base[k]=deepMerge(base[k]||{}, patch[k]); else base[k]=patch[k]; } return base; }
 
-    /* ----------------------------- UI wiring ----------------------------- */
+    /* ----------------------------- UI Elements ---------------------------- */
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const leftTitle = document.getElementById('leftTitle');
+    const practiceArea = document.getElementById('practiceArea');
+    const scriptList = document.getElementById('scriptList');
+
     const roleSel = document.getElementById('roleSel');
     const sceneSel = document.getElementById('sceneSel');
     const modeSel = document.getElementById('modeSel');
@@ -298,67 +217,70 @@
     const quizPartner = document.getElementById('quizPartner');
     const ttsOther = document.getElementById('ttsOther');
     const autoAdvance = document.getElementById('autoAdvance');
-    const practiceArea = document.getElementById('practiceArea');
-    const scriptList = document.getElementById('scriptList');
+    const excludeSongs = document.getElementById('excludeSongs');
+
     const heartsBox = document.getElementById('hearts');
     const xpBox = document.getElementById('xp');
     const streakBox = document.getElementById('streak');
 
-    // Editor
-    const editor = document.getElementById('editor');
-    const openEditorBtn = document.getElementById('openEditorBtn');
-    const closeEditorBtn = document.getElementById('closeEditorBtn');
-    const editorTable = document.querySelector('#editorTable tbody');
-    const addLineBtn = document.getElementById('addLineBtn');
-    const saveEditorBtn = document.getElementById('saveEditorBtn');
-    const batchParseBtn = document.getElementById('batchParseBtn');
-    const batchInput = document.getElementById('batchInput');
-    const exportBtn = document.getElementById('exportBtn');
-    const importFile = document.getElementById('importFile');
-    const setDataUrlBtn = document.getElementById('setDataUrlBtn');
-    const loadGithubBtn = document.getElementById('loadGithubBtn');
+    const songsPanel = document.getElementById('songsPanel');
+    const songSel = document.getElementById('songSel');
+    const songModeSel = document.getElementById('songModeSel');
+    const clozeEvery = document.getElementById('clozeEvery');
+    const songContextSel = document.getElementById('songContextSel');
+    const songPractice = document.getElementById('songPractice');
+    const songProgress = document.getElementById('songProgress');
+    const songXP = document.getElementById('songXP');
 
-    // populate selects
+    /* --------------------------- Population / Init ------------------------ */
     function refreshSelectors(){
       roleSel.innerHTML = state.roles.map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`).join('');
-      sceneSel.innerHTML = state.scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
-      modeSel.value = state.prefs.mode;
-      contextSel.value = String(state.prefs.context||2);
-      hideCuts.checked = !!state.prefs.hidCuts;
-      includeOptional.checked = !!state.prefs.includeOptional;
-      quizPartner.checked = !!state.prefs.quizPartner;
-      ttsOther.checked = !!state.prefs.ttsOther;
-      autoAdvance.checked = !!state.prefs.autoAdvance;
+      const scenes = state.scenes.filter(s=> s.type!=='song');
+      sceneSel.innerHTML = scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
+      if(!state.prefs.role && state.roles[0]) state.prefs.role = state.roles[0];
+      if(!state.prefs.sceneId && scenes[0]) state.prefs.sceneId = scenes[0].id;
+      modeSel.value = state.prefs.mode; contextSel.value = String(state.prefs.context||2);
+      hideCuts.checked = !!state.prefs.hidCuts; includeOptional.checked = !!state.prefs.includeOptional; quizPartner.checked = !!state.prefs.quizPartner;
+      ttsOther.checked = !!state.prefs.ttsOther; autoAdvance.checked = !!state.prefs.autoAdvance; excludeSongs.checked = !!state.prefs.excludeSongs;
+
+      songSel.innerHTML = state.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title}</option>`).join('');
+      if(!state.prefs.songId && state.songs[0]) state.prefs.songId = state.songs[0].id;
+      songModeSel.value = state.prefs.songMode; songContextSel.value = String(state.prefs.songContext||1); clozeEvery.value = 5;
     }
 
     function currentScene(){ return state.scenes.find(s=>s.id===state.prefs.sceneId) || state.scenes[0]; }
+    function currentSong(){ return state.songs.find(s=>s.id===state.prefs.songId) || state.songs[0]; }
 
-    function filteredLines(scene){
-      return scene.lines.filter(l=>{
-        if(state.prefs.hidCuts && l.status==='cut') return false;
-        if(!state.prefs.includeOptional && l.status==='optional') return false;
-        return true;
-      });
-    }
+    function filteredLines(scene){ return scene?.lines?.filter(l=>{ if(state.prefs.hidCuts && l.status==='cut') return false; if(!state.prefs.includeOptional && l.status==='optional') return false; return true; }) || []; }
 
     function buildScriptList(){
-      const scene = currentScene();
-      const lines = filteredLines(scene);
       scriptList.innerHTML='';
-      lines.forEach((l, idx)=>{
-        const div = document.createElement('div');
-        div.className = `script-item status ${l.status||'keep'}`;
-        div.role='listitem';
-        div.innerHTML = `
-          <div class="meta"><span>${scene.name}</span><span>${(l.status==='cut'?'gestrichen':(l.status==='optional'?'optional':'bleibt'))}</span></div>
-          <div><b>${l.speaker}:</b> <span class="line">${escapeHtml(l.text)}</span></div>
-        `;
-        div.addEventListener('click', ()=>{ startPracticeAt(idx); });
-        scriptList.appendChild(div);
+      state.scenes.filter(s=> s.type!=='song').forEach(scene=>{
+        const lines = filteredLines(scene);
+        lines.forEach((l, idx)=>{
+          const div = document.createElement('div');
+          div.className = `script-item status ${l.status||'keep'}`;
+          div.role='listitem';
+          div.innerHTML = `<div class="meta"><span>${scene.name}</span><span>${(l.status==='cut'?'gestrichen':(l.status==='optional'?'optional':'bleibt'))}</span></div>
+                           <div><b>${l.speaker}:</b> <span class="line">${escapeHtml(l.text)}</span></div>`;
+          div.addEventListener('click', ()=>{ selectTab('trainer'); startPracticeAtScene(scene.id, idx); });
+          scriptList.appendChild(div);
+        });
+      });
+      const h = document.createElement('div'); h.className='muted'; h.style.margin='8px 0'; h.innerHTML='— <b>Songs</b> —'; scriptList.appendChild(h);
+      state.songs.forEach(song=>{
+        song.lines.forEach((l, idx)=>{
+          const div = document.createElement('div');
+          div.className = `script-item status ${l.status||'keep'}`;
+          div.role='listitem';
+          div.innerHTML = `<div class="meta"><span>🎵 ${song.title}</span><span>Song</span></div>
+                           <div><b>${l.speaker||'ENSEMBLE'}:</b> <span class="line">${escapeHtml(l.text)}</span></div>`;
+          div.addEventListener('click', ()=>{ selectTab('songs'); startSongAt(song.id, idx); });
+          scriptList.appendChild(div);
+        });
       });
     }
 
-    // Hearts/XP/Streak
     function refreshProgress(){
       heartsBox.innerHTML = '';
       for(let i=0;i<3;i++){
@@ -367,396 +289,150 @@
       }
       xpBox.textContent = `XP: ${state.meta.xp}`;
       streakBox.textContent = `🔥 Streak ${state.meta.streak}`;
+      songXP.textContent = `🎵 XP: ${state.meta.songXP}`;
     }
 
-    // Practice Engine
-    let practiceIdx = 0; // index in filtered scene
-    let lastSpokenUtterance = null;
-
-    function startPracticeAt(idx){
-      const scene = currentScene();
-      const lines = filteredLines(scene);
-      practiceIdx = Math.max(0, Math.min(idx, lines.length-1));
-      renderPractice();
-    }
-    function startPractice(){ startPracticeAt(0); }
+    /* ---------------------- Trainer (Dialogues) Engine --------------------- */
+    let practiceIdx = 0; let lastSpokenUtterance = null;
+    function startPractice(){ startPracticeAtScene(state.prefs.sceneId, 0); }
+    function startPracticeAtScene(sceneId, idx){ state.prefs.sceneId = sceneId; saveState(); const scene=currentScene(); const lines=filteredLines(scene); practiceIdx=Math.max(0, Math.min(idx, (lines.length||1)-1)); renderPractice(); }
 
     function renderPractice(){
-      const scene = currentScene();
-      const lines = filteredLines(scene);
-      if(lines.length===0){ practiceArea.innerHTML = '<div class="muted">Keine Zeilen nach Filter.</div>'; return; }
-
+      if(state.prefs.tab!=='trainer'){ return; }
+      const scene = currentScene(); if(!scene){ practiceArea.innerHTML='<div class="muted">Keine Szene gewählt.</div>'; return; }
+      const lines = filteredLines(scene); if(!lines.length){ practiceArea.innerHTML='<div class="muted">Keine Zeilen nach Filter.</div>'; return; }
       const ctxN = Math.max(0, Number(state.prefs.context||2));
-      const l = lines[practiceIdx];
-      // Determine whether current prompt is for my role or partner
-      const askPartnerToo = !!state.prefs.quizPartner;
-      const isMyLine = l.speaker === state.prefs.role;
-      let askFor = (isMyLine? 'me' : (askPartnerToo ? 'partner' : 'skip'));
-      if(askFor==='skip'){ // skip partner-only if user doesn't want to learn it
-        const nextIdx = findNextAskable(lines, practiceIdx, state.prefs.role, askPartnerToo);
-        if(nextIdx===-1){ practiceArea.innerHTML = '<div class="muted">Fertig für diese Szene! 🎉</div>'; return; }
-        practiceIdx = nextIdx; return renderPractice();
-      }
+      const l = lines[practiceIdx]; const askPartnerToo = !!state.prefs.quizPartner; const isMyLine = l.speaker === state.prefs.role; let askFor = (isMyLine? 'me' : (askPartnerToo ? 'partner' : 'skip'));
+      if(askFor==='skip'){ const nextIdx = findNextAskable(lines, practiceIdx, state.prefs.role, askPartnerToo); if(nextIdx===-1){ practiceArea.innerHTML='<div class="muted">Fertig für diese Szene! 🎉</div>'; return; } practiceIdx = nextIdx; return renderPractice(); }
 
-      // Context block (previous ctxN lines)
-      const context = [];
-      for(let i=Math.max(0, practiceIdx-ctxN); i<practiceIdx; i++){
-        const c = lines[i];
-        context.push(`<div class="cue"><div class="speaker">${c.speaker}</div><div>${escapeHtml(c.text)}</div></div>`);
-      }
+      const context = []; for(let i=Math.max(0, practiceIdx-ctxN); i<practiceIdx; i++){ const c = lines[i]; context.push(`<div class="cue"><div class="speaker">${c.speaker}</div><div>${escapeHtml(c.text)}</div></div>`); }
+      const header = `<div class="row" style="justify-content:space-between"><div class="pill">${scene.name}</div><div class="pill">Schritt ${practiceIdx+1} / ${lines.length}</div></div>`;
+      const prompt = `<div class="cue" style="border:1px dashed rgba(255,255,255,0.18)"><div class="speaker">${l.speaker}${isMyLine?' (Du)':''}</div><div class="muted">${isMyLine?'Deine Zeile':'Partner-Zeile'}</div></div>`;
 
-      const header = `<div class="row" style="justify-content:space-between">
-          <div class="pill">${scene.name}</div>
-          <div class="pill">Schritt ${practiceIdx+1} / ${lines.length}</div>
-        </div>`;
-
-      const prompt = `<div class="cue" style="border:1px dashed rgba(255,255,255,0.18)">
-        <div class="speaker">${l.speaker}${isMyLine?' (Du)':''}</div>
-        <div class="muted">${isMyLine?'Deine Zeile':'Partner-Zeile'}</div>
-      </div>`;
-
-      const mode = state.prefs.mode;
-      let interaction = '';
+      const mode = state.prefs.mode; let interaction='';
       if(mode==='read'){
-        interaction = `
-          <div class="btns">
-            <button id="revealBtn" class="secondary">Zeile anzeigen</button>
-            <button id="playOtherBtn" class="ghost">Vorherige(n) Kontext vorlesen</button>
-            <button id="nextBtn">Weiter</button>
-          </div>
-          <div id="revealBox" class="hidden" style="margin-top:8px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06)">
-            <div class="line">${escapeHtml(l.text)}</div>
-          </div>
-        `;
+        interaction = `<div class="btns"><button id="revealBtn" class="secondary">Zeile anzeigen</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn">Weiter</button></div>
+                       <div id="revealBox" class="hidden" style="margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)"><div class="line">${escapeHtml(l.text)}</div></div>`;
       } else if(mode==='type'){
-        interaction = `
-          <div class="answerBox">
-            <input id="answerInput" type="text" autocomplete="off" placeholder="Tippe die Zeile exakt (Groß/Kleinschreibung egal)" />
-            <button id="checkBtn">Prüfen</button>
-          </div>
-          <div id="feedback" style="min-height:28px" class="muted"></div>
-          <div class="btns">
-            <button id="hintBtn" class="ghost">Hinweis</button>
-            <button id="skipBtn" class="ghost">Überspringen</button>
-            <button id="playOtherBtn" class="ghost">Kontext vorlesen</button>
-            <button id="nextBtn" class="secondary">Weiter</button>
-          </div>
-        `;
-      } else { // speak
-        interaction = `
-          <div class="btns">
-            <button id="startRecBtn" class="secondary">Sprechen starten</button>
-            <button id="stopRecBtn" class="ghost">Stopp</button>
-            <button id="playOtherBtn" class="ghost">Kontext vorlesen</button>
-            <button id="nextBtn">Weiter</button>
-          </div>
-          <div id="recOut" class="muted"></div>
-        `;
+        interaction = `<div class="answerBox"><input id="answerInput" type="text" autocomplete="off" placeholder="Tippe die Zeile exakt (Groß/Klein egal)" /><button id="checkBtn">Prüfen</button></div>
+                       <div id="feedback" style="min-height:28px" class="muted"></div>
+                       <div class="btns"><button id="hintBtn" class="ghost">Hinweis</button><button id="skipBtn" class="ghost">Überspringen</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn" class="secondary">Weiter</button></div>`;
+      } else {
+        interaction = `<div class="btns"><button id="startRecBtn" class="secondary">Sprechen starten</button><button id="stopRecBtn" class="ghost">Stopp</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn">Weiter</button></div><div id="recOut" class="muted"></div>`;
       }
 
       practiceArea.innerHTML = header + context.join('') + prompt + interaction;
-
-      // wire actions
-      const playOtherBtn = document.getElementById('playOtherBtn');
-      playOtherBtn?.addEventListener('click', ()=> speakContext(contextText(lines, practiceIdx, ctxN)) );
-
+      document.getElementById('playOtherBtn')?.addEventListener('click', ()=> speakContext(contextText(lines, practiceIdx, ctxN)) );
       document.getElementById('nextBtn')?.addEventListener('click', nextItem);
-      document.getElementById('revealBtn')?.addEventListener('click', ()=>{
-        document.getElementById('revealBox')?.classList.remove('hidden');
-      });
-
+      document.getElementById('revealBtn')?.addEventListener('click', ()=>{ document.getElementById('revealBox')?.classList.remove('hidden'); });
       if(mode==='type'){
-        const input = document.getElementById('answerInput');
-        const feedback = document.getElementById('feedback');
-        input?.focus();
-        document.getElementById('checkBtn')?.addEventListener('click', ()=>{
-          const ok = similarEnough(input.value, l.text);
-          if(ok){
-            feedback.innerHTML = '✅ Richtig!';
-            gainXP(10); advanceOrEnd();
-          } else {
-            state.meta.hearts = Math.max(0, state.meta.hearts-1); saveState(); refreshProgress();
-            const diff = diffHint(input.value, l.text);
-            feedback.innerHTML = '❌ Nicht ganz. Tipp: ' + diff;
-            if(state.meta.hearts===0){ feedback.innerHTML += '<br>💔 Keine Herzen mehr – mach eine Pause oder setze die Herzen im Menü zurück.' }
-          }
-        });
-        document.getElementById('hintBtn')?.addEventListener('click', ()=>{
-          const hint = firstNCharsHint(l.text, input.value);
-          feedback.textContent = 'Hinweis: ' + hint;
-        });
+        const input = document.getElementById('answerInput'); const feedback = document.getElementById('feedback'); input?.focus();
+        document.getElementById('checkBtn')?.addEventListener('click', ()=>{ const ok = similarEnough(input.value, l.text); if(ok){ feedback.innerHTML='✅ Richtig!'; gainXP(10); advanceOrEnd(); } else { miss(feedback, input.value, l.text); } });
+        document.getElementById('hintBtn')?.addEventListener('click', ()=>{ feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text, input.value); });
         document.getElementById('skipBtn')?.addEventListener('click', nextItem);
       }
-
       if(mode==='speak') setupSpeech(l.text);
-
       refreshProgress();
     }
 
-    function nextItem(){
-      const scene = currentScene();
-      const lines = filteredLines(scene);
-      practiceIdx = Math.min(practiceIdx+1, lines.length-1);
-      renderPractice();
-    }
-    function advanceOrEnd(){
-      const scene = currentScene(); const lines = filteredLines(scene);
-      if(practiceIdx >= lines.length-1){ state.meta.streak++; saveState(); refreshProgress(); practiceArea.innerHTML = '<div>🎉 Szene abgeschlossen! Super Leistung.</div>'; }
-      else { practiceIdx++; renderPractice(); }
-    }
-    function findNextAskable(lines, idx, role, askPartner){
-      for(let i=idx+1; i<lines.length; i++){
-        const isMine = lines[i].speaker===role;
-        if(isMine || askPartner) return i;
+    function nextItem(){ const scene=currentScene(); const lines=filteredLines(scene); practiceIdx=Math.min(practiceIdx+1, (lines.length||1)-1); renderPractice(); }
+    function advanceOrEnd(){ const scene=currentScene(); const lines=filteredLines(scene); if(practiceIdx>=lines.length-1){ state.meta.streak++; saveState(); refreshProgress(); practiceArea.innerHTML='<div>🎉 Szene abgeschlossen! Super Leistung.</div>'; } else { practiceIdx++; renderPractice(); } }
+    function findNextAskable(lines, idx, role, askPartner){ for(let i=idx+1;i<lines.length;i++){ const isMine = lines[i].speaker===role; if(isMine||askPartner) return i; } return -1; }
+
+    /* ---------------------------- Songs Engine ---------------------------- */
+    let songIdx = 0;
+    function startSong(){ startSongAt(state.prefs.songId, 0); }
+    function startSongAt(songId, idx){ state.prefs.songId = songId; saveState(); const song=currentSong(); songIdx=Math.max(0, Math.min(idx, (song?.lines?.length||1)-1)); renderSong(); }
+    function renderSong(){
+      if(state.prefs.tab!=='songs'){ return; }
+      const song = currentSong(); if(!song){ songPractice.innerHTML='<div class="muted">Kein Song ausgewählt.</div>'; return; }
+      const lines = song.lines; if(!lines?.length){ songPractice.innerHTML='<div class="muted">Keine Songzeilen vorhanden.</div>'; return; }
+      const ctxN = Math.max(0, Number(state.prefs.songContext||1));
+      const l = lines[songIdx]; const isMyLine = l.speaker===state.prefs.role; const askPartnerToo = !!state.prefs.songQuizPartner;
+      const context = []; for(let i=Math.max(0, songIdx-ctxN); i<songIdx; i++){ const c = lines[i]; context.push(`<div class=\"cue\"><div class=\"speaker\">${c.speaker||'ENSEMBLE'}</div><div>${escapeHtml(c.text)}</div></div>`); }
+      const header = `<div class="row" style="justify-content:space-between"><div class="pill">🎵 ${song.title}</div><div class="pill">Zeile ${songIdx+1} / ${lines.length}</div></div>`;
+      let body=''; const mode = state.prefs.songMode;
+      if(mode==='reveal'){
+        body = `<div class=\"btns\"><button id=\"songRevealBtn\" class=\"secondary\">Zeile anzeigen</button><button id=\"songPlayCtxBtn\" class=\"ghost\">Kontext vorlesen</button><button id=\"songNextBtn\">Weiter</button></div>
+                <div id=\"songRevealBox\" class=\"hidden\" style=\"margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)\"><div class=\"line\">${escapeHtml(l.text)}</div></div>`;
+      } else if(mode==='cloze'){
+        const every = Number(document.getElementById('clozeEvery').value||5);
+        const {masked} = clozeMask(l.text, every);
+        body = `<div class=\"cue\"><div class=\"speaker\">${l.speaker||'ENSEMBLE'}${isMyLine?' (Du)':''}</div><div class=\"line\">${masked}</div></div>
+                <div class=\"answerBox\"><input id=\"songAnswer\" type=\"text\" autocomplete=\"off\" placeholder=\"Fehlende Wörter in richtiger Reihenfolge\" /><button id=\"songCheck\">Prüfen</button></div>
+                <div id=\"songFb\" class=\"muted\"></div>
+                <div class=\"btns\"><button id=\"songHint\" class=\"ghost\">Hinweis</button><button id=\"songNextBtn\" class=\"secondary\">Weiter</button></div>`;
+      } else { // firstletters
+        const firsts = firstLetters(l.text);
+        body = `<div class=\"cue\"><div class=\"speaker\">${l.speaker||'ENSEMBLE'}${isMyLine?' (Du)':''}</div><div class=\"line\">${firsts}</div></div>
+                <div class=\"btns\"><button id=\"songRevealBtn\" class=\"secondary\">Ganzen Text anzeigen</button><button id=\"songPlayCtxBtn\" class=\"ghost\">Kontext vorlesen</button><button id=\"songNextBtn\">Weiter</button></div>
+                <div id=\"songRevealBox\" class=\"hidden\" style=\"margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)\"><div class=\"line\">${escapeHtml(l.text)}</div></div>`;
       }
-      return -1;
+      songPractice.innerHTML = header + context.join('') + body;
+      songProgress.textContent = `${songIdx+1} / ${lines.length}`;
+      document.getElementById('songNextBtn')?.addEventListener('click', ()=>{ if(songIdx>=lines.length-1){ songPractice.innerHTML='<div>🎉 Song durch!'</div>; } else { songIdx++; renderSong(); } });
+      document.getElementById('songRevealBtn')?.addEventListener('click', ()=>{ document.getElementById('songRevealBox')?.classList.remove('hidden'); });
+      document.getElementById('songPlayCtxBtn')?.addEventListener('click', ()=>{ if(state.prefs.songTtsOther) speakContext(contextText(lines, songIdx, ctxN)); });
+      if(mode==='cloze'){
+        const input = document.getElementById('songAnswer'); const fb = document.getElementById('songFb');
+        document.getElementById('songCheck')?.addEventListener('click', ()=>{ const ok = containsWordsInOrder(input.value, l.text, Number(clozeEvery.value||5)); if(ok){ fb.textContent='✅ Stark!'; state.meta.songXP += 8; saveState(); renderSong(); } else { fb.textContent='❌ Fast – prüfe Reihenfolge/Endungen'; } });
+        document.getElementById('songHint')?.addEventListener('click', ()=>{ fb.textContent='Hinweis: ' + firstNCharsHint(l.text, input.value); });
+      }
+      refreshProgress();
     }
+
+    /* --------------------------- Tabs & Selectors ------------------------- */
+    function selectTab(name){ state.prefs.tab=name; tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name)); leftTitle.textContent = (name==='trainer'?'Trainer':'Songs'); document.getElementById('trainerControls').style.display = (name==='trainer')?'grid':'none'; document.getElementById('trainerToggles').style.display=(name==='trainer')?'flex':'none'; practiceArea.style.display=(name==='trainer')?'block':'none'; songsPanel.classList.toggle('hidden', name!=='songs'); saveState(); if(name==='trainer') renderPractice(); if(name==='songs') renderSong(); }
+    tabs.forEach(t=> t.addEventListener('click', ()=> selectTab(t.dataset.tab) ));
+
+    roleSel.addEventListener('change', ()=>{ state.prefs.role=roleSel.value; saveState(); renderPractice(); renderSong(); });
+    sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId=sceneSel.value; saveState(); buildScriptList(); startPractice(); });
+    modeSel.addEventListener('change', ()=>{ state.prefs.mode=modeSel.value; saveState(); renderPractice(); });
+    contextSel.addEventListener('change', ()=>{ state.prefs.context=Number(contextSel.value); saveState(); renderPractice(); });
+    hideCuts.addEventListener('change', ()=>{ state.prefs.hidCuts=hideCuts.checked; saveState(); buildScriptList(); renderPractice(); });
+    includeOptional.addEventListener('change', ()=>{ state.prefs.includeOptional=includeOptional.checked; saveState(); buildScriptList(); renderPractice(); });
+    quizPartner.addEventListener('change', ()=>{ state.prefs.quizPartner=quizPartner.checked; saveState(); renderPractice(); });
+    ttsOther.addEventListener('change', ()=>{ state.prefs.ttsOther=ttsOther.checked; saveState(); });
+    autoAdvance.addEventListener('change', ()=>{ state.prefs.autoAdvance=autoAdvance.checked; saveState(); });
+    excludeSongs.addEventListener('change', ()=>{ state.prefs.excludeSongs=excludeSongs.checked; saveState(); buildScriptList(); });
+
+    songSel.addEventListener('change', ()=>{ state.prefs.songId=songSel.value; saveState(); startSong(); });
+    songModeSel.addEventListener('change', ()=>{ state.prefs.songMode=songModeSel.value; saveState(); renderSong(); });
+    songContextSel.addEventListener('change', ()=>{ state.prefs.songContext=Number(songContextSel.value); saveState(); renderSong(); });
 
     /* ------------------------------ TTS / STT ------------------------------ */
-    function speakContext(text){
-      if(!state.prefs.ttsOther || !('speechSynthesis' in window)) return;
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'de-DE';
-      u.rate = 1.0; u.pitch = 1.0;
-      cancelLastUtterance();
-      window.speechSynthesis.speak(u);
-      lastSpokenUtterance = u;
-      if(state.prefs.autoAdvance){
-        u.onend = ()=> nextItem();
-      }
-    }
-    function contextText(lines, idx, ctxN){
-      const parts = [];
-      for(let i=Math.max(0, idx-ctxN); i<idx; i++){
-        parts.push(`${lines[i].speaker}: ${lines[i].text}`);
-      }
-      return parts.join('. ');
-    }
-    function cancelLastUtterance(){
-      try{ if(lastSpokenUtterance){ window.speechSynthesis.cancel(); lastSpokenUtterance = null; } }catch(e){}
-    }
+    function speakContext(text){ if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=1.0; u.pitch=1.0; try{ speechSynthesis.cancel(); }catch(_){} speechSynthesis.speak(u); if(state.prefs.autoAdvance){ u.onend=()=> nextItem(); } }
+    function contextText(lines, idx, ctxN){ const parts=[]; for(let i=Math.max(0, idx-ctxN); i<idx; i++){ parts.push(`${lines[i].speaker||'ENSEMBLE'}: ${lines[i].text}`); } return parts.join('. '); }
 
-    let rec = null; // webkitSpeechRecognition
-    function setupSpeech(expected){
-      const out = document.getElementById('recOut');
-      if(!('webkitSpeechRecognition' in window)){
-        out.innerHTML = 'Sprachtraining benötigt Chrome (Desktop) – Web Speech API.'; return;
-      }
-      rec = new webkitSpeechRecognition();
-      rec.lang = 'de-DE'; rec.interimResults = true; rec.continuous = false;
-      rec.onresult = (e)=>{
-        let final = '';
-        for(let i=e.resultIndex; i<e.results.length; i++){
-          const tr = e.results[i];
-          if(tr.isFinal) final += tr[0].transcript + ' ';
-        }
-        out.textContent = 'Du sagst: ' + final.trim();
-        if(final && similarEnough(final, expected)){
-          out.textContent += '  ✅'; gainXP(10); advanceOrEnd(); try{ rec.stop(); }catch(err){}
-        }
-      };
-      rec.onerror = (e)=>{ out.textContent = 'Fehler: ' + e.error; };
-      document.getElementById('startRecBtn')?.addEventListener('click', ()=>{ try{ rec.start(); out.textContent='…hören zu'; }catch(e){} });
-      document.getElementById('stopRecBtn')?.addEventListener('click', ()=>{ try{ rec.stop(); out.textContent='gestoppt'; }catch(e){} });
-    }
-
-    /* ------------------------------- Utils -------------------------------- */
-    function escapeHtml(s){ return s.replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    /* -------------------------------- Utils -------------------------------- */
+    function escapeHtml(s){ return (s||'').replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
     function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
-    function similarEnough(a,b){
-      const A = normalize(a), B = normalize(b);
-      if(!A) return false; if(A===B) return true;
-      const d = levenshtein(A,B); const maxLen = Math.max(A.length,B.length);
-      const sim = 1 - d / Math.max(1,maxLen);
-      return sim >= 0.88; // ~12% Fehlerquote erlaubt
-    }
-    function firstNCharsHint(target, typed){
-      const T = normalize(target); const U = normalize(typed);
-      let i=0; while(i < Math.min(T.length, U.length) && T[i]===U[i]) i++;
-      return target.slice(0, Math.max(1, i+1)) + '…';
-    }
-    function diffHint(a,b){
-      const A = normalize(a).split(' '), B = normalize(b).split(' ');
-      let i=0; while(i<A.length && i<B.length && A[i]===B[i]) i++;
-      const next = B[i]||''; return next? (`Nächstes Wort: "${next}"`) : 'Prüfe Satzende & Satzbau';
-    }
-    function levenshtein(a,b){
-      const m=a.length, n=b.length; if(!m) return n; if(!n) return m; const dp=new Array(n+1).fill(0);
-      for(let j=0;j<=n;j++) dp[j]=j;
-      for(let i=1;i<=m;i++){
-        let prev=dp[0]; dp[0]=i;
-        for(let j=1;j<=n;j++){
-          const tmp=dp[j]; dp[j]= Math.min(
-            dp[j]+1,
-            dp[j-1]+1,
-            prev + (a[i-1]===b[j-1]?0:1)
-          ); prev=tmp;
-        }
-      }
-      return dp[n];
-    }
+    function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); const sim=1 - d / Math.max(1,maxLen); return sim>=0.88; }
+    function firstNCharsHint(target, typed){ const T=normalize(target); const U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
+    function diffHint(a,b){ const A=normalize(a).split(' '), B=normalize(b).split(' '); let i=0; while(i<A.length&&i<B.length&&A[i]===B[i]) i++; const next=B[i]||''; return next? (`Nächstes Wort: "${next}"`) : 'Prüfe Satzende & Satzbau'; }
+    function levenshtein(a,b){ const m=a.length, n=b.length; if(!m) return n; if(!n) return m; const dp=new Array(n+1).fill(0); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
     function gainXP(x){ state.meta.xp += x; saveState(); refreshProgress(); }
+    function miss(fb, typed, target){ state.meta.hearts=Math.max(0,state.meta.hearts-1); saveState(); refreshProgress(); const diff=diffHint(typed,target); fb.innerHTML='❌ Nicht ganz. Tipp: '+diff+(state.meta.hearts===0?'<br>💔 Keine Herzen mehr – kurze Pause?':''); }
+
+    function clozeMask(text, every){ const words=text.split(/(\s+)/); const masked = words.map((w,i)=>{ if(w.trim()==='') return w; const k=(i/2)|0; if(k>0 && k % every === 0){ return '<span style="opacity:.35; border-bottom:1px dashed #cbd7ff">_____</span>'; } return escapeHtml(w); }).join(''); return {masked}; }
+    function containsWordsInOrder(input, target, every){ const it=normalize(input).split(' ').filter(Boolean); const tt=normalize(target).split(' ').filter(Boolean); let j=0; for(let i=0;i<tt.length;i++){ if((i+1)%every===0){ if(j>=it.length || it[j]!==tt[i]) return false; j++; } } return true; }
+    function firstLetters(text){ return text.split(/(\s+)/).map(t=> t.trim()? t[0].toUpperCase()+'·' : t).join(''); }
 
     // Keyboard shortcuts
-    window.addEventListener('keydown', (e)=>{
-      if(e.key==='ArrowRight'){ e.preventDefault(); document.getElementById('nextBtn')?.click(); }
-      if(e.key===' '){ const b=document.getElementById('revealBtn'); if(b){ e.preventDefault(); b.click(); } }
-    });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'){ e.preventDefault(); document.getElementById('nextBtn')?.click(); document.getElementById('songNextBtn')?.click(); } if(e.key===' '){ const b=document.getElementById('revealBtn')||document.getElementById('songRevealBtn'); if(b){ e.preventDefault(); b.click(); } } });
 
-    /* ------------------------------- Editor -------------------------------- */
-    function openEditor(){ editor.style.display='flex'; renderEditor(); }
-    function closeEditor(){ editor.style.display='none'; }
-    function renderEditor(){
-      const rows = [];
-      state.scenes.forEach(s=>{
-        s.lines.forEach((l, idx)=>{
-          rows.push({scene:s, line:l, idx});
-        });
-      });
-      editorTable.innerHTML = rows.map((r,i)=>{
-        return `<tr data-sid="${r.scene.id}" data-idx="${r.idx}">
-          <td contenteditable="true" class="cell-scene">${escapeHtml(r.scene.id)}</td>
-          <td contenteditable="true" class="cell-speaker">${escapeHtml(r.line.speaker||'')}</td>
-          <td contenteditable="true" class="cell-text">${escapeHtml(r.line.text||'')}</td>
-          <td>
-            <select class="cell-status">
-              <option value="keep" ${r.line.status==='keep'?'selected':''}>behalten</option>
-              <option value="optional" ${r.line.status==='optional'?'selected':''}>optional (gelb/orange)</option>
-              <option value="cut" ${r.line.status==='cut'?'selected':''}>gestrichen (grün)</option>
-            </select>
-          </td>
-          <td class="row-actions"><button class="ghost small" onclick="deleteRow(${i})">Löschen</button></td>
-        </tr>`;
-      }).join('');
+    /* ---------------------- Auto‑Load horrorladen_script.json -------------- */
+    async function loadFromUrl(url){
+      try{
+        const res = await fetch(url, {cache:'no-store'});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const json = await res.json();
+        if(json.roles) state.roles = json.roles; if(json.scenes) state.scenes = json.scenes; if(json.songs) state.songs = json.songs;
+        saveState(); refreshSelectors(); buildScriptList(); selectTab(state.prefs.tab||'trainer'); if((state.scenes?.length||0)>0) startPractice(); if((state.songs?.length||0)>0) startSong();
+      }catch(err){ alert('Konnte Script nicht laden: '+err.message+'\nURL: '+url); }
     }
-    window.deleteRow = function(rowIdx){
-      // map rowIdx back to scene+line
-      let counter=0;
-      for(const s of state.scenes){
-        for(let i=0;i<s.lines.length;i++){
-          if(counter===rowIdx){ s.lines.splice(i,1); saveState(); renderEditor(); buildScriptList(); return; }
-          counter++;
-        }
-      }
-    }
-    addLineBtn.addEventListener('click', ()=>{
-      const s = currentScene();
-      s.lines.push({speaker:'SPRECHER', text:'Neue Zeile', status:'keep'});
-      saveState(); renderEditor(); buildScriptList();
-    });
-    saveEditorBtn.addEventListener('click', ()=>{
-      const trs = Array.from(editorTable.querySelectorAll('tr'));
-      // Rebuild scenes from rows
-      const byScene = new Map();
-      trs.forEach(tr=>{
-        const sid = tr.querySelector('.cell-scene').innerText.trim() || '1';
-        const spk = tr.querySelector('.cell-speaker').innerText.trim();
-        const txt = tr.querySelector('.cell-text').innerText.trim();
-        const st  = tr.querySelector('.cell-status').value;
-        if(!byScene.has(sid)) byScene.set(sid, { id: sid, name: `${sid}. Szene`, lines: [] });
-        byScene.get(sid).lines.push({speaker: spk, text: txt, status: st});
-      });
-      // Keep names if existed
-      state.scenes = Array.from(byScene.values()).map(s=>{
-        const old = state.scenes.find(x=>x.id===s.id);
-        return { id:s.id, name: old?.name || `${s.id}. Szene`, lines: s.lines };
-      });
-      saveState(); closeEditor(); buildScriptList(); startPracticeAt(0);
-    });
-
-    batchParseBtn.addEventListener('click', ()=>{
-      const lines = batchInput.value.split(/\n+/).map(l=>l.trim()).filter(Boolean);
-      for(const row of lines){
-        // 1|MUSHNIK: Text optional
-        const m = row.match(/^(.*?)\|(.*?):\s*(.*?)(?:\s+(optional|cut))?$/i);
-        if(!m) continue;
-        const sid = (m[1]||'1').trim();
-        const spk = (m[2]||'').trim();
-        const txt = (m[3]||'').trim();
-        const st  = (m[4]||'keep').toLowerCase();
-        let scene = state.scenes.find(s=>s.id===sid);
-        if(!scene){ scene = {id:sid, name:`${sid}. Szene`, lines:[]}; state.scenes.push(scene); }
-        scene.lines.push({speaker:spk, text:txt, status:st});
-      }
-      saveState(); renderEditor(); buildScriptList();
-    });
-
-    openEditorBtn.addEventListener('click', openEditor);
-    closeEditorBtn.addEventListener('click', closeEditor);
-
-    // Export / Import
-    exportBtn.addEventListener('click', ()=>{
-      const data = {title: state.title, roles: state.roles, scenes: state.scenes};
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'horrorladen_script.json'; a.click();
-      URL.revokeObjectURL(a.href);
-    });
-    importFile.addEventListener('change', (e)=>{
-      const file = e.target.files?.[0]; if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try{
-          const json = JSON.parse(reader.result);
-          if(json.roles) state.roles = json.roles;
-          if(json.scenes) state.scenes = json.scenes;
-          saveState(); refreshSelectors(); buildScriptList(); startPractice();
-        }catch(err){ alert('Ungültige JSON-Datei'); }
-      };
-      reader.readAsText(file);
-    });
-
-   // Automatisches Laden der Script-Daten
-async function loadFromUrl(url) {
-  try {
-    const res = await fetch(url, {cache: 'no-store'});
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-
-    if (json.roles) state.roles = json.roles;
-    if (json.scenes) state.scenes = json.scenes;
-    if (json.songs) state.songs = json.songs;
-
-    saveState();
-    refreshSelectors();
-    buildScriptList();
-    startPractice();
-  } catch (err) {
-    alert('Konnte Script nicht laden: ' + err.message + '\nURL: ' + url);
-  }
-}
-
-// Prüfe, ob ?data= oder #data= in der URL steht, sonst Fallback auf Repo-Datei
-function detectDataUrl() {
-  const qs = new URLSearchParams(location.search);
-  const hs = new URLSearchParams(location.hash.replace(/^#/, ''));
-  return (
-    qs.get('data') ||
-    hs.get('data') ||
-    'horrorladen_script.json'   // Standard-Datei im Repo
-  );
-}
-
-// Lade beim Start automatisch
-window.addEventListener('DOMContentLoaded', () => {
-  const url = detectDataUrl();
-  loadFromUrl(url);
-});
-
-    // Selector change wiring
-    roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveState(); startPractice(); });
-    sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = sceneSel.value; saveState(); buildScriptList(); startPractice(); });
-    modeSel.addEventListener('change', ()=>{ state.prefs.mode = modeSel.value; saveState(); renderPractice(); });
-    contextSel.addEventListener('change', ()=>{ state.prefs.context = Number(contextSel.value); saveState(); renderPractice(); });
-    hideCuts.addEventListener('change', ()=>{ state.prefs.hidCuts = hideCuts.checked; saveState(); buildScriptList(); startPracticeAt(practiceIdx); });
-    includeOptional.addEventListener('change', ()=>{ state.prefs.includeOptional = includeOptional.checked; saveState(); buildScriptList(); startPracticeAt(practiceIdx); });
-    quizPartner.addEventListener('change', ()=>{ state.prefs.quizPartner = quizPartner.checked; saveState(); renderPractice(); });
-    ttsOther.addEventListener('change', ()=>{ state.prefs.ttsOther = ttsOther.checked; saveState(); });
-    autoAdvance.addEventListener('change', ()=>{ state.prefs.autoAdvance = autoAdvance.checked; saveState(); });
-
-    // Init
-    refreshSelectors(); buildScriptList();
-    const autoUrl = detectDataUrl(); if(autoUrl){ loadFromUrl(autoUrl); } else { startPractice(); }
+    function detectDataUrl(){ const qs=new URLSearchParams(location.search); const hs=new URLSearchParams(location.hash.replace(/^#/,'')); return qs.get('data') || hs.get('data') || 'horrorladen_script.json'; }
+    window.addEventListener('DOMContentLoaded', ()=>{ const url = detectDataUrl(); loadFromUrl(url); });
   </script>
 </body>
 </html>
