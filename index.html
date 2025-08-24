@@ -392,12 +392,27 @@ function detectDataUrl(){
   return qs.get('data') || 'horrorladen_script.json';
 }
 async function initLoad(){
+  const url = detectDataUrl() || 'horrorladen_script.json';
   try{
-    const url = detectDataUrl();
-    await loadData(url);
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
+    const j = await res.json();
+    if(!Array.isArray(j.roles) || !Array.isArray(j.scenes) || !Array.isArray(j.songs)){
+      throw new Error('JSON-Struktur unvollständig (roles/scenes/songs)');
+    }
+    state.data.roles  = j.roles;
+    state.data.scenes = (j.scenes||[]).filter(s=>Array.isArray(s.lines));
+    state.data.songs  = (j.songs||[]).filter(s=>Array.isArray(s.lines));
+    if(!state.prefs.role && state.data.roles[0]) state.prefs.role = state.data.roles[0];
+    if(!state.prefs.songRole && state.data.roles[0]) state.prefs.songRole = state.data.roles[0];
+    if(!state.prefs.sceneId && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
+    if(!state.prefs.songId && state.data.songs[0]) state.prefs.songId = state.data.songs[0].id;
+    saveSilently();
+    populateTextSetup(); populateSongSetup(); buildBrowser(); buildEditor();
+    toastOK('Script geladen: '+url);
   }catch(e){
-    console.error('Daten laden fehlgeschlagen:', e);
-    alert('Konnte Script nicht laden: '+e.message);
+    showLoadError('Konnte Script nicht laden: '+e.message+'\nURL: '+url);
+    console.error('[auto-load]', e);
   }
 }
 
@@ -863,6 +878,16 @@ function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return
 function firstNCharsHint(target, typed){ const T=normalize(target), U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
 const toast = document.getElementById('toast'); let toastTimer=null;
 function showToast(txt){ toast.textContent=txt; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'), 850); }
+function showLoadError(msg){
+  const box = document.getElementById('edList') || document.body;
+  const div = document.createElement('div');
+  div.style.cssText='padding:12px;border:1px solid #f55;border-radius:10px;background:#2a1010;color:#ffdede;margin:8px 0;white-space:pre-wrap';
+  div.textContent = msg;
+  box.prepend(div);
+  alert(msg);
+}
+function toastOK(t){ showToast(t||'Geladen'); }
+
 
 /* ---------------------- Data URL UI --------------------------- */
 document.getElementById('setDataUrl').addEventListener('click', ()=>{
