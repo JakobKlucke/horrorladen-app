@@ -752,6 +752,102 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 
+/* ---------- Canon-Rollen + Varianten-Mapping ---------- */
+const CANON_ROLES = [
+  "SEYMOUR","AUDREY","MR. MUSHNIK","ORIN","PFLANZE","STIMME",
+  "CRYSTAL","RONETTE","CHIFFON","SOULGIRLS",
+  "PENNER 1","PENNER 2","KUNDE","PATIENT",
+  "MRS. LUCE","MRS. BERNSTEIN","MR. MARTIN","ALLE"
+];
+
+// Schreibweisen-/Synonym-Varianten -> Canon
+const ROLE_VARIANTS = new Map([
+  ["SEYMOUR","SEYMOUR"],
+  ["AUDREY","AUDREY"],
+  ["MR. MUSHNIK","MR. MUSHNIK"],["MR MUSHNIK","MR. MUSHNIK"],["MUSHNIK","MR. MUSHNIK"],
+  ["ORIN","ORIN"],
+  ["DIE PFLANZE","PFLANZE"],["PFLANZE","PFLANZE"],["AUDREY II","PFLANZE"],["AUDREY 2","PFLANZE"],
+  ["STIMME","STIMME"],["STIMME DER PFLANZE","STIMME"],
+  ["CRYSTAL","CRYSTAL"],["RONETTE","RONETTE"],["CHIFFON","CHIFFON"],
+  ["SOULGIRLS","SOULGIRLS"],["GIRLS","SOULGIRLS"],["DREAMGIRLS","SOULGIRLS"],
+  ["PENNER 1","PENNER 1"],["PENNER1","PENNER 1"],["PENNER","PENNER 1"],
+  ["PENNER 2","PENNER 2"],["PENNER2","PENNER 2"],
+  ["KUNDE","KUNDE"],["PATIENT","PATIENT"],
+  ["MRS. LUCE","MRS. LUCE"],["MRS LUCE","MRS. LUCE"],
+  ["MRS. BERNSTEIN","MRS. BERNSTEIN"],["MRS BERNSTEIN","MRS. BERNSTEIN"],
+  ["MR. MARTIN","MR. MARTIN"],["MR MARTIN","MR. MARTIN"],
+  ["ALLE","ALLE"],["ENSEMBLE","ALLE"]
+]);
+
+function normRoleName(raw){
+  const k = String(raw||"").replace(/\./g,'').replace(/\s+/g,' ').trim().toUpperCase();
+  // Versuch exakte Variantenzuordnung
+  for(const [v,canon] of ROLE_VARIANTS){
+    const vv = v.replace(/\./g,'').toUpperCase();
+    if(k===vv) return canon;
+  }
+  // sonst, wenn es exakt im Kanon steht (z. B. "MR. MUSHNIK"):
+  if (CANON_ROLES.includes(String(raw||"").toUpperCase())) return String(raw||"").toUpperCase();
+  return String(raw||"").toUpperCase();
+}
+
+function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+// Prüft, ob Text mit einem Rollenlabel startet und gibt {speaker,text} zurück
+function extractPrefixedSpeaker(text){
+  const t = String(text||'').trim();
+  if(!t) return null;
+  // längere Varianten zuerst (MR. MUSHNIK vor MUSHNIK)
+  const variants = Array.from(ROLE_VARIANTS.keys()).sort((a,b)=> b.length - a.length);
+  for(const v of variants){
+    const re = new RegExp('^'+escapeReg(v)+'\\b\\s*(?:[:\\-–—])?\\s*(.*)$','i');
+    const m = t.match(re);
+    if(m){
+      const canon = ROLE_VARIANTS.get(v) || normRoleName(v);
+      const rest  = (m[1]||'').trim();
+      return {speaker: canon, text: rest, labelOnly: rest.length===0};
+    }
+  }
+  return null;
+}
+
+// Repariert Sprecher in einem Lines-Array
+function fixLines(lines){
+  const out = [];
+  let carrySpeaker = null; // wenn vorher Zeile nur "SPEAKER" stand
+  for(const L of (lines||[])){
+    let sp   = String(L.speaker||'').trim();
+    let text = String(L.text||'');
+    const status = L.status || 'keep';
+
+    // 1) Wenn "ALLE"/leer und Text beginnt mit Rollenlabel -> splitten
+    if(!sp || sp.toUpperCase()==='ALLE'){
+      const ex = extractPrefixedSpeaker(text);
+      if(ex){
+        if(ex.labelOnly){
+          // reine Sprecherzeile (z. B. Zeilenumbruch danach): nur Speaker merken
+          carrySpeaker = ex.speaker;
+          continue; // nichts pushen
+        }else{
+          sp   = ex.speaker;
+          text = ex.text;
+        }
+      }else if(carrySpeaker){ // 2) Vorheriges Label wirkt fort
+        sp = carrySpeaker;
+      }
+    }
+
+    // 3) existierenden Speaker normalisieren
+    sp = normRoleName(sp);
+
+    // 4) Carry fortschreiben (wenn echter Sprecher)
+    if(sp && sp.toUpperCase()!=='ALLE') carrySpeaker = sp;
+
+    out.push({speaker: sp || 'ALLE', text, status});
+  }
+  return out;
+}
+
 /* ---------------------- Utils -------------------------------- */
 function heartsSvg(n){
   let html=''; for(let i=0;i<3;i++){
