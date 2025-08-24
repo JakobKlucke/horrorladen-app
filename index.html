@@ -135,6 +135,7 @@ label{font-size:.85rem;color:var(--muted)}
       <div class="sep"></div>
       <label class="row" style="gap:8px"><input type="checkbox" id="hideCuts" checked> <span>grüne Striche (cut) ausblenden</span></label>
       <label class="row" style="gap:8px"><input type="checkbox" id="includeOpt" checked> <span>optionale (gelb/orange) einbeziehen</span></label>
+      <label class="row" style="gap:8px"><input type="checkbox" id="onlyMyScenes" checked><span>nur Szenen mit Text für meine Rolle</span></label>
     </div>
     <div class="card">
       <h2>3) Modus</h2>
@@ -308,9 +309,10 @@ function loadState(){
       meta:{hearts:3, xp:0},
       prefs:{
         role:'', includeAlle:true, sceneId:'', hideCuts:true, includeOpt:true,
-        mode:'flash', // flash | context | type
-        songRole:'', songId:'', songIncludeAlle:true
-      },
+        mode:'flash',
+        songRole:'', songId:'', songIncludeAlle:true,
+        onlyMyScenes: true      // <— NEU
+},
       data:{ roles:[], scenes:[], songs:[] },
       ui:{ page:'home' }
     };
@@ -439,18 +441,29 @@ function populateTextSetup(){
     .map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`)
     .join('');
 
-  // **Nur Dialog-Szenen** (Songs raus) + sortieren + nummerieren
-  const scenesDialog = sortScenes(
+  // Basis: nur Dialog-Szenen (Songs raus)
+  const allDialog = sortScenes(
     (state.data.scenes||[]).filter(s => (s.type||'dialogue').toLowerCase() !== 'song')
   );
 
-  // Falls der gespeicherte sceneId auf eine Song-Szene zeigte → erste Dialogszene wählen
-  if (!scenesDialog.find(s => s.id === state.prefs.sceneId) && scenesDialog[0]) {
-    state.prefs.sceneId = scenesDialog[0].id;
+  // Optional filtern: nur Szenen, in denen meine Rolle Text hat
+  const role = state.prefs.role || roleSel.value;
+  const useFilter = !!state.prefs.onlyMyScenes;
+  const scenesDialog = useFilter
+    ? allDialog.filter(s => sceneHasRole(s, role, state.prefs.includeAlle))
+    : allDialog;
+
+  // Fallback: wenn Filter leer liefert, nimm alle Dialoge
+  const list = scenesDialog.length ? scenesDialog : allDialog;
+
+  // Aktuellen sceneId sichern/ersetzen
+  if (!list.find(s => s.id === state.prefs.sceneId) && list[0]) {
+    state.prefs.sceneId = list[0].id;
     saveSilently();
   }
 
-  sceneSel.innerHTML = scenesDialog
+  // Dropdown befüllen (nummeriert)
+  sceneSel.innerHTML = list
     .map((s, i)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${i+1}. ${s.name}</option>`)
     .join('');
 
@@ -458,13 +471,26 @@ function populateTextSetup(){
   includeAlle.checked = !!state.prefs.includeAlle;
   hideCuts.checked    = !!state.prefs.hideCuts;
   includeOpt.checked  = !!state.prefs.includeOpt;
+
+  // Neuer Schalter
+  const onlyBox = document.getElementById('onlyMyScenes');
+  if(onlyBox){
+    onlyBox.checked = !!state.prefs.onlyMyScenes;
+  }
 }
+
 
 roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); });
 sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = sceneSel.value; saveSilently(); });
 includeAlle.addEventListener('change', ()=>{ state.prefs.includeAlle = includeAlle.checked; saveSilently(); });
 hideCuts.addEventListener('change', ()=>{ state.prefs.hideCuts = hideCuts.checked; saveSilently(); });
 includeOpt.addEventListener('change', ()=>{ state.prefs.includeOpt = includeOpt.checked; saveSilently(); });
+// reagiert, wenn Rolle/Alle-Schalter/Only-My-Scenes geändert wird
+roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); populateTextSetup(); });
+includeAlle.addEventListener('change', ()=>{ state.prefs.includeAlle = includeAlle.checked; saveSilently(); populateTextSetup(); });
+document.getElementById('onlyMyScenes')?.addEventListener('change', (e)=>{
+  state.prefs.onlyMyScenes = e.target.checked; saveSilently(); populateTextSetup();
+});
 
 /* ---------------------- UI: Song Setup ----------------------- */
 const goSongSetup = document.getElementById('goSongSetup');
@@ -941,6 +967,35 @@ function showLoadError(msg){
   alert(msg);
 }
 function toastOK(t){ showToast(t||'Geladen'); }
+
+  function parseSceneId(id){
+  // akzeptiert "1.1", "2.10", "2", auch "01.02"
+  const m = String(id||'').trim().match(/^(\d+)(?:\.(\d+))?$/);
+  if(!m) return {act: 9999, num: 9999};           // unsortierbar -> ans Ende
+  return {act: Number(m[1]||0), num: Number(m[2]||0)};
+}
+
+function sortScenes(list){
+  return (list||[]).slice().sort((a,b)=>{
+    // 1) explizite order bevorzugen
+    if(typeof a.order==='number' && typeof b.order==='number') return a.order-b.order;
+    if(typeof a.order==='number') return -1;
+    if(typeof b.order==='number') return 1;
+    // 2) natürliche Sortierung nach ID (Akt/Nummer)
+    const A=parseSceneId(a.id), B=parseSceneId(b.id);
+    if(A.act!==B.act) return A.act - B.act;
+    if(A.num!==B.num) return A.num - B.num;
+    // 3) Fallback: natürlicher Name
+    return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true, sensitivity:'base'});
+  });
+}
+
+function sceneHasRole(scene, role, includeAlle){
+  if(!role) return true;
+  return (scene?.lines||[]).some(l =>
+    l.speaker===role || (includeAlle && l.speaker==='ALLE')
+  );
+}
 
 
 /* ---------------------- Data URL UI --------------------------- */
