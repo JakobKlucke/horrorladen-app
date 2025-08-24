@@ -400,46 +400,23 @@ async function initLoad(){
     const res = await fetch(url, {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
     const j = await res.json();
-    if(!Array.isArray(j.roles) || !Array.isArray(j.scenes) || !Array.isArray(j.songs)){
-      throw new Error('JSON-Struktur unvollständig (roles/scenes/songs)');
-    }
-    state.data.roles  = j.roles || [];
-    // Rohdaten aus JSON
-const allScenesRaw = Array.isArray(j.scenes) ? j.scenes.filter(s=>Array.isArray(s.lines)) : [];
-const songsRaw     = Array.isArray(j.songs)  ? j.songs.filter(s=>Array.isArray(s.lines))  : [];
 
-// Alles, was als Scene "song" ist ODER mit "Lied" im Namen startet, gilt als Song-Szene
-const songScenes = allScenesRaw.filter(s =>
-  (String(s.type||'').toLowerCase()==='song') || /^lied\b/i.test(String(s.name||''))
-);
-
-// Die übrigen sind echte Dialog-Szenen
-const dialogScenes = allScenesRaw.filter(s =>
-  (String(s.type||'').toLowerCase()!=='song') && !/^lied\b/i.test(String(s.name||''))
-);
-
-// Songs zusammenführen (aus songs[] + aus scenes[])
-const songsMerged = [
-  ...songsRaw,
-  ...songScenes.map(s => ({ id: s.id || ('song-'+(s.name||'')), title: s.title || s.name, status: s.status || 'keep', lines: s.lines }))
-];
+// **NEU**: normalisieren – Songs sauber trennen
+const norm = normalizeScript(j);
 
 // In den State schreiben
-state.data.roles  = j.roles || [];
-state.data.scenes = dialogScenes;   // nur Dialoge
-state.data.songs  = songsMerged;    // alle Songs
+state.data.roles  = norm.roles;
+state.data.scenes = norm.scenes;  // nur Dialog-Szenen
+state.data.songs  = norm.songs;   // alle Songs
 
-    if(!state.prefs.role && state.data.roles[0]) state.prefs.role = state.data.roles[0];
-    if(!state.prefs.songRole && state.data.roles[0]) state.prefs.songRole = state.data.roles[0];
-    if(!state.prefs.sceneId && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
-    if(!state.prefs.songId && state.data.songs[0]) state.prefs.songId = state.data.songs[0].id;
-    saveSilently();
-    populateTextSetup(); populateSongSetup(); buildBrowser(); buildEditor();
-    toastOK('Script geladen: '+url);
-  }catch(e){
-    showLoadError('Konnte Script nicht laden: '+e.message+'\nURL: '+url);
-    console.error('[auto-load]', e);
-  }
+// Defaults setzen wie bisher
+if(!state.prefs.role      && state.data.roles[0])  state.prefs.role    = state.data.roles[0];
+if(!state.prefs.songRole  && state.data.roles[0])  state.prefs.songRole= state.data.roles[0];
+if(!state.prefs.sceneId   && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
+if(!state.prefs.songId    && state.data.songs[0])  state.prefs.songId  = state.data.songs[0].id;
+
+saveSilently();
+populateTextSetup(); populateSongSetup(); buildBrowser(); buildEditor();
 }
 
 /* ---------------------- UI: Text Setup ----------------------- */
@@ -1010,6 +987,70 @@ function sceneHasRole(scene, role, includeAlle){
   return (scene?.lines||[]).some(l =>
     l.speaker===role || (includeAlle && l.speaker==='ALLE')
   );
+}
+
+function normalizeScript(j){
+  const roles = j.roles || [];
+  const scenesRaw = Array.isArray(j.scenes) ? j.scenes.filter(s => Array.isArray(s.lines)) : [];
+  const songsRaw  = Array.isArray(j.songs)  ? j.songs.filter(s => Array.isArray(s.lines))  : [];
+
+  const isSongByType = s => String(s.type||'').toLowerCase()==='song';
+  const isSongByName = s => /^(\d+\.\s*)?lied\b/i.test(String(s.name||''));
+  const cleanTitle = name => String(name||'')
+      .replace(/^(\d+\.\s*)?/,'')     // führende Nummerierung "12. "
+      .replace(/^lied[: ]*/i,'')      // "Lied:" entfernen
+      .replace(/^["„]|["“]$/g,'')     // Anführungen außen
+      .trim();
+
+  const dialogScenes = [];
+  const songsMerged = [];
+
+  // 1) Alle scenes sauber aufteilen
+  for(const s of scenesRaw){
+    if(isSongByType(s) || isSongByName(s)){
+      songsMerged.push({
+        id: s.id || ('song-' + (s.name||'').replace(/\s+/g,'-')),
+        title: s.title || cleanTitle(s.name),
+        status: s.status || 'keep',
+        lines: s.lines
+      });
+    } else {
+      dialogScenes.push({ ...s, type:'dialogue' });
+    }
+  }
+
+  // 2) songs[] dazunehmen, doppelte per Titel zusammenfassen
+  const byTitle = new Map();
+  const addSong = (sg) => {
+    const key = (sg.title || sg.name || sg.id || '').toLowerCase();
+    if(!key) return;
+    if(!byTitle.has(key)) byTitle.set(key, { id: sg.id || ('song-'+key), title: sg.title || sg.name || sg.id, status: sg.status || 'keep', lines: [] });
+    byTitle.get(key).lines.push(...(sg.lines||[]));
+  };
+  songsRaw.forEach(addSong);
+  songsMerged.forEach(addSong);
+
+  // 3) Sonderfall ESSENSZEIT: Mushniks Sprechtext im Dialog lassen
+  const essKey = 'essenszeit';
+  if(byTitle.has(essKey)){
+    const song = byTitle.get(essKey);
+    const keepInDialog = [];
+    const rest = [];
+    for(const l of (song.lines||[])){
+      const sp = String(l.speaker||'').toUpperCase().replace(/\./g,'');
+      if(sp==='MUSHNIK' || sp==='MR MUSHNIK' || sp==='MR MUSHNIK'){ keepInDialog.push(l); }
+      else { rest.push(l); }
+    }
+    song.lines = rest;
+    // hänge die Mushnik-Zeilen an die letzte Dialogszene vor ESSENSZEIT (falls vorhanden)
+    if(keepInDialog.length && dialogScenes.length){
+      dialogScenes[dialogScenes.length-1].lines.push(...keepInDialog);
+    }
+  }
+
+  // 4) Ergebnis
+  const songs = Array.from(byTitle.values());
+  return { roles, scenes: dialogScenes, songs };
 }
 
 
