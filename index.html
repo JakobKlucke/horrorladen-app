@@ -435,7 +435,10 @@ modeType.addEventListener('click', ()=>{ state.prefs.mode='type'; startSession()
 
 function populateTextSetup(){
   roleSel.innerHTML = state.data.roles.map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`).join('');
-  sceneSel.innerHTML = state.data.scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
+  const scenesSorted = sortScenes(state.data.scenes);
+sceneSel.innerHTML = scenesSorted
+  .map((s, i)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${i+1}. ${s.name}</option>`)
+  .join('');
   includeAlle.checked = !!state.prefs.includeAlle;
   hideCuts.checked = !!state.prefs.hideCuts;
   includeOpt.checked = !!state.prefs.includeOpt;
@@ -474,13 +477,21 @@ goBrowser.addEventListener('click', ()=> show('browser'));
 
 function buildBrowser(){
   sceneList.innerHTML = '';
-  state.data.scenes.forEach(s=>{
-    const div = document.createElement('div');
-    div.className='item';
-    div.innerHTML = `<div class="row" style="justify-content:space-between"><b>${s.name}</b><span class="small">${s.lines.length} Zeilen</span></div>`;
-    div.addEventListener('click', ()=>{ state.prefs.sceneId = s.id; show('textSetup'); populateTextSetup(); });
-    sceneList.appendChild(div);
+const scenesSorted = sortScenes(state.data.scenes);
+scenesSorted.forEach((s, i)=>{
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML = `<div class="row" style="justify-content:space-between">
+      <b>${i+1}. ${s.name}</b>
+      <span class="small">${(s.lines||[]).length} Zeilen</span>
+    </div>`;
+  div.addEventListener('click', ()=>{
+    state.prefs.sceneId = s.id;
+    show('textSetup'); 
+    populateTextSetup();
   });
+  sceneList.appendChild(div);
+});
   songList.innerHTML = '';
   state.data.songs.forEach(s=>{
     const div = document.createElement('div');
@@ -873,6 +884,32 @@ function heartsSvg(n){
   return html;
 }
 function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function parseSceneId(id){
+  // akzeptiert "1.1", "1.10", "2.3", "01.02", "1", "2"
+  const m = String(id||'').match(/^(\d+)(?:\.(\d+))?$/);
+  if(!m) return {act: 9999, num: 9999};
+  return {act: Number(m[1]||0), num: Number(m[2]||0)};
+}
+
+function sortScenes(list){
+  // Bevorzugt vorhandenes "order", sonst natürliche Sortierung nach id
+  return (list||[]).slice().sort((a,b)=>{
+    const ao = (typeof a.order==='number') ? a.order : null;
+    const bo = (typeof b.order==='number') ? b.order : null;
+    if(ao!=null && bo!=null) return ao - bo;
+    if(ao!=null) return -1;
+    if(bo!=null) return 1;
+
+    const A = parseSceneId(a.id);
+    const B = parseSceneId(b.id);
+    if(A.act!==B.act) return A.act - B.act;
+    if(A.num!==B.num) return A.num - B.num;
+
+    // fallback: Name natürlich sortieren
+    return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true,sensitivity:'base'});
+  });
+}
+
 function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
 function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
 function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); return (1 - d/Math.max(1,maxLen)) >= .88; }
