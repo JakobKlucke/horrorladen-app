@@ -231,17 +231,48 @@ label{font-size:.85rem;color:var(--muted)}
     </div>
   </section>
 
-  <!-- PAGE: BROWSER -->
-  <section id="page-browser" class="hidden grid grid-2">
+    <!-- PAGE: EDITOR -->
+  <section id="page-editor" class="hidden grid grid-2">
     <div class="card">
-      <h2>Szenen</h2>
-      <div id="sceneList" class="list"></div>
+      <h2>Editor</h2>
+      <div class="grid">
+        <div>
+          <label>Ansicht</label>
+          <select id="edView">
+            <option value="dialogue">Dialog-Szenen</option>
+            <option value="songs">Songs</option>
+          </select>
+        </div>
+        <div id="edSceneWrap">
+          <label>Szene</label>
+          <select id="edSceneSel"></select>
+        </div>
+        <div id="edSongWrap" class="hidden">
+          <label>Song</label>
+          <select id="edSongSel"></select>
+        </div>
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          <button class="btn ghost" id="edSelectAll">Alle markieren</button>
+          <button class="btn ghost" id="edClearSel">Markierung löschen</button>
+          <span class="small">Markierte Zeilen → Status setzen:</span>
+          <button class="btn secondary" id="edSetKeep">keep</button>
+          <button class="btn secondary" id="edSetOptional">optional</button>
+          <button class="btn secondary" id="edSetCut">cut</button>
+        </div>
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          <button class="btn" id="edExportJson">Export JSON</button>
+          <button class="btn ghost" id="edSaveLocal">Speichern (Local)</button>
+          <button class="btn ghost" id="edReload">Neu laden</button>
+        </div>
+      </div>
     </div>
     <div class="card">
-      <h2>Songs</h2>
-      <div id="songList" class="list"></div>
+      <h2 id="edTitle">Zeilen</h2>
+      <div class="small">Tipp: Mehrfachauswahl am Desktop mit <span class="kbd">Shift</span>/<span class="kbd">Ctrl</span>. Auf dem Handy Zeilen einfach nacheinander antippen.</div>
+      <div id="edList" class="list" style="margin-top:8px"></div>
     </div>
   </section>
+
 
 </main>
 
@@ -250,6 +281,7 @@ label{font-size:.85rem;color:var(--muted)}
   <button class="tabbtn active" data-tab="home">🏠 <span>Home</span></button>
   <button class="tabbtn" data-tab="text">🗣️ <span>Text</span></button>
   <button class="tabbtn" data-tab="songs">🎵 <span>Songs</span></button>
+  <button class="tabbtn" data-tab="editor">✏️ <span>Editor</span></button>
 </nav>
 
 <div id="toast" class="toast">Gespeichert</div>
@@ -286,7 +318,8 @@ const pages = {
   textSess: document.getElementById('page-text-session'),
   songSetup:document.getElementById('page-song-setup'),
   songSess: document.getElementById('page-song-session'),
-  browser:  document.getElementById('page-browser')
+  browser:  document.getElementById('page-browser'),
+  editor:   document.getElementById('page-editor')
 };
 const tabbtns = Array.from(document.querySelectorAll('.tabbtn'));
 function show(page){
@@ -300,16 +333,22 @@ function show(page){
     songSetup:'Songs lernen',
     songSess:'Song',
     browser:'Skript-Browser'
+    editor:'Editor'
   })[page] || 'Horrorladen';
   tabbtns.forEach(b=> b.classList.toggle('active',
     (page==='home' && b.dataset.tab==='home') ||
     ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
-    ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs')));
+    ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs')
+    ((page==='editor') && b.dataset.tab==='editor')));
 }
 function saveSilently(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 backBtn.addEventListener('click', ()=>{ if(state.ui.page==='textSess') show('textSetup'); else if(state.ui.page==='songSess') show('songSetup'); else show('home'); });
 tabbtns.forEach(b=> b.addEventListener('click', ()=>{
-  const t=b.dataset.tab; if(t==='home') show('home'); if(t==='text'){ show('textSetup'); } if(t==='songs'){ show('songSetup'); }
+  const t=b.dataset.tab;
+  if(t==='home')  show('home');
+  if(t==='text')  show('textSetup');
+  if(t==='songs') show('songSetup');
+  if(t==='editor'){ buildEditor(); show('editor'); }
 }));
 
 /* ---------------------- Data Loading ------------------------- */
@@ -557,6 +596,124 @@ function showSong(){
 }
 songRevealAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.remove('hidden')); });
 songHideAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.add('hidden')); });
+
+/* ---------------------- Editor ------------------------------- */
+const edView = document.getElementById('edView');
+const edSceneWrap = document.getElementById('edSceneWrap');
+const edSongWrap  = document.getElementById('edSongWrap');
+const edSceneSel  = document.getElementById('edSceneSel');
+const edSongSel   = document.getElementById('edSongSel');
+const edList      = document.getElementById('edList');
+const edTitle     = document.getElementById('edTitle');
+const edSelectAll = document.getElementById('edSelectAll');
+const edClearSel  = document.getElementById('edClearSel');
+const edSetKeep   = document.getElementById('edSetKeep');
+const edSetOptional = document.getElementById('edSetOptional');
+const edSetCut    = document.getElementById('edSetCut');
+const edExportJson= document.getElementById('edExportJson');
+const edSaveLocal = document.getElementById('edSaveLocal');
+const edReload    = document.getElementById('edReload');
+
+let edSelection = new Set(); // indices of selected lines in current view
+
+function buildEditor(){
+  // populate selectors
+  edSceneSel.innerHTML = state.data.scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
+  edSongSel.innerHTML  = state.data.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title||s.name||s.id}</option>`).join('');
+  // view
+  edView.value = (state.ui.editorView || 'dialogue');
+  edSceneWrap.classList.toggle('hidden', edView.value!=='dialogue');
+  edSongWrap.classList.toggle('hidden', edView.value!=='songs');
+  renderEdList();
+}
+
+function currentEdLines(){
+  if(edView.value==='songs'){
+    const s = state.data.songs.find(x=>x.id===edSongSel.value);
+    return {kind:'song', obj:s, lines:(s?.lines||[])};
+  }else{
+    const s = state.data.scenes.find(x=>x.id===edSceneSel.value);
+    return {kind:'scene', obj:s, lines:(s?.lines||[])};
+  }
+}
+
+function renderEdList(){
+  edSelection.clear();
+  const {kind, obj, lines} = currentEdLines();
+  edTitle.textContent = (kind==='song' ? `🎵 ${obj?.title||obj?.name||obj?.id}` : (obj?.name||'Szene'));
+  edList.innerHTML = '';
+  lines.forEach((l,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.idx = String(idx);
+    item.innerHTML = `
+      <div class="row" style="justify-content:space-between;gap:8px">
+        <div><b>${l.speaker||'—'}</b> <span class="small">[${l.status||'keep'}]</span></div>
+        <div class="row" style="gap:6px">
+          <select class="edStatus">
+            <option value="keep" ${l.status==='keep'?'selected':''}>keep</option>
+            <option value="optional" ${l.status==='optional'?'selected':''}>optional</option>
+            <option value="cut" ${l.status==='cut'?'selected':''}>cut</option>
+          </select>
+          <button class="btn ghost edSelBtn">Markieren</button>
+        </div>
+      </div>
+      <div class="line" style="margin-top:6px">${escapeHtml(l.text||'')}</div>
+    `;
+    // events
+    item.querySelector('.edSelBtn').addEventListener('click', ()=>{
+      if(edSelection.has(idx)){ edSelection.delete(idx); item.style.outline=''; }
+      else { edSelection.add(idx); item.style.outline='2px solid var(--brand)'; }
+    });
+    item.querySelector('.edStatus').addEventListener('change', (e)=>{
+      l.status = e.target.value;
+      saveSilently();
+      item.querySelector('.small').textContent = `[${l.status}]`;
+    });
+    edList.appendChild(item);
+  });
+}
+
+edView.addEventListener('change', ()=>{
+  state.ui.editorView = edView.value; saveSilently();
+  edSceneWrap.classList.toggle('hidden', edView.value!=='dialogue');
+  edSongWrap.classList.toggle('hidden', edView.value!=='songs');
+  renderEdList();
+});
+edSceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = edSceneSel.value; saveSilently(); renderEdList(); });
+edSongSel.addEventListener('change', ()=>{ state.prefs.songId = edSongSel.value; saveSilently(); renderEdList(); });
+
+edSelectAll.addEventListener('click', ()=>{
+  edSelection = new Set([...Array(currentEdLines().lines.length).keys()]);
+  edList.querySelectorAll('.item').forEach(el=> el.style.outline='2px solid var(--brand)');
+});
+edClearSel.addEventListener('click', ()=>{
+  edSelection.clear();
+  edList.querySelectorAll('.item').forEach(el=> el.style.outline='');
+});
+
+function bulkSetStatus(status){
+  const {lines} = currentEdLines();
+  edSelection.forEach(idx=>{
+    if(lines[idx]) lines[idx].status = status;
+  });
+  saveSilently();
+  renderEdList();
+}
+edSetKeep.addEventListener('click', ()=> bulkSetStatus('keep'));
+edSetOptional.addEventListener('click', ()=> bulkSetStatus('optional'));
+edSetCut.addEventListener('click', ()=> bulkSetStatus('cut'));
+
+edExportJson.addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify({title:state.data.title||'Horrorladen', roles:state.data.roles, scenes:state.data.scenes, songs:state.data.songs}, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'horrorladen_script_edited.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+edSaveLocal.addEventListener('click', ()=>{ save(); });
+edReload.addEventListener('click', ()=>{ location.reload(); });
+
 
 /* ---------------------- Gesten (Swipe) ------------------------ */
 let touchStartX=null,touchStartY=null;
