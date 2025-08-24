@@ -394,29 +394,40 @@ function detectDataUrl(){
   const qs = new URLSearchParams(location.search);
   return qs.get('data') || 'horrorladen_script.json';
 }
+
 async function initLoad(){
   const url = detectDataUrl() || 'horrorladen_script.json';
   try{
     const res = await fetch(url, {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
-    const j = await res.json();
+    const raw = await res.json();
 
-// **NEU**: normalisieren – Songs sauber trennen
-const norm = normalizeScript(j);
+    // normalisieren – Songs sauber trennen
+    const norm = normalizeScript(raw);
 
-// In den State schreiben
-state.data.roles  = norm.roles;
-state.data.scenes = norm.scenes;  // nur Dialog-Szenen
-state.data.songs  = norm.songs;   // alle Songs
+    // Sprecherfehler korrigieren (ALLE → echte Sprecher, Label-Zeilen etc.)
+    norm.scenes = (norm.scenes||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
+    norm.songs  = (norm.songs||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
 
-// Defaults setzen wie bisher
-if(!state.prefs.role      && state.data.roles[0])  state.prefs.role    = state.data.roles[0];
-if(!state.prefs.songRole  && state.data.roles[0])  state.prefs.songRole= state.data.roles[0];
-if(!state.prefs.sceneId   && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
-if(!state.prefs.songId    && state.data.songs[0])  state.prefs.songId  = state.data.songs[0].id;
+    // In den State schreiben
+    state.data.roles  = norm.roles || [];
+    state.data.scenes = norm.scenes || [];
+    state.data.songs  = norm.songs  || [];
 
-saveSilently();
-populateTextSetup(); populateSongSetup(); buildBrowser(); buildEditor();
+    // Defaults
+    if(!state.prefs.role      && state.data.roles[0])  state.prefs.role     = state.data.roles[0];
+    if(!state.prefs.songRole  && state.data.roles[0])  state.prefs.songRole = state.data.roles[0];
+    if(!state.prefs.sceneId   && state.data.scenes[0]) state.prefs.sceneId  = state.data.scenes[0].id;
+    if(!state.prefs.songId    && state.data.songs[0])  state.prefs.songId   = state.data.songs[0].id;
+
+    saveSilently();
+    populateTextSetup();
+    populateSongSetup();
+    buildBrowser();
+    buildEditor();
+  } catch(e){
+    showLoadError('Konnte Script nicht laden: '+e.message+'\nURL: '+url);
+  }
 }
 
 /* ---------------------- UI: Text Setup ----------------------- */
