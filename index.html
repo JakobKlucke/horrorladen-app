@@ -1,438 +1,616 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b0f17" />
-  <title>HorrorLaden Line Coach (Auto‑Load)</title>
-  <meta name="description" content="Duolingo-ähnlicher Trainer für 'Der kleine Horrorladen' – lädt automatisch horrorladen_script.json aus dem Repo. Mobile‑ready & share‑friendly." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{ --bg:#0b0f17; --panel:rgba(255,255,255,0.08); --panel-strong:rgba(255,255,255,0.14); --text:#eaf0ff; --muted:#a5b0c2; --brand:#7c9cff; --ok:#55e39f; --warn:#ffd166; --bad:#ff6b6b; --chip:rgba(255,255,255,0.12); --shadow:0 10px 30px rgba(0,0,0,0.35); --glass:blur(16px) saturate(120%); }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans';color:var(--text);
-      background: radial-gradient(1200px 600px at 10% -10%, #2a2c7a44, transparent), radial-gradient(900px 400px at 110% 0%, #7a2a7a44, transparent), radial-gradient(900px 500px at 50% 120%, #1b7a7a33, transparent), var(--bg);}
-    header{position:sticky;top:0;z-index:30;backdrop-filter:var(--glass);background:linear-gradient(180deg, rgba(12,14,20,0.9), rgba(12,14,20,0));border-bottom:1px solid rgba(255,255,255,0.08)}
-    .wrap{max-width:1100px;margin:0 auto;padding:14px 18px}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    h1{margin:0;font-size:1.2rem;letter-spacing:.3px}
-    .badge{font-size:.8rem;color:#cbd7ff;background:var(--chip);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.12)}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
-    .tab{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:8px 12px;border-radius:999px;cursor:pointer}
-    .tab.active{background:var(--brand);color:#091120}
-
-    main{max-width:1100px;margin:18px auto;padding:0 18px;display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
-    @media (max-width:900px){ main{grid-template-columns:1fr} }
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,0.12);border-radius:18px;box-shadow:var(--shadow);padding:16px;backdrop-filter:var(--glass)}
-    .title{display:flex;align-items:center;justify-content:space-between}
-    .title h2{margin:0;font-size:1.05rem}
-    .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
-    @media (max-width:800px){ .controls{grid-template-columns:repeat(2,minmax(0,1fr));} button{padding:12px 16px} .line{font-size:1.2rem} .cue{padding:14px} }
-    label{font-size:.8rem;color:var(--muted)}
-    select,input[type="text"],textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:var(--text)}
-    .toggle{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--chip);border:1px solid rgba(255,255,255,0.12);user-select:none}
-    .chip input{accent-color:var(--brand)}
-    .status-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
-    .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
-    .dot.keep{background:var(--ok)} .dot.optional{background:var(--warn)} .dot.cut{background:#66ff66}
-
-    .practice{display:flex;flex-direction:column;gap:12px}
-    .cue{font-size:.95rem;color:#d4defa;background:var(--panel-strong);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12)}
-    .cue .speaker{font-weight:700;text-transform:uppercase;font-size:.8rem;color:#9db1ff}
-    .line{font-size:1.12rem;line-height:1.6}
-    .muted{color:var(--muted)}
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    button{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;color:#0b0f17;background:var(--brand);box-shadow:0 6px 14px rgba(124,156,255,0.3)}
-    button.secondary{background:#a9b8ff;color:#051428} button.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.18)}
-    .progress{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed rgba(255,255,255,0.1);padding-top:10px;margin-top:8px}
-    .hearts{display:flex;gap:6px} .heart{width:18px;height:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4))}
-    .xp{font-weight:700;color:#b9c7ff} .pill{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:6px 10px;border-radius:999px}
-
-    .script-list{max-height:60vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
-    .script-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05)}
-    .script-item .meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.8rem}
-    .status.keep{outline:2px solid var(--ok)} .status.optional{outline:2px solid var(--warn)} .status.cut{outline:2px solid #66ff66;opacity:.6}
-
-    .sr-only{position:absolute;left:-9999px}
-    .hint{font-size:.85rem;color:var(--muted)}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Horrorladen – Line Coach</title>
+<meta name="theme-color" content="#0b0f17">
+<style>
+:root{
+  --bg:#0b0f17; --fg:#e9ecf3; --muted:#a9b3c5; --card:#121826; --card2:#0f1522;
+  --line:#1e2840; --brand:#6ea8ff; --ok:#58e39e; --warn:#ffd166; --cut:#66ff66;
+  --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--fg);
+  background:
+    radial-gradient(1000px 500px at 10% -10%, #2a2c7a40, transparent),
+    radial-gradient(900px 400px at 110% 0%, #7a2a7a40, transparent),
+    radial-gradient(900px 500px at 50% 120%, #1b7a7a30, transparent),
+    var(--bg);}
+a{color:inherit}
+button{font:inherit}
+.hidden{display:none!important}
+header{
+  position:sticky; top:0; z-index:20; backdrop-filter:saturate(120%) blur(14px);
+  background:linear-gradient(180deg, #0c0f17eb, #0c0f1700); border-bottom:1px solid #ffffff14;
+}
+.topbar{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
+#backBtn{border:none;background:transparent;color:var(--fg);opacity:.8;padding:6px 8px;border-radius:10px}
+#backBtn:active{transform:scale(.98)}
+h1{margin:0;font-weight:700;font-size:1.05rem;letter-spacing:.25px}
+.main{max-width:1100px;margin:14px auto;padding:0 16px 80px;display:grid;gap:14px}
+.card{background:var(--card); border:1px solid #ffffff18; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;gap:12px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:860px){ .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+h2{margin:0 0 8px 0;font-size:1.05rem}
+h3{margin:.6rem 0 .3rem 0;font-size:.95rem;color:#d6ddff}
+.small{font-size:.85rem;color:var(--muted)}
+select,input[type="range"],input[type="text"]{
+  width:100%;padding:10px 12px;border-radius:12px;border:1px solid #ffffff24;background:var(--card2);color:var(--fg);
+}
+label{font-size:.85rem;color:var(--muted)}
+.btn{
+  border:none;border-radius:12px;padding:11px 14px;font-weight:600;cursor:pointer;
+  color:#08121f;background:var(--brand); box-shadow:0 10px 26px rgba(110,168,255,.25);
+}
+.btn.secondary{background:#9bb8ff;color:#071425}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid #ffffff30}
+.btn.block{width:100%}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#00000033;padding:2px 6px;border-radius:6px;border:1px solid #ffffff22}
+.list{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}
+.item{border:1px solid #ffffff18;background:#ffffff08;border-radius:14px;padding:10px}
+.badge{background:#ffffff14;border:1px solid #ffffff26;border-radius:999px;padding:5px 10px;color:#cdd7ef;font-size:.8rem}
+.pill{background:#ffffff10;border:1px solid #ffffff1f;border-radius:999px;padding:6px 9px}
+.status.keep{outline:2px solid var(--ok)}
+.status.optional{outline:2px solid var(--warn)}
+.status.cut{outline:2px solid var(--cut);opacity:.7}
+.line{font-size:1.12rem;line-height:1.6}
+.cue{background:var(--card2);border:1px dashed #ffffff22;padding:12px;border-radius:12px}
+.spk{font-weight:700;text-transform:uppercase;font-size:.8rem;color:#aecdff;margin-bottom:4px}
+.hearts{display:flex;gap:6px}
+.heart{width:20px;height:20px}
+.progressRow{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:10px}
+.bottomnav{
+  position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; gap:10px; padding:10px;
+  background:linear-gradient(0deg, #0c0f17f0, #0c0f1700); backdrop-filter:blur(14px);
+}
+.tabbtn{flex:1;border:1px solid #ffffff20;background:#ffffff10;color:#dfe7ff;border-radius:12px;padding:10px 6px;display:flex;gap:8px;justify-content:center;align-items:center}
+.tabbtn.active{background:var(--brand);color:#08121f}
+.center{display:flex;justify-content:center;align-items:center}
+.icon{width:18px;height:18px}
+.sep{height:1px;background:#ffffff18;margin:8px 0}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#1c2333;border:1px solid #ffffff20;padding:8px 12px;border-radius:12px;opacity:0;transition:.3s}
+.toast.show{opacity:1}
+</style>
 </head>
 <body>
-  <header>
-    <div class="wrap row">
-      <h1>HorrorLaden Line Coach</h1>
-      <span class="badge">Auto‑Load JSON</span>
-      <span class="badge">Mobile‑ready</span>
-      <div class="tabs">
-        <button class="tab active" data-tab="trainer">Trainer</button>
-        <button class="tab" data-tab="songs">Songs</button>
-        <button class="tab" data-tab="script">Skript</button>
+
+<header>
+  <div class="topbar">
+    <button id="backBtn" aria-label="Zurück" class="hidden">◀︎</button>
+    <h1 id="title">Hauptmenü</h1>
+    <span class="badge" style="margin-left:auto">Auto-Load</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- PAGE: HOME -->
+  <section id="page-home" class="grid grid-2">
+    <div class="card">
+      <h2>Text lernen</h2>
+      <p class="small">Wähle deinen Charakter & Szene, dann Lernmodus (Flashcards, Zusammenhang, Tippen).</p>
+      <div class="row"><button class="btn" id="goTextSetup">Los geht’s</button></div>
+    </div>
+    <div class="card">
+      <h2>Songs lernen</h2>
+      <p class="small">Song/Charakter auswählen, Text ansehen und üben.</p>
+      <div class="row"><button class="btn" id="goSongSetup">Song-Training</button></div>
+    </div>
+    <div class="card">
+      <h2>Skript-Browser</h2>
+      <p class="small">Szenen & Songs durchstöbern, Zeilen antippen, um zu springen.</p>
+      <div class="row"><button class="btn secondary" id="goBrowser">Öffnen</button></div>
+    </div>
+    <div class="card">
+      <h2>Datenquelle</h2>
+      <p class="small">Standard: <code>horrorladen_script.json</code>. Oder andere URL setzen.</p>
+      <div class="row" style="gap:8px">
+        <button class="btn ghost" id="setDataUrl">Daten-URL</button>
+        <button class="btn ghost" id="reloadData">Neu laden</button>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main>
-    <!-- Left: Trainer / Songs -->
-    <section class="card" id="leftCard">
-      <div class="title">
-        <h2 id="leftTitle">Trainer</h2>
-        <div class="hint">Die App lädt automatisch <code>horrorladen_script.json</code> aus deinem Repo. Optional: <code>?data=URL</code>.</div>
+  <!-- PAGE: TEXT SETUP -->
+  <section id="page-text-setup" class="hidden grid grid-2">
+    <div class="card">
+      <h2>1) Charakter</h2>
+      <label for="roleSel">Meine Rolle</label>
+      <select id="roleSel"></select>
+      <div class="sep"></div>
+      <label class="row" style="gap:8px"><input type="checkbox" id="includeAlle" checked> <span>„ALLE“ zählt für mich</span></label>
+    </div>
+    <div class="card">
+      <h2>2) Szene</h2>
+      <label for="sceneSel">Szene</label>
+      <select id="sceneSel"></select>
+      <div class="sep"></div>
+      <label class="row" style="gap:8px"><input type="checkbox" id="hideCuts" checked> <span>grüne Striche (cut) ausblenden</span></label>
+      <label class="row" style="gap:8px"><input type="checkbox" id="includeOpt" checked> <span>optionale (gelb/orange) einbeziehen</span></label>
+    </div>
+    <div class="card">
+      <h2>3) Modus</h2>
+      <div class="grid grid-3">
+        <button class="btn block" id="modeFlash">Flashcards</button>
+        <button class="btn block" id="modeContext">Zusammenhang</button>
+        <button class="btn block" id="modeType">Tippen & Prüfen</button>
       </div>
+      <p class="small" style="margin-top:6px">Du kannst jederzeit wischen: <span class="kbd">←</span>/<span class="kbd">→</span> oder **Swipe**.</p>
+    </div>
+  </section>
 
-      <!-- Trainer Controls -->
-      <div id="trainerControls" class="controls" style="margin-bottom:6px">
-        <div>
-          <label for="roleSel">Meine Rolle</label>
-          <select id="roleSel"></select>
+  <!-- PAGE: TEXT SESSION -->
+  <section id="page-text-session" class="hidden grid">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="row" style="gap:8px">
+          <span class="pill" id="sessionScenePill">Szene</span>
+          <span class="pill" id="sessionRolePill">Rolle</span>
         </div>
-        <div>
-          <label for="sceneSel">Szene</label>
-          <select id="sceneSel"></select>
-        </div>
-        <div>
-          <label for="modeSel">Modus</label>
-          <select id="modeSel">
-            <option value="read">Durchlauf (Reveal)</option>
-            <option value="type">Tippen & Prüfen</option>
-            <option value="speak">Sprechen (Beta)</option>
-          </select>
-        </div>
-        <div>
-          <label for="contextSel">Kontext-Zeilen</label>
-          <select id="contextSel">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="trainerToggles" class="toggle" style="margin-bottom:8px">
-        <label class="chip"><input type="checkbox" id="hideCuts" checked> Sichere Striche (grün) ausblenden</label>
-        <label class="chip"><input type="checkbox" id="includeOptional" checked> Optionale Striche (gelb/orange) einbeziehen</label>
-        <label class="chip"><input type="checkbox" id="quizPartner"> Partner-Text mitlernen</label>
-        <label class="chip"><input type="checkbox" id="ttsOther" checked> Andere Rollen vorlesen (TTS)</label>
-        <label class="chip"><input type="checkbox" id="autoAdvance"> Auto‑Weiter (TTS Ende)</label>
-        <label class="chip"><input type="checkbox" id="excludeSongs" checked> Songs aus Trainer ausschließen</label>
-      </div>
-
-      <div class="status-legend" aria-hidden="true">
-        <span><span class="dot keep"></span> behalten</span>
-        <span><span class="dot optional"></span> optional</span>
-        <span><span class="dot cut"></span> gestrichen</span>
-      </div>
-
-      <!-- Trainer Practice Area -->
-      <div class="practice" id="practiceArea" aria-live="polite"></div>
-      <div class="progress">
         <div class="hearts" id="hearts"></div>
-        <div class="xp" id="xp">XP: 0</div>
-        <div class="pill" id="streak">🔥 Streak 0</div>
       </div>
 
-      <!-- Songs Panel -->
-      <div id="songsPanel" class="hidden">
-        <div class="controls" style="margin-top:4px">
-          <div>
-            <label for="songSel">Song</label>
-            <select id="songSel"></select>
-          </div>
-          <div>
-            <label for="songModeSel">Song‑Modus</label>
-            <select id="songModeSel">
-              <option value="reveal">Reveal (Zeilen aufdecken)</option>
-              <option value="cloze">Cloze (Lücken füllen)</option>
-              <option value="firstletters">Erste Buchstaben</option>
-            </select>
-          </div>
-          <div>
-            <label for="clozeEvery">Cloze: jedes n‑te Wort</label>
-            <input id="clozeEvery" type="range" min="3" max="8" value="5" />
-          </div>
-          <div>
-            <label for="songContextSel">Kontext-Zeilen</label>
-            <select id="songContextSel">
-              <option value="0">0</option>
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-            </select>
-          </div>
+      <div id="contextBox" class="grid"></div>
+
+      <div class="cue" id="promptBox">
+        <div class="spk" id="promptSpeaker">–</div>
+        <div class="small" id="promptHint">Deine Zeile</div>
+      </div>
+
+      <div id="answerArea" class="grid" style="margin-top:8px">
+        <div id="revealArea" class="row">
+          <button class="btn secondary" id="revealBtn">Zeile anzeigen</button>
+          <button class="btn ghost" id="wrongBtn">Falsch</button>
+          <button class="btn" id="rightBtn">Richtig</button>
         </div>
-        <div class="toggle" style="margin:8px 0">
-          <label class="chip"><input type="checkbox" id="songTtsOther" checked> Andere Rollen vorlesen (TTS)</label>
-          <label class="chip"><input type="checkbox" id="songQuizPartner"> Partner‑Text mitlernen</label>
-        </div>
-        <div class="practice" id="songPractice"></div>
-        <div class="progress">
-          <div class="pill" id="songProgress">0 / 0</div>
-          <div class="pill" id="songXP">🎵 XP: 0</div>
+        <div id="typeArea" class="hidden">
+          <input id="typeInput" type="text" placeholder="Tippe die Zeile (Groß/Klein egal)">
+          <div class="row" style="gap:8px">
+            <button class="btn" id="checkBtn">Prüfen</button>
+            <button class="btn ghost" id="skipBtn">Überspringen</button>
+            <button class="btn secondary" id="hintBtn">Hinweis</button>
+          </div>
+          <div class="small" id="feedback"></div>
         </div>
       </div>
-    </section>
 
-    <!-- Right Column: Script/Songs list -->
-    <aside class="card" aria-labelledby="scriptTitle">
-      <div class="title">
-        <h2 id="scriptTitle">Skript & Inhalte</h2>
-        <div class="hint">Klicke auf eine Zeile bzw. Songzeile, um im Trainer dorthin zu springen. Songs sind separat markiert.</div>
+      <div id="revealText" class="hidden" style="margin-top:10px">
+        <div class="line" id="revealLine"></div>
       </div>
-      <div id="scriptList" class="script-list" role="list"></div>
-    </aside>
-  </main>
 
-  <script>
-    /* ----------------------------- Data Model ----------------------------- */
-    const STORAGE_KEY = 'horrorcoach_state_auto_v1';
-    const DEFAULT_DATA = {
-      title: 'Der kleine Horrorladen',
-      roles: [],
-      scenes: [],
-      songs: [],
-      prefs: { tab:'trainer', role:'', sceneId:'', mode:'read', context:2, hidCuts:true, includeOptional:true, quizPartner:false, ttsOther:true, autoAdvance:false, excludeSongs:true,
-               songId:'', songMode:'reveal', songContext:1, songTtsOther:true, songQuizPartner:false },
-      meta: { xp:0, hearts:3, streak:0, songXP:0 }
+      <div class="progressRow">
+        <div class="small" id="stepInfo">0 / 0</div>
+        <div class="row" style="gap:8px">
+          <button class="btn ghost" id="prevBtn">Zurück</button>
+          <button class="btn" id="nextBtn">Weiter</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: SONG SETUP -->
+  <section id="page-song-setup" class="hidden grid grid-2">
+    <div class="card">
+      <h2>1) Charakter</h2>
+      <select id="songRoleSel"></select>
+      <div class="small">„ALLE“ zählt optional per Schalter unten.</div>
+      <label class="row" style="gap:8px;margin-top:6px"><input type="checkbox" id="songIncludeAlle" checked> <span>„ALLE“ zählt für mich</span></label>
+    </div>
+    <div class="card">
+      <h2>2) Song</h2>
+      <select id="songSel"></select>
+      <div class="sep"></div>
+      <div class="row" style="gap:8px">
+        <button class="btn" id="startSongBtn">Song anzeigen</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: SONG SESSION -->
+  <section id="page-song-session" class="hidden grid">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="row" style="gap:8px">
+          <span class="pill" id="songTitlePill">Song</span>
+          <span class="pill" id="songRolePill">Rolle</span>
+        </div>
+        <div class="row" style="gap:6px">
+          <button class="btn ghost" id="songRevealAll">Alles zeigen</button>
+          <button class="btn ghost" id="songHideAll">Alles verbergen</button>
+        </div>
+      </div>
+      <div id="songLines" class="list"></div>
+    </div>
+  </section>
+
+  <!-- PAGE: BROWSER -->
+  <section id="page-browser" class="hidden grid grid-2">
+    <div class="card">
+      <h2>Szenen</h2>
+      <div id="sceneList" class="list"></div>
+    </div>
+    <div class="card">
+      <h2>Songs</h2>
+      <div id="songList" class="list"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Nav -->
+<nav class="bottomnav">
+  <button class="tabbtn active" data-tab="home">🏠 <span>Home</span></button>
+  <button class="tabbtn" data-tab="text">🗣️ <span>Text</span></button>
+  <button class="tabbtn" data-tab="songs">🎵 <span>Songs</span></button>
+</nav>
+
+<div id="toast" class="toast">Gespeichert</div>
+
+<script>
+/* ---------------------- State + Storage ---------------------- */
+const STORAGE_KEY = 'hlc_state_v3';
+const state = loadState();
+function loadState(){
+  try{
+    const base = {
+      meta:{hearts:3, xp:0},
+      prefs:{
+        role:'', includeAlle:true, sceneId:'', hideCuts:true, includeOpt:true,
+        mode:'flash', // flash | context | type
+        songRole:'', songId:'', songIncludeAlle:true
+      },
+      data:{ roles:[], scenes:[], songs:[] },
+      ui:{ page:'home' }
     };
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? deepMerge(base, JSON.parse(raw)) : base;
+  }catch{ return {meta:{hearts:3,xp:0},prefs:{},data:{roles:[],scenes:[],songs:[]},ui:{page:'home'}}; }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showToast('Gespeichert'); }
+function deepMerge(a,b){ for(const k in b){ if(Array.isArray(b[k])) a[k]=b[k]; else if(b[k] && typeof b[k]==='object') a[k]=deepMerge(a[k]||{}, b[k]); else a[k]=b[k]; } return a; }
 
-    let state = loadState();
+/* ---------------------- Router / Pages ----------------------- */
+const titleEl = document.getElementById('title');
+const backBtn = document.getElementById('backBtn');
+const pages = {
+  home:     document.getElementById('page-home'),
+  textSetup:document.getElementById('page-text-setup'),
+  textSess: document.getElementById('page-text-session'),
+  songSetup:document.getElementById('page-song-setup'),
+  songSess: document.getElementById('page-song-session'),
+  browser:  document.getElementById('page-browser')
+};
+const tabbtns = Array.from(document.querySelectorAll('.tabbtn'));
+function show(page){
+  state.ui.page = page; saveSilently();
+  for(const k in pages){ pages[k].classList.toggle('hidden', k!==page); }
+  backBtn.classList.toggle('hidden', page==='home');
+  titleEl.textContent = ({
+    home:'Hauptmenü',
+    textSetup:'Text lernen',
+    textSess:'Training',
+    songSetup:'Songs lernen',
+    songSess:'Song',
+    browser:'Skript-Browser'
+  })[page] || 'Horrorladen';
+  tabbtns.forEach(b=> b.classList.toggle('active',
+    (page==='home' && b.dataset.tab==='home') ||
+    ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
+    ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs')));
+}
+function saveSilently(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+backBtn.addEventListener('click', ()=>{ if(state.ui.page==='textSess') show('textSetup'); else if(state.ui.page==='songSess') show('songSetup'); else show('home'); });
+tabbtns.forEach(b=> b.addEventListener('click', ()=>{
+  const t=b.dataset.tab; if(t==='home') show('home'); if(t==='text'){ show('textSetup'); } if(t==='songs'){ show('songSetup'); }
+}));
 
-    function loadState(){ try{ const raw=localStorage.getItem(STORAGE_KEY); const base=structuredClone(DEFAULT_DATA); if(!raw) return base; const parsed=JSON.parse(raw); return deepMerge(base, parsed);}catch(e){ return structuredClone(DEFAULT_DATA);} }
-    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    function deepMerge(base, patch){ for(const k in patch){ if(Array.isArray(patch[k])) base[k]=patch[k]; else if(patch[k] && typeof patch[k]==='object') base[k]=deepMerge(base[k]||{}, patch[k]); else base[k]=patch[k]; } return base; }
+/* ---------------------- Data Loading ------------------------- */
+async function loadData(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const j = await res.json();
+  // Accept both top-level songs[] and scenes with type: "song"
+  const roles = j.roles||[];
+  const scenes = Array.isArray(j.scenes)? j.scenes.filter(s=>Array.isArray(s.lines)) : [];
+  let songs = Array.isArray(j.songs)? j.songs.filter(s=>Array.isArray(s.lines)) : [];
+  const songScenes = scenes.filter(s=> (s.type||'').toLowerCase()==='song');
+  if(songScenes.length && !songs.length){
+    songs = songScenes.map(s=>({id:s.id||('song-'+s.name), title:s.name.replace(/^Lied:\s*/i,''), status:'keep', lines:s.lines}));
+  }
+  state.data.roles = roles;
+  state.data.scenes = scenes.filter(s=> (s.type||'dialogue').toLowerCase()!=='song'); // dialogue only for scene list
+  state.data.songs  = songs;
+  // Defaults
+  if(!state.prefs.role && roles[0]) state.prefs.role = roles[0];
+  if(!state.prefs.songRole && roles[0]) state.prefs.songRole = roles[0];
+  if(!state.prefs.sceneId && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
+  if(!state.prefs.songId && state.data.songs[0]) state.prefs.songId = state.data.songs[0].id;
+  saveSilently();
+  populateTextSetup(); populateSongSetup(); buildBrowser();
+}
+function detectDataUrl(){
+  const qs = new URLSearchParams(location.search);
+  return qs.get('data') || 'horrorladen_script.json';
+}
+async function initLoad(){
+  try{
+    const url = detectDataUrl();
+    await loadData(url);
+  }catch(e){
+    console.error('Daten laden fehlgeschlagen:', e);
+    alert('Konnte Script nicht laden: '+e.message);
+  }
+}
 
-    /* ----------------------------- UI Elements ---------------------------- */
-    const tabs = Array.from(document.querySelectorAll('.tab'));
-    const leftTitle = document.getElementById('leftTitle');
-    const practiceArea = document.getElementById('practiceArea');
-    const scriptList = document.getElementById('scriptList');
+/* ---------------------- UI: Text Setup ----------------------- */
+const roleSel = document.getElementById('roleSel');
+const includeAlle = document.getElementById('includeAlle');
+const sceneSel = document.getElementById('sceneSel');
+const hideCuts = document.getElementById('hideCuts');
+const includeOpt = document.getElementById('includeOpt');
+const goTextSetup = document.getElementById('goTextSetup');
+const modeFlash = document.getElementById('modeFlash');
+const modeContext = document.getElementById('modeContext');
+const modeType = document.getElementById('modeType');
 
-    const roleSel = document.getElementById('roleSel');
-    const sceneSel = document.getElementById('sceneSel');
-    const modeSel = document.getElementById('modeSel');
-    const contextSel = document.getElementById('contextSel');
-    const hideCuts = document.getElementById('hideCuts');
-    const includeOptional = document.getElementById('includeOptional');
-    const quizPartner = document.getElementById('quizPartner');
-    const ttsOther = document.getElementById('ttsOther');
-    const autoAdvance = document.getElementById('autoAdvance');
-    const excludeSongs = document.getElementById('excludeSongs');
+goTextSetup.addEventListener('click', ()=> show('textSetup'));
+modeFlash.addEventListener('click', ()=>{ state.prefs.mode='flash'; startSession(); });
+modeContext.addEventListener('click', ()=>{ state.prefs.mode='context'; startSession(); });
+modeType.addEventListener('click', ()=>{ state.prefs.mode='type'; startSession(); });
 
-    const heartsBox = document.getElementById('hearts');
-    const xpBox = document.getElementById('xp');
-    const streakBox = document.getElementById('streak');
+function populateTextSetup(){
+  roleSel.innerHTML = state.data.roles.map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`).join('');
+  sceneSel.innerHTML = state.data.scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
+  includeAlle.checked = !!state.prefs.includeAlle;
+  hideCuts.checked = !!state.prefs.hideCuts;
+  includeOpt.checked = !!state.prefs.includeOpt;
+}
 
-    const songsPanel = document.getElementById('songsPanel');
-    const songSel = document.getElementById('songSel');
-    const songModeSel = document.getElementById('songModeSel');
-    const clozeEvery = document.getElementById('clozeEvery');
-    const songContextSel = document.getElementById('songContextSel');
-    const songPractice = document.getElementById('songPractice');
-    const songProgress = document.getElementById('songProgress');
-    const songXP = document.getElementById('songXP');
+roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); });
+sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = sceneSel.value; saveSilently(); });
+includeAlle.addEventListener('change', ()=>{ state.prefs.includeAlle = includeAlle.checked; saveSilently(); });
+hideCuts.addEventListener('change', ()=>{ state.prefs.hideCuts = hideCuts.checked; saveSilently(); });
+includeOpt.addEventListener('change', ()=>{ state.prefs.includeOpt = includeOpt.checked; saveSilently(); });
 
-    /* --------------------------- Population / Init ------------------------ */
-    function refreshSelectors(){
-      roleSel.innerHTML = state.roles.map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`).join('');
-      const scenes = state.scenes.filter(s=> s.type!=='song');
-      sceneSel.innerHTML = scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
-      if(!state.prefs.role && state.roles[0]) state.prefs.role = state.roles[0];
-      if(!state.prefs.sceneId && scenes[0]) state.prefs.sceneId = scenes[0].id;
-      modeSel.value = state.prefs.mode; contextSel.value = String(state.prefs.context||2);
-      hideCuts.checked = !!state.prefs.hidCuts; includeOptional.checked = !!state.prefs.includeOptional; quizPartner.checked = !!state.prefs.quizPartner;
-      ttsOther.checked = !!state.prefs.ttsOther; autoAdvance.checked = !!state.prefs.autoAdvance; excludeSongs.checked = !!state.prefs.excludeSongs;
+/* ---------------------- UI: Song Setup ----------------------- */
+const goSongSetup = document.getElementById('goSongSetup');
+const songRoleSel = document.getElementById('songRoleSel');
+const songSel = document.getElementById('songSel');
+const songIncludeAlle = document.getElementById('songIncludeAlle');
+const startSongBtn = document.getElementById('startSongBtn');
 
-      songSel.innerHTML = state.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title}</option>`).join('');
-      if(!state.prefs.songId && state.songs[0]) state.prefs.songId = state.songs[0].id;
-      songModeSel.value = state.prefs.songMode; songContextSel.value = String(state.prefs.songContext||1); clozeEvery.value = 5;
+goSongSetup.addEventListener('click', ()=> show('songSetup'));
+startSongBtn.addEventListener('click', ()=> showSong());
+
+function populateSongSetup(){
+  songRoleSel.innerHTML = state.data.roles.map(r=>`<option ${r===state.prefs.songRole?'selected':''}>${r}</option>`).join('');
+  songSel.innerHTML = state.data.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title||s.name||s.id}</option>`).join('');
+  songIncludeAlle.checked = !!state.prefs.songIncludeAlle;
+}
+songRoleSel.addEventListener('change', ()=>{ state.prefs.songRole = songRoleSel.value; saveSilently(); });
+songSel.addEventListener('change', ()=>{ state.prefs.songId = songSel.value; saveSilently(); });
+songIncludeAlle.addEventListener('change', ()=>{ state.prefs.songIncludeAlle = songIncludeAlle.checked; saveSilently(); });
+
+/* ---------------------- Browser ------------------------------- */
+const sceneList = document.getElementById('sceneList');
+const songList = document.getElementById('songList');
+const goBrowser = document.getElementById('goBrowser');
+goBrowser.addEventListener('click', ()=> show('browser'));
+
+function buildBrowser(){
+  sceneList.innerHTML = '';
+  state.data.scenes.forEach(s=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<div class="row" style="justify-content:space-between"><b>${s.name}</b><span class="small">${s.lines.length} Zeilen</span></div>`;
+    div.addEventListener('click', ()=>{ state.prefs.sceneId = s.id; show('textSetup'); populateTextSetup(); });
+    sceneList.appendChild(div);
+  });
+  songList.innerHTML = '';
+  state.data.songs.forEach(s=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<div class="row" style="justify-content:space-between"><b>🎵 ${s.title||s.name||s.id}</b><span class="small">${(s.lines||[]).length} Zeilen</span></div>`;
+    div.addEventListener('click', ()=>{ state.prefs.songId = s.id; show('songSetup'); populateSongSetup(); });
+    songList.appendChild(div);
+  });
+}
+
+/* ---------------------- Session (Text) ------------------------ */
+const heartsBox = document.getElementById('hearts');
+const sessionScenePill = document.getElementById('sessionScenePill');
+const sessionRolePill = document.getElementById('sessionRolePill');
+const contextBox = document.getElementById('contextBox');
+const promptSpeaker = document.getElementById('promptSpeaker');
+const promptHint = document.getElementById('promptHint');
+const revealBtn = document.getElementById('revealBtn');
+const wrongBtn = document.getElementById('wrongBtn');
+const rightBtn = document.getElementById('rightBtn');
+const revealArea = document.getElementById('revealArea');
+const typeArea = document.getElementById('typeArea');
+const typeInput = document.getElementById('typeInput'); const checkBtn = document.getElementById('checkBtn'); const hintBtn = document.getElementById('hintBtn'); const feedback = document.getElementById('feedback'); const skipBtn = document.getElementById('skipBtn');
+const revealText = document.getElementById('revealText'); const revealLine = document.getElementById('revealLine');
+const stepInfo = document.getElementById('stepInfo');
+const prevBtn = document.getElementById('prevBtn'); const nextBtn = document.getElementById('nextBtn');
+
+let session = { lines:[], idx:0, hearts:3, mode:'flash' };
+
+function startSession(){
+  const role = state.prefs.role;
+  const scene = state.data.scenes.find(s=>s.id===state.prefs.sceneId);
+  if(!scene){ alert('Keine Szene gefunden.'); return; }
+  session.mode = state.prefs.mode;
+  session.hearts = 3;
+  session.lines = filterLinesForSession(scene.lines, role, state.prefs.includeAlle, state.prefs.hideCuts, state.prefs.includeOpt);
+  session.idx = 0;
+  sessionScenePill.textContent = scene.name;
+  sessionRolePill.textContent = role;
+  heartsBox.innerHTML = heartsSvg(session.hearts);
+  revealText.classList.add('hidden');
+  typeArea.classList.toggle('hidden', session.mode!=='type');
+  revealArea.classList.toggle('hidden', session.mode==='type');
+  show('textSess');
+  renderStep();
+}
+
+function filterLinesForSession(lines, role, includeAlle, hideCuts, includeOpt){
+  return (lines||[]).filter(l=>{
+    if(hideCuts && l.status==='cut') return false;
+    if(!includeOpt && l.status==='optional') return false;
+    const isMine = (l.speaker===role) || (includeAlle && l.speaker==='ALLE');
+    const inContextMode = state.prefs.mode==='context';
+    return inContextMode ? true : isMine; // in Kontextmodus zeigen wir alle, fragen aber nächste Zeile
+  });
+}
+
+function renderStep(){
+  const n = session.lines.length;
+  if(n===0){ promptHint.textContent='Keine Zeilen nach Filter.'; promptSpeaker.textContent='—'; stepInfo.textContent='0/0'; return; }
+  if(session.idx>=n) { session.idx=n-1; }
+  const l = session.lines[session.idx];
+  const ctx = Math.max(0, Math.min(2, session.idx)); // 2 Zeilen Kontext
+  contextBox.innerHTML = '';
+  for(let i=Math.max(0, session.idx-ctx); i<session.idx; i++){
+    const c = session.lines[i];
+    contextBox.innerHTML += `<div class="cue"><div class="spk">${c.speaker}</div><div class="line">${escapeHtml(c.text)}</div></div>`;
+  }
+  // Prompt
+  if(session.mode==='context'){
+    // Frage: Nächste Zeile (unabhängig von Sprecher)
+    promptSpeaker.textContent = (session.idx+1<n) ? (session.lines[session.idx+1].speaker + ' – Nächste Zeile?') : 'Ende der Szene';
+    promptHint.textContent = 'Erinnere die nächste Zeile';
+  }else if(session.mode==='type'){
+    promptSpeaker.textContent = `${l.speaker}`;
+    promptHint.textContent = 'Tippe deine Zeile';
+    typeInput.value='';
+    feedback.textContent='';
+  }else{
+    promptSpeaker.textContent = `${l.speaker}`;
+    promptHint.textContent = 'Deine Zeile';
+  }
+  stepInfo.textContent = `${session.idx+1} / ${n}`;
+  revealText.classList.add('hidden');
+  revealLine.textContent = '';
+}
+
+// Controls
+revealBtn.addEventListener('click', ()=>{
+  const l = session.lines[session.idx];
+  revealLine.textContent = l.text; revealText.classList.remove('hidden');
+});
+wrongBtn.addEventListener('click', ()=>{ session.hearts=Math.max(0,session.hearts-1); heartsBox.innerHTML = heartsSvg(session.hearts); if(session.hearts===0){ alert('💔 Keine Herzen mehr – Runde vorbei.'); show('textSetup'); return; } nextStep(); });
+rightBtn.addEventListener('click', ()=>{ state.meta.xp += 8; saveSilently(); nextStep(); });
+
+checkBtn.addEventListener('click', ()=>{
+  const l = (session.mode==='context' && session.lines[session.idx+1]) ? session.lines[session.idx+1] : session.lines[session.idx];
+  const ok = similarEnough(typeInput.value, l.text);
+  feedback.textContent = ok ? '✅ Richtig!' : '❌ Nicht ganz.';
+  if(ok){ state.meta.xp += 10; saveSilently(); setTimeout(nextStep, 300); }
+  else { session.hearts=Math.max(0,session.hearts-1); heartsBox.innerHTML = heartsSvg(session.hearts); if(session.hearts===0){ alert('💔 Keine Herzen mehr – Runde vorbei.'); show('textSetup'); } }
+});
+hintBtn.addEventListener('click', ()=>{
+  const l = (session.mode==='context' && session.lines[session.idx+1]) ? session.lines[session.idx+1] : session.lines[session.idx];
+  feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text, typeInput.value);
+});
+skipBtn.addEventListener('click', nextStep);
+prevBtn.addEventListener('click', prevStep);
+nextBtn.addEventListener('click', nextStep);
+
+function prevStep(){ session.idx = Math.max(0, session.idx-1); renderStep(); }
+function nextStep(){ session.idx = Math.min(session.lines.length, session.idx+1); renderStep(); }
+
+/* ---------------------- Song Session -------------------------- */
+const songTitlePill = document.getElementById('songTitlePill');
+const songRolePill  = document.getElementById('songRolePill');
+const songLinesBox  = document.getElementById('songLines');
+const songRevealAll = document.getElementById('songRevealAll');
+const songHideAll   = document.getElementById('songHideAll');
+
+function showSong(){
+  const role = state.prefs.songRole;
+  const song = state.data.songs.find(s=>s.id===state.prefs.songId);
+  if(!song){ alert('Kein Song gefunden.'); return; }
+  songTitlePill.textContent = song.title || song.name || song.id;
+  songRolePill.textContent = role;
+  songLinesBox.innerHTML = '';
+  (song.lines||[]).forEach((l,i)=>{
+    const hide = (l.status==='cut'); // geschnittene default aus
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `<div class="small">${l.speaker||'ENSEMBLE'}</div>
+      <div class="line ${hide?'hidden':''}" data-i="${i}">${escapeHtml(l.text)}</div>`;
+    row.addEventListener('click', ()=>{
+      const el = row.querySelector('.line');
+      el.classList.toggle('hidden');
+    });
+    songLinesBox.appendChild(row);
+  });
+  show('songSess');
+}
+songRevealAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.remove('hidden')); });
+songHideAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.add('hidden')); });
+
+/* ---------------------- Gesten (Swipe) ------------------------ */
+let touchStartX=null,touchStartY=null;
+function onTouchStart(e){ const t=e.changedTouches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
+function onTouchEnd(e){
+  if(touchStartX==null) return;
+  const t=e.changedTouches[0]; const dx=t.clientX - touchStartX; const dy=t.clientY - touchStartY;
+  if(Math.abs(dx)>60 && Math.abs(dy)<50){
+    if(dx<0){ // left
+      if(state.ui.page==='textSess') nextStep();
+    }else{ // right
+      if(state.ui.page==='textSess') prevStep();
     }
+  }
+  touchStartX=touchStartY=null;
+}
+document.addEventListener('touchstart', onTouchStart, {passive:true});
+document.addEventListener('touchend', onTouchEnd, {passive:true});
+document.addEventListener('keydown', (e)=>{
+  if(state.ui.page==='textSess'){
+    if(e.key==='ArrowRight') nextStep();
+    if(e.key==='ArrowLeft') prevStep();
+    if(e.key===' ') { e.preventDefault(); const b=(state.prefs.mode==='type'?checkBtn:revealBtn); b?.click(); }
+  }
+});
 
-    function currentScene(){ return state.scenes.find(s=>s.id===state.prefs.sceneId) || state.scenes[0]; }
-    function currentSong(){ return state.songs.find(s=>s.id===state.prefs.songId) || state.songs[0]; }
+/* ---------------------- Utils -------------------------------- */
+function heartsSvg(n){
+  let html=''; for(let i=0;i<3;i++){
+    const c = i<n ? '#ff6b6b' : '#3a4057';
+    html += `<svg class="heart" viewBox="0 0 24 24"><path fill="${c}" d="M12 21s-6.716-4.727-9.428-7.44C.86 11.85.86 8.65 2.572 6.94c1.714-1.714 4.486-1.714 6.2 0L12 10.17l3.228-3.23c1.714-1.714 4.486-1.714 6.2 0 1.714 1.71 1.714 4.91 0 6.62C18.716 16.273 12 21 12 21z"/></svg>`;
+  }
+  return html;
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
+function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
+function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); return (1 - d/Math.max(1,maxLen)) >= .88; }
+function firstNCharsHint(target, typed){ const T=normalize(target), U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
+const toast = document.getElementById('toast'); let toastTimer=null;
+function showToast(txt){ toast.textContent=txt; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'), 850); }
 
-    function filteredLines(scene){ return scene?.lines?.filter(l=>{ if(state.prefs.hidCuts && l.status==='cut') return false; if(!state.prefs.includeOptional && l.status==='optional') return false; return true; }) || []; }
+/* ---------------------- Data URL UI --------------------------- */
+document.getElementById('setDataUrl').addEventListener('click', ()=>{
+  const current = new URLSearchParams(location.search).get('data') || '';
+  const u = prompt('Daten-URL eingeben (z.B. https://USERNAME.github.io/REPO/horrorladen_script.json)', current);
+  if(u){ const url = new URL(location.href); url.searchParams.set('data', u.trim()); location.href = url.toString(); }
+});
+document.getElementById('reloadData').addEventListener('click', ()=> initLoad());
 
-    function buildScriptList(){
-      scriptList.innerHTML='';
-      state.scenes.filter(s=> s.type!=='song').forEach(scene=>{
-        const lines = filteredLines(scene);
-        lines.forEach((l, idx)=>{
-          const div = document.createElement('div');
-          div.className = `script-item status ${l.status||'keep'}`;
-          div.role='listitem';
-          div.innerHTML = `<div class="meta"><span>${scene.name}</span><span>${(l.status==='cut'?'gestrichen':(l.status==='optional'?'optional':'bleibt'))}</span></div>
-                           <div><b>${l.speaker}:</b> <span class="line">${escapeHtml(l.text)}</span></div>`;
-          div.addEventListener('click', ()=>{ selectTab('trainer'); startPracticeAtScene(scene.id, idx); });
-          scriptList.appendChild(div);
-        });
-      });
-      const h = document.createElement('div'); h.className='muted'; h.style.margin='8px 0'; h.innerHTML='— <b>Songs</b> —'; scriptList.appendChild(h);
-      state.songs.forEach(song=>{
-        song.lines.forEach((l, idx)=>{
-          const div = document.createElement('div');
-          div.className = `script-item status ${l.status||'keep'}`;
-          div.role='listitem';
-          div.innerHTML = `<div class="meta"><span>🎵 ${song.title}</span><span>Song</span></div>
-                           <div><b>${l.speaker||'ENSEMBLE'}:</b> <span class="line">${escapeHtml(l.text)}</span></div>`;
-          div.addEventListener('click', ()=>{ selectTab('songs'); startSongAt(song.id, idx); });
-          scriptList.appendChild(div);
-        });
-      });
-    }
-
-    function refreshProgress(){
-      heartsBox.innerHTML = '';
-      for(let i=0;i<3;i++){
-        const svg = `<svg class="heart" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="${i<state.meta.hearts?'#ff6b6b':'#3a3f55'}" d="M12 21s-6.716-4.727-9.428-7.44C.86 11.85.86 8.65 2.572 6.94c1.714-1.714 4.486-1.714 6.2 0L12 10.17l3.228-3.23c1.714-1.714 4.486-1.714 6.2 0 1.714 1.71 1.714 4.91 0 6.62C18.716 16.273 12 21 12 21z"/></svg>`;
-        heartsBox.insertAdjacentHTML('beforeend', svg);
-      }
-      xpBox.textContent = `XP: ${state.meta.xp}`;
-      streakBox.textContent = `🔥 Streak ${state.meta.streak}`;
-      songXP.textContent = `🎵 XP: ${state.meta.songXP}`;
-    }
-
-    /* ---------------------- Trainer (Dialogues) Engine --------------------- */
-    let practiceIdx = 0; let lastSpokenUtterance = null;
-    function startPractice(){ startPracticeAtScene(state.prefs.sceneId, 0); }
-    function startPracticeAtScene(sceneId, idx){ state.prefs.sceneId = sceneId; saveState(); const scene=currentScene(); const lines=filteredLines(scene); practiceIdx=Math.max(0, Math.min(idx, (lines.length||1)-1)); renderPractice(); }
-
-    function renderPractice(){
-      if(state.prefs.tab!=='trainer'){ return; }
-      const scene = currentScene(); if(!scene){ practiceArea.innerHTML='<div class="muted">Keine Szene gewählt.</div>'; return; }
-      const lines = filteredLines(scene); if(!lines.length){ practiceArea.innerHTML='<div class="muted">Keine Zeilen nach Filter.</div>'; return; }
-      const ctxN = Math.max(0, Number(state.prefs.context||2));
-      const l = lines[practiceIdx]; const askPartnerToo = !!state.prefs.quizPartner; const isMyLine = l.speaker === state.prefs.role; let askFor = (isMyLine? 'me' : (askPartnerToo ? 'partner' : 'skip'));
-      if(askFor==='skip'){ const nextIdx = findNextAskable(lines, practiceIdx, state.prefs.role, askPartnerToo); if(nextIdx===-1){ practiceArea.innerHTML='<div class="muted">Fertig für diese Szene! 🎉</div>'; return; } practiceIdx = nextIdx; return renderPractice(); }
-
-      const context = []; for(let i=Math.max(0, practiceIdx-ctxN); i<practiceIdx; i++){ const c = lines[i]; context.push(`<div class="cue"><div class="speaker">${c.speaker}</div><div>${escapeHtml(c.text)}</div></div>`); }
-      const header = `<div class="row" style="justify-content:space-between"><div class="pill">${scene.name}</div><div class="pill">Schritt ${practiceIdx+1} / ${lines.length}</div></div>`;
-      const prompt = `<div class="cue" style="border:1px dashed rgba(255,255,255,0.18)"><div class="speaker">${l.speaker}${isMyLine?' (Du)':''}</div><div class="muted">${isMyLine?'Deine Zeile':'Partner-Zeile'}</div></div>`;
-
-      const mode = state.prefs.mode; let interaction='';
-      if(mode==='read'){
-        interaction = `<div class="btns"><button id="revealBtn" class="secondary">Zeile anzeigen</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn">Weiter</button></div>
-                       <div id="revealBox" class="hidden" style="margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)"><div class="line">${escapeHtml(l.text)}</div></div>`;
-      } else if(mode==='type'){
-        interaction = `<div class="answerBox"><input id="answerInput" type="text" autocomplete="off" placeholder="Tippe die Zeile exakt (Groß/Klein egal)" /><button id="checkBtn">Prüfen</button></div>
-                       <div id="feedback" style="min-height:28px" class="muted"></div>
-                       <div class="btns"><button id="hintBtn" class="ghost">Hinweis</button><button id="skipBtn" class="ghost">Überspringen</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn" class="secondary">Weiter</button></div>`;
-      } else {
-        interaction = `<div class="btns"><button id="startRecBtn" class="secondary">Sprechen starten</button><button id="stopRecBtn" class="ghost">Stopp</button><button id="playOtherBtn" class="ghost">Kontext vorlesen</button><button id="nextBtn">Weiter</button></div><div id="recOut" class="muted"></div>`;
-      }
-
-      practiceArea.innerHTML = header + context.join('') + prompt + interaction;
-      document.getElementById('playOtherBtn')?.addEventListener('click', ()=> speakContext(contextText(lines, practiceIdx, ctxN)) );
-      document.getElementById('nextBtn')?.addEventListener('click', nextItem);
-      document.getElementById('revealBtn')?.addEventListener('click', ()=>{ document.getElementById('revealBox')?.classList.remove('hidden'); });
-      if(mode==='type'){
-        const input = document.getElementById('answerInput'); const feedback = document.getElementById('feedback'); input?.focus();
-        document.getElementById('checkBtn')?.addEventListener('click', ()=>{ const ok = similarEnough(input.value, l.text); if(ok){ feedback.innerHTML='✅ Richtig!'; gainXP(10); advanceOrEnd(); } else { miss(feedback, input.value, l.text); } });
-        document.getElementById('hintBtn')?.addEventListener('click', ()=>{ feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text, input.value); });
-        document.getElementById('skipBtn')?.addEventListener('click', nextItem);
-      }
-      if(mode==='speak') setupSpeech(l.text);
-      refreshProgress();
-    }
-
-    function nextItem(){ const scene=currentScene(); const lines=filteredLines(scene); practiceIdx=Math.min(practiceIdx+1, (lines.length||1)-1); renderPractice(); }
-    function advanceOrEnd(){ const scene=currentScene(); const lines=filteredLines(scene); if(practiceIdx>=lines.length-1){ state.meta.streak++; saveState(); refreshProgress(); practiceArea.innerHTML='<div>🎉 Szene abgeschlossen! Super Leistung.</div>'; } else { practiceIdx++; renderPractice(); } }
-    function findNextAskable(lines, idx, role, askPartner){ for(let i=idx+1;i<lines.length;i++){ const isMine = lines[i].speaker===role; if(isMine||askPartner) return i; } return -1; }
-
-    /* ---------------------------- Songs Engine ---------------------------- */
-    let songIdx = 0;
-    function startSong(){ startSongAt(state.prefs.songId, 0); }
-    function startSongAt(songId, idx){ state.prefs.songId = songId; saveState(); const song=currentSong(); songIdx=Math.max(0, Math.min(idx, (song?.lines?.length||1)-1)); renderSong(); }
-    function renderSong(){
-      if(state.prefs.tab!=='songs'){ return; }
-      const song = currentSong(); if(!song){ songPractice.innerHTML='<div class="muted">Kein Song ausgewählt.</div>'; return; }
-      const lines = song.lines; if(!lines?.length){ songPractice.innerHTML='<div class="muted">Keine Songzeilen vorhanden.</div>'; return; }
-      const ctxN = Math.max(0, Number(state.prefs.songContext||1));
-      const l = lines[songIdx]; const isMyLine = l.speaker===state.prefs.role; const askPartnerToo = !!state.prefs.songQuizPartner;
-      const context = []; for(let i=Math.max(0, songIdx-ctxN); i<songIdx; i++){ const c = lines[i]; context.push(`<div class=\"cue\"><div class=\"speaker\">${c.speaker||'ENSEMBLE'}</div><div>${escapeHtml(c.text)}</div></div>`); }
-      const header = `<div class="row" style="justify-content:space-between"><div class="pill">🎵 ${song.title}</div><div class="pill">Zeile ${songIdx+1} / ${lines.length}</div></div>`;
-      let body=''; const mode = state.prefs.songMode;
-      if(mode==='reveal'){
-        body = `<div class=\"btns\"><button id=\"songRevealBtn\" class=\"secondary\">Zeile anzeigen</button><button id=\"songPlayCtxBtn\" class=\"ghost\">Kontext vorlesen</button><button id=\"songNextBtn\">Weiter</button></div>
-                <div id=\"songRevealBox\" class=\"hidden\" style=\"margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)\"><div class=\"line\">${escapeHtml(l.text)}</div></div>`;
-      } else if(mode==='cloze'){
-        const every = Number(document.getElementById('clozeEvery').value||5);
-        const {masked} = clozeMask(l.text, every);
-        body = `<div class=\"cue\"><div class=\"speaker\">${l.speaker||'ENSEMBLE'}${isMyLine?' (Du)':''}</div><div class=\"line\">${masked}</div></div>
-                <div class=\"answerBox\"><input id=\"songAnswer\" type=\"text\" autocomplete=\"off\" placeholder=\"Fehlende Wörter in richtiger Reihenfolge\" /><button id=\"songCheck\">Prüfen</button></div>
-                <div id=\"songFb\" class=\"muted\"></div>
-                <div class=\"btns\"><button id=\"songHint\" class=\"ghost\">Hinweis</button><button id=\"songNextBtn\" class=\"secondary\">Weiter</button></div>`;
-      } else { // firstletters
-        const firsts = firstLetters(l.text);
-        body = `<div class=\"cue\"><div class=\"speaker\">${l.speaker||'ENSEMBLE'}${isMyLine?' (Du)':''}</div><div class=\"line\">${firsts}</div></div>
-                <div class=\"btns\"><button id=\"songRevealBtn\" class=\"secondary\">Ganzen Text anzeigen</button><button id=\"songPlayCtxBtn\" class=\"ghost\">Kontext vorlesen</button><button id=\"songNextBtn\">Weiter</button></div>
-                <div id=\"songRevealBox\" class=\"hidden\" style=\"margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)\"><div class=\"line\">${escapeHtml(l.text)}</div></div>`;
-      }
-      songPractice.innerHTML = header + context.join('') + body;
-      songProgress.textContent = `${songIdx+1} / ${lines.length}`;
-      document.getElementById('songNextBtn')?.addEventListener('click', ()=>{ if(songIdx>=lines.length-1){ songPractice.innerHTML='<div>🎉 Song durch!'</div>; } else { songIdx++; renderSong(); } });
-      document.getElementById('songRevealBtn')?.addEventListener('click', ()=>{ document.getElementById('songRevealBox')?.classList.remove('hidden'); });
-      document.getElementById('songPlayCtxBtn')?.addEventListener('click', ()=>{ if(state.prefs.songTtsOther) speakContext(contextText(lines, songIdx, ctxN)); });
-      if(mode==='cloze'){
-        const input = document.getElementById('songAnswer'); const fb = document.getElementById('songFb');
-        document.getElementById('songCheck')?.addEventListener('click', ()=>{ const ok = containsWordsInOrder(input.value, l.text, Number(clozeEvery.value||5)); if(ok){ fb.textContent='✅ Stark!'; state.meta.songXP += 8; saveState(); renderSong(); } else { fb.textContent='❌ Fast – prüfe Reihenfolge/Endungen'; } });
-        document.getElementById('songHint')?.addEventListener('click', ()=>{ fb.textContent='Hinweis: ' + firstNCharsHint(l.text, input.value); });
-      }
-      refreshProgress();
-    }
-
-    /* --------------------------- Tabs & Selectors ------------------------- */
-    function selectTab(name){ state.prefs.tab=name; tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name)); leftTitle.textContent = (name==='trainer'?'Trainer':'Songs'); document.getElementById('trainerControls').style.display = (name==='trainer')?'grid':'none'; document.getElementById('trainerToggles').style.display=(name==='trainer')?'flex':'none'; practiceArea.style.display=(name==='trainer')?'block':'none'; songsPanel.classList.toggle('hidden', name!=='songs'); saveState(); if(name==='trainer') renderPractice(); if(name==='songs') renderSong(); }
-    tabs.forEach(t=> t.addEventListener('click', ()=> selectTab(t.dataset.tab) ));
-
-    roleSel.addEventListener('change', ()=>{ state.prefs.role=roleSel.value; saveState(); renderPractice(); renderSong(); });
-    sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId=sceneSel.value; saveState(); buildScriptList(); startPractice(); });
-    modeSel.addEventListener('change', ()=>{ state.prefs.mode=modeSel.value; saveState(); renderPractice(); });
-    contextSel.addEventListener('change', ()=>{ state.prefs.context=Number(contextSel.value); saveState(); renderPractice(); });
-    hideCuts.addEventListener('change', ()=>{ state.prefs.hidCuts=hideCuts.checked; saveState(); buildScriptList(); renderPractice(); });
-    includeOptional.addEventListener('change', ()=>{ state.prefs.includeOptional=includeOptional.checked; saveState(); buildScriptList(); renderPractice(); });
-    quizPartner.addEventListener('change', ()=>{ state.prefs.quizPartner=quizPartner.checked; saveState(); renderPractice(); });
-    ttsOther.addEventListener('change', ()=>{ state.prefs.ttsOther=ttsOther.checked; saveState(); });
-    autoAdvance.addEventListener('change', ()=>{ state.prefs.autoAdvance=autoAdvance.checked; saveState(); });
-    excludeSongs.addEventListener('change', ()=>{ state.prefs.excludeSongs=excludeSongs.checked; saveState(); buildScriptList(); });
-
-    songSel.addEventListener('change', ()=>{ state.prefs.songId=songSel.value; saveState(); startSong(); });
-    songModeSel.addEventListener('change', ()=>{ state.prefs.songMode=songModeSel.value; saveState(); renderSong(); });
-    songContextSel.addEventListener('change', ()=>{ state.prefs.songContext=Number(songContextSel.value); saveState(); renderSong(); });
-
-    /* ------------------------------ TTS / STT ------------------------------ */
-    function speakContext(text){ if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=1.0; u.pitch=1.0; try{ speechSynthesis.cancel(); }catch(_){} speechSynthesis.speak(u); if(state.prefs.autoAdvance){ u.onend=()=> nextItem(); } }
-    function contextText(lines, idx, ctxN){ const parts=[]; for(let i=Math.max(0, idx-ctxN); i<idx; i++){ parts.push(`${lines[i].speaker||'ENSEMBLE'}: ${lines[i].text}`); } return parts.join('. '); }
-
-    /* -------------------------------- Utils -------------------------------- */
-    function escapeHtml(s){ return (s||'').replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-    function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
-    function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); const sim=1 - d / Math.max(1,maxLen); return sim>=0.88; }
-    function firstNCharsHint(target, typed){ const T=normalize(target); const U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
-    function diffHint(a,b){ const A=normalize(a).split(' '), B=normalize(b).split(' '); let i=0; while(i<A.length&&i<B.length&&A[i]===B[i]) i++; const next=B[i]||''; return next? (`Nächstes Wort: "${next}"`) : 'Prüfe Satzende & Satzbau'; }
-    function levenshtein(a,b){ const m=a.length, n=b.length; if(!m) return n; if(!n) return m; const dp=new Array(n+1).fill(0); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
-    function gainXP(x){ state.meta.xp += x; saveState(); refreshProgress(); }
-    function miss(fb, typed, target){ state.meta.hearts=Math.max(0,state.meta.hearts-1); saveState(); refreshProgress(); const diff=diffHint(typed,target); fb.innerHTML='❌ Nicht ganz. Tipp: '+diff+(state.meta.hearts===0?'<br>💔 Keine Herzen mehr – kurze Pause?':''); }
-
-    function clozeMask(text, every){ const words=text.split(/(\s+)/); const masked = words.map((w,i)=>{ if(w.trim()==='') return w; const k=(i/2)|0; if(k>0 && k % every === 0){ return '<span style="opacity:.35; border-bottom:1px dashed #cbd7ff">_____</span>'; } return escapeHtml(w); }).join(''); return {masked}; }
-    function containsWordsInOrder(input, target, every){ const it=normalize(input).split(' ').filter(Boolean); const tt=normalize(target).split(' ').filter(Boolean); let j=0; for(let i=0;i<tt.length;i++){ if((i+1)%every===0){ if(j>=it.length || it[j]!==tt[i]) return false; j++; } } return true; }
-    function firstLetters(text){ return text.split(/(\s+)/).map(t=> t.trim()? t[0].toUpperCase()+'·' : t).join(''); }
-
-    // Keyboard shortcuts
-    window.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'){ e.preventDefault(); document.getElementById('nextBtn')?.click(); document.getElementById('songNextBtn')?.click(); } if(e.key===' '){ const b=document.getElementById('revealBtn')||document.getElementById('songRevealBtn'); if(b){ e.preventDefault(); b.click(); } } });
-
-    /* ---------------------- Auto‑Load horrorladen_script.json -------------- */
-    async function loadFromUrl(url){
-      try{
-        const res = await fetch(url, {cache:'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const json = await res.json();
-        if(json.roles) state.roles = json.roles; if(json.scenes) state.scenes = json.scenes; if(json.songs) state.songs = json.songs;
-        saveState(); refreshSelectors(); buildScriptList(); selectTab(state.prefs.tab||'trainer'); if((state.scenes?.length||0)>0) startPractice(); if((state.songs?.length||0)>0) startSong();
-      }catch(err){ alert('Konnte Script nicht laden: '+err.message+'\nURL: '+url); }
-    }
-    function detectDataUrl(){ const qs=new URLSearchParams(location.search); const hs=new URLSearchParams(location.hash.replace(/^#/,'')); return qs.get('data') || hs.get('data') || 'horrorladen_script.json'; }
-    window.addEventListener('DOMContentLoaded', ()=>{ const url = detectDataUrl(); loadFromUrl(url); });
-  </script>
+/* ---------------------- Start -------------------------------- */
+document.getElementById('goTextSetup').addEventListener('click', ()=> show('textSetup'));
+show(state.ui.page||'home');
+initLoad();
+</script>
 </body>
 </html>
