@@ -348,10 +348,11 @@ function show(page){
   editor:'Editor'
 })[page] || 'Horrorladen';
   tabbtns.forEach(b=> b.classList.toggle('active',
-    (page==='home' && b.dataset.tab==='home') ||
-    ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
-    ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs')
-    ((page==='editor') && b.dataset.tab==='editor')));
+  (page==='home' && b.dataset.tab==='home') ||
+  ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
+  ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs') ||
+  ((page==='editor') && b.dataset.tab==='editor')
+));
 }
 function saveSilently(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 backBtn.addEventListener('click', ()=>{ if(state.ui.page==='textSess') show('textSetup'); else if(state.ui.page==='songSess') show('songSetup'); else show('home'); });
