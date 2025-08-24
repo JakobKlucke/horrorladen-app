@@ -1000,28 +1000,45 @@ function sceneHasRole(scene, role, includeAlle){
   );
 }
 
+/* ---------------------- Bekannte Songs ------------------------ */
+const KNOWN_SONGS = [
+  "KLEINER HORRORLADEN",
+  "VORSTADT",
+  "DA – DOO",
+  "WACHS FÜR MICH",
+  "WUNDER GIBT ES DOCH",   // gestrichen, aber in Liste
+  "IM GRÜNEN IRGENWO",
+  "WIR MÜSSEN RENOVIEREN",
+  "ZAHNARZT",
+  "MUSHNIK UND SOHN",
+  "SCHICKSAL, WELCH EINE WENDUNG",
+  "GIB’S MIR",
+  "JETZT",
+  "JETZT HAST DU SEYMOUR",
+  "ESSENSZEIT",
+  "DIE LETZTEN WERDEN DIE ERSTEN SEIN",
+  "FINALE"
+  // "MEAN GREEN MOTHER" ausgelassen (gestrichen)
+];
+
 function normalizeScript(j){
   const roles = j.roles || [];
   const scenesRaw = Array.isArray(j.scenes) ? j.scenes.filter(s => Array.isArray(s.lines)) : [];
   const songsRaw  = Array.isArray(j.songs)  ? j.songs.filter(s => Array.isArray(s.lines))  : [];
 
-  const isSongByType = s => String(s.type||'').toLowerCase()==='song';
-  const isSongByName = s => /^(\d+\.\s*)?lied\b/i.test(String(s.name||''));
-  const cleanTitle = name => String(name||'')
-      .replace(/^(\d+\.\s*)?/,'')     // führende Nummerierung "12. "
-      .replace(/^lied[: ]*/i,'')      // "Lied:" entfernen
-      .replace(/^["„]|["“]$/g,'')     // Anführungen außen
-      .trim();
+  const isKnownSong = s => {
+    const n = String(s.name||s.title||'').toUpperCase().replace(/[„“"']/g,'').trim();
+    return KNOWN_SONGS.includes(n);
+  };
 
   const dialogScenes = [];
   const songsMerged = [];
 
-  // 1) Alle scenes sauber aufteilen
   for(const s of scenesRaw){
-    if(isSongByType(s) || isSongByName(s)){
+    if(isKnownSong(s)){
       songsMerged.push({
         id: s.id || ('song-' + (s.name||'').replace(/\s+/g,'-')),
-        title: s.title || cleanTitle(s.name),
+        title: s.title || s.name,
         status: s.status || 'keep',
         lines: s.lines
       });
@@ -1030,39 +1047,37 @@ function normalizeScript(j){
     }
   }
 
-  // 2) songs[] dazunehmen, doppelte per Titel zusammenfassen
+  // Songs aus songsRaw auch rein
   const byTitle = new Map();
   const addSong = (sg) => {
-    const key = (sg.title || sg.name || sg.id || '').toLowerCase();
-    if(!key) return;
-    if(!byTitle.has(key)) byTitle.set(key, { id: sg.id || ('song-'+key), title: sg.title || sg.name || sg.id, status: sg.status || 'keep', lines: [] });
-    byTitle.get(key).lines.push(...(sg.lines||[]));
+    const title = String(sg.title || sg.name || sg.id || '').toUpperCase().replace(/[„“"']/g,'').trim();
+    if(!title) return;
+    if(!byTitle.has(title)) byTitle.set(title, { id: sg.id||('song-'+title), title: sg.title||sg.name||sg.id, status: sg.status||'keep', lines: [] });
+    byTitle.get(title).lines.push(...(sg.lines||[]));
   };
   songsRaw.forEach(addSong);
   songsMerged.forEach(addSong);
 
-  // 3) Sonderfall ESSENSZEIT: Mushniks Sprechtext im Dialog lassen
-  const essKey = 'essenszeit';
+  // Sonderfall Essenszeit (Mushniks Sprechtext im Dialog lassen)
+  const essKey = "ESSENSZEIT";
   if(byTitle.has(essKey)){
     const song = byTitle.get(essKey);
     const keepInDialog = [];
     const rest = [];
     for(const l of (song.lines||[])){
-      const sp = String(l.speaker||'').toUpperCase().replace(/\./g,'');
-      if(sp==='MUSHNIK' || sp==='MR MUSHNIK' || sp==='MR MUSHNIK'){ keepInDialog.push(l); }
-      else { rest.push(l); }
+      const sp = String(l.speaker||'').toUpperCase();
+      if(sp.includes("MUSHNIK")) keepInDialog.push(l);
+      else rest.push(l);
     }
     song.lines = rest;
-    // hänge die Mushnik-Zeilen an die letzte Dialogszene vor ESSENSZEIT (falls vorhanden)
     if(keepInDialog.length && dialogScenes.length){
       dialogScenes[dialogScenes.length-1].lines.push(...keepInDialog);
     }
   }
 
-  // 4) Ergebnis
-  const songs = Array.from(byTitle.values());
-  return { roles, scenes: dialogScenes, songs };
+  return { roles, scenes: dialogScenes, songs: Array.from(byTitle.values()) };
 }
+
 
 
 /* ---------------------- Data URL UI --------------------------- */
