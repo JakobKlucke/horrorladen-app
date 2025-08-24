@@ -401,9 +401,9 @@ async function initLoad(){
     if(!Array.isArray(j.roles) || !Array.isArray(j.scenes) || !Array.isArray(j.songs)){
       throw new Error('JSON-Struktur unvollständig (roles/scenes/songs)');
     }
-    state.data.roles  = j.roles;
-    state.data.scenes = (j.scenes||[]).filter(s=>Array.isArray(s.lines));
-    state.data.songs  = (j.songs||[]).filter(s=>Array.isArray(s.lines));
+    state.data.roles  = j.roles || [];
+    state.data.scenes = (j.scenes || []).filter(s => Array.isArray(s.lines) && (s.type||'dialogue').toLowerCase() !== 'song');
+    state.data.songs  = (j.songs  || []).filter(s => Array.isArray(s.lines));
     if(!state.prefs.role && state.data.roles[0]) state.prefs.role = state.data.roles[0];
     if(!state.prefs.songRole && state.data.roles[0]) state.prefs.songRole = state.data.roles[0];
     if(!state.prefs.sceneId && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
@@ -434,14 +434,30 @@ modeContext.addEventListener('click', ()=>{ state.prefs.mode='context'; startSes
 modeType.addEventListener('click', ()=>{ state.prefs.mode='type'; startSession(); });
 
 function populateTextSetup(){
-  roleSel.innerHTML = state.data.roles.map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`).join('');
-  const scenesSorted = sortScenes(state.data.scenes);
-sceneSel.innerHTML = scenesSorted
-  .map((s, i)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${i+1}. ${s.name}</option>`)
-  .join('');
+  // Rollen
+  roleSel.innerHTML = (state.data.roles||[])
+    .map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`)
+    .join('');
+
+  // **Nur Dialog-Szenen** (Songs raus) + sortieren + nummerieren
+  const scenesDialog = sortScenes(
+    (state.data.scenes||[]).filter(s => (s.type||'dialogue').toLowerCase() !== 'song')
+  );
+
+  // Falls der gespeicherte sceneId auf eine Song-Szene zeigte → erste Dialogszene wählen
+  if (!scenesDialog.find(s => s.id === state.prefs.sceneId) && scenesDialog[0]) {
+    state.prefs.sceneId = scenesDialog[0].id;
+    saveSilently();
+  }
+
+  sceneSel.innerHTML = scenesDialog
+    .map((s, i)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${i+1}. ${s.name}</option>`)
+    .join('');
+
+  // Schalter
   includeAlle.checked = !!state.prefs.includeAlle;
-  hideCuts.checked = !!state.prefs.hideCuts;
-  includeOpt.checked = !!state.prefs.includeOpt;
+  hideCuts.checked    = !!state.prefs.hideCuts;
+  includeOpt.checked  = !!state.prefs.includeOpt;
 }
 
 roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); });
