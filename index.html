@@ -886,65 +886,51 @@ function extractPrefixedSpeaker(text){
 // Repariert Sprecher in einem Lines-Array
 function fixLines(lines){
   const out = [];
-  let carrySpeaker = null;
+  let carrySpeaker = null; // letzter „echter“ Sprecher
 
   for(const L of (lines||[])){
     let sp   = String(L.speaker||'').trim();
-    let text = String(L.text||'');
+    let text = String(L.text||'').trim();
     const status = L.status || 'keep';
 
-    // Falls Text mit Rollenlabel startet (z. B. "MUSHNIK: ..."), Speaker/Rest extrahieren
+    // Text beginnt mit Rollenlabel? (z.B. "MUSHNIK: ...")
     const ex = extractPrefixedSpeaker(text);
     if(ex){
       if(ex.labelOnly){
-        // Nur ein Label in dieser Zeile -> als "gemerkter" Sprecher weiterverwenden,
-        // aber Zeile NICHT verwerfen (wir erzeugen einen Platzhalter, damit die Szene nicht leer wird)
+        // nur ein Sprecher-Label in dieser Zeile -> merken und weiter
         carrySpeaker = ex.speaker;
-        // Falls wirklich gar kein Text folgt, fügen wir eine (unsichtbare) Separator-Zeile hinzu.
-        out.push({ speaker: carrySpeaker, text: '', status });
         continue;
-      } else {
+      }else{
         sp   = ex.speaker;
         text = ex.text;
       }
     }
 
-    // Wenn Speaker leer oder "ALLE": letzten bekannten übernehmen
+    // Speaker aus vorheriger Label-Zeile übernehmen
     if(!sp || sp.toUpperCase()==='ALLE'){
       sp = carrySpeaker || 'ALLE';
     }
 
-    // Normalisieren
+    // normalisieren
     sp = normRoleName(sp);
 
-    // Carry aktualisieren
+    // Carry aktualisieren (nur für echte Sprecher)
     if(sp && sp.toUpperCase()!=='ALLE') carrySpeaker = sp;
+
+    // komplett leere Platzhalter vermeiden
+    if(!text && sp==='ALLE') continue;
 
     out.push({ speaker: sp || 'ALLE', text, status });
   }
 
-  // Sicherheitsnetz: Wenn alles weggefallen wäre, Originalzeilen (minimal) übernehmen
-  if(out.length===0){
-    return (lines||[]).map(l => ({
-      speaker: normRoleName(l.speaker || 'ALLE'),
-      text: String(l.text||''),
-      status: l.status || 'keep'
-    }));
-  }
-
-  return out;
+  // Sicherheitsnetz: falls alles gefiltert wurde, Original minimal übernehmen
+  return out.length ? out : (lines||[]).map(l=>({
+    speaker: normRoleName(l.speaker || 'ALLE'),
+    text: String(l.text||''),
+    status: l.status || 'keep'
+  }));
 }
 
-    // 3) existierenden Speaker normalisieren
-    sp = normRoleName(sp);
-
-    // 4) Carry fortschreiben (wenn echter Sprecher)
-    if(sp && sp.toUpperCase()!=='ALLE') carrySpeaker = sp;
-
-    out.push({speaker: sp || 'ALLE', text, status});
-  }
-  return out;
-}
 
 /* ---------------------- Utils -------------------------------- */
 function heartsSvg(n){
