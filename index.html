@@ -231,6 +231,18 @@ label{font-size:.85rem;color:var(--muted)}
     </div>
   </section>
 
+ <!-- PAGE: BROWSER (neu) -->
+  <section id="page-browser" class="hidden grid grid-2">
+    <div class="card">
+      <h2>Szenen</h2>
+      <div id="sceneList" class="list"></div>
+    </div>
+    <div class="card">
+      <h2>Songs</h2>
+      <div id="songList" class="list"></div>
+    </div>
+  </section>
+
     <!-- PAGE: EDITOR -->
   <section id="page-editor" class="hidden grid grid-2">
     <div class="card">
@@ -327,14 +339,14 @@ function show(page){
   for(const k in pages){ pages[k].classList.toggle('hidden', k!==page); }
   backBtn.classList.toggle('hidden', page==='home');
   titleEl.textContent = ({
-    home:'Hauptmenü',
-    textSetup:'Text lernen',
-    textSess:'Training',
-    songSetup:'Songs lernen',
-    songSess:'Song',
-    browser:'Skript-Browser'
-    editor:'Editor'
-  })[page] || 'Horrorladen';
+  home:'Hauptmenü',
+  textSetup:'Text lernen',
+  textSess:'Training',
+  songSetup:'Songs lernen',
+  songSess:'Song',
+  browser:'Skript-Browser',
+  editor:'Editor'
+})[page] || 'Horrorladen';
   tabbtns.forEach(b=> b.classList.toggle('active',
     (page==='home' && b.dataset.tab==='home') ||
     ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
