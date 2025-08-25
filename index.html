@@ -567,23 +567,51 @@ const prevBtn = document.getElementById('prevBtn'); const nextBtn = document.get
 
 let session = { lines:[], idx:0, hearts:3, mode:'flash' };
 
+function isMyLine(l, role, includeAlle){
+  return (l.speaker===role) || (includeAlle && l.speaker==='ALLE');
+}
+
+function filterByStatus(lines, hideCuts, includeOpt){
+  return (lines||[]).filter(l=>{
+    if(hideCuts && l.status==='cut') return false;
+    if(!includeOpt && l.status==='optional') return false;
+    return true;
+  });
+}
+
+
 function startSession(){
-  const role = state.prefs.role;
-  const scene = state.data.scenes.find(s=>s.id===state.prefs.sceneId);
+  const role   = state.prefs.role;
+  const scene  = state.data.scenes.find(s=>s.id===state.prefs.sceneId);
   if(!scene){ alert('Keine Szene gefunden.'); return; }
-  session.mode = state.prefs.mode;
+
+  session.mode   = state.prefs.mode;
   session.hearts = 3;
-  session.lines = filterLinesForSession(scene.lines, role, state.prefs.includeAlle, state.prefs.hideCuts, state.prefs.includeOpt);
-  session.idx = 0;
+
+  const all = filterByStatus(scene.lines, state.prefs.hideCuts, state.prefs.includeOpt);
+
+  if(session.mode==='context'){
+    // Kontext nutzt ALLE Zeilen, aber abfragen nur eigene:
+    session.linesFull = all;                           // kompletter Fluss
+    session.askIdxs   = all.map((l,i)=> isMyLine(l, role, state.prefs.includeAlle)? i : -1).filter(i=>i>=0);
+    session.askPtr    = 0;                             // Zeiger auf die n-te eigene Zeile
+  } else {
+    // Flash/Type fragen nur eigene Zeilen ab (wie bisher)
+    session.lines     = all.filter(l=> isMyLine(l, role, state.prefs.includeAlle));
+    session.idx       = 0;
+  }
+
   sessionScenePill.textContent = displaySceneName(scene);
-  sessionRolePill.textContent = role;
+  sessionRolePill.textContent  = role;
   heartsBox.innerHTML = heartsSvg(session.hearts);
   revealText.classList.add('hidden');
   typeArea.classList.toggle('hidden', session.mode!=='type');
   revealArea.classList.toggle('hidden', session.mode==='type');
+
   show('textSess');
   renderStep();
 }
+
 
 function filterLinesForSession(lines, role, includeAlle, hideCuts, includeOpt){
   return (lines||[]).filter(l=>{
@@ -596,66 +624,127 @@ function filterLinesForSession(lines, role, includeAlle, hideCuts, includeOpt){
 }
 
 function renderStep(){
-  const n = session.lines.length;
-  if(n===0){
-    promptHint.textContent='Keine Zeilen nach Filter.';
-    promptSpeaker.textContent='—';
-    stepInfo.textContent='0/0';
-    return;
-  }
-  if(session.idx>=n) { session.idx=n-1; }
-  const l = session.lines[session.idx];
-
-  // Regie-Zeile
-  if (l.type === 'stage') {
-    promptSpeaker.textContent = 'Regie';
-    promptHint.textContent = 'Info';
+  // 0) Leere- / Endzustände
+  if(session.mode === 'context'){
+    const totalMy = (session.askIdxs || []).length;
+    if(!totalMy){
+      promptSpeaker.textContent = '—';
+      promptHint.textContent = 'Für diese Rolle gibt es in dieser Szene keine abzufragenden Zeilen.';
+      stepInfo.textContent = '0/0';
+      contextBox.innerHTML = '';
+      revealText.classList.add('hidden');
+      revealLine.textContent = '';
+      // Eingabebereiche neutral
+      typeArea.classList.add('hidden');
+      revealArea.classList.remove('hidden');
+      return;
+    }
+    if(session.askPtr >= totalMy) session.askPtr = totalMy - 1;
   } else {
-    promptSpeaker.textContent = (l.type==='song' ? `🎵 ${l.speaker||'ENSEMBLE'}` : `${l.speaker}`);
-    promptHint.textContent    = (l.type==='song' ? 'Songzeile' : (session.mode==='type' ? 'Tippe deine Zeile' : 'Deine Zeile'));
+    const n = (session.lines || []).length;
+    if(!n){
+      promptSpeaker.textContent = '—';
+      promptHint.textContent = 'Keine Zeilen nach Filter.';
+      stepInfo.textContent = '0/0';
+      contextBox.innerHTML = '';
+      revealText.classList.add('hidden');
+      revealLine.textContent = '';
+      typeArea.classList.add('hidden');
+      revealArea.classList.remove('hidden');
+      return;
+    }
+    if(session.idx >= n) session.idx = n - 1;
   }
 
-  // Kontext (2 Zeilen vorher)
-  const ctx = Math.max(0, Math.min(2, session.idx));
+  // 1) Zielzeile + Kontextquelle bestimmen
+  let l, ctxSource, baseIndex;
+  if(session.mode === 'context'){
+    const targetIndex = session.askIdxs[session.askPtr] ?? 0;
+    l         = (session.linesFull || [])[targetIndex] || {};
+    ctxSource = session.linesFull || [];
+    baseIndex = targetIndex;
+  } else {
+    l         = (session.lines || [])[session.idx] || {};
+    ctxSource = session.lines || [];
+    baseIndex = session.idx;
+  }
+
+  // 2) Kopfzeile / Hinweise (Regie kursiv, Song mit Icon)
+  const isStage = l.type === 'stage';
+  const isSong  = l.type === 'song';
+
+  if(isStage){
+    promptSpeaker.textContent = 'Regie';
+    promptHint.textContent    = (session.mode==='type' ? 'Info (Tippen deaktiviert)' : 'Info');
+  } else if(isSong){
+    promptSpeaker.textContent = `🎵 ${l.speaker || 'ENSEMBLE'}`;
+    promptHint.textContent    = (session.mode==='type' ? 'Tippe die Zeile' : 'Songzeile');
+  } else {
+    promptSpeaker.textContent = l.speaker || '—';
+    promptHint.textContent    = (session.mode==='type' ? 'Tippe deine Zeile' : (session.mode==='context' ? 'Erinnere deine Zeile' : 'Deine Zeile'));
+  }
+
+  // 3) Sichtbarkeit der Antwortbereiche (Stage niemals tippen)
+  const typeAllowed = (session.mode === 'type') && !isStage;
+  typeArea.classList.toggle('hidden', !typeAllowed);
+  revealArea.classList.toggle('hidden', typeAllowed);
+  if(typeAllowed){
+    typeInput.value = '';
+    feedback.textContent = '';
+  }
+
+  // 4) Kontext (max 2 vorherige Einträge aus dem vollen Fluss für context,
+  //    bzw. aus den gefilterten Zeilen für flash/type)
+  const ctxN = 2;
   contextBox.innerHTML = '';
-  for(let i=Math.max(0, session.idx-ctx); i<session.idx; i++){
-    const c = session.lines[i];
-    const cText = (c.type==='stage') ? `<em>${escapeHtml(c.text)}</em>` : escapeHtml(c.text);
-    contextBox.innerHTML += `<div class="cue"><div class="spk">${c.speaker}</div><div class="line">${cText}</div></div>`;
+  for(let i=Math.max(0, baseIndex - ctxN); i<baseIndex; i++){
+    const c = ctxSource[i] || {};
+    const cIsStage = c.type === 'stage';
+    const cIsSong  = c.type === 'song';
+    const speaker  = cIsStage ? 'Regie'
+                    : (cIsSong ? `🎵 ${c.speaker || 'ENSEMBLE'}` : (c.speaker || '—'));
+    const textHtml = cIsStage ? `<em>${escapeHtml(c.text || '')}</em>` : escapeHtml(c.text || '');
+    contextBox.innerHTML += `<div class="cue"><div class="spk">${speaker}</div><div class="line">${textHtml}</div></div>`;
   }
 
-  // Prompt
-  if(session.mode==='context'){
-    promptSpeaker.textContent = (session.idx+1<n) ? (session.lines[session.idx+1].speaker + ' – Nächste Zeile?') : 'Ende der Szene';
-    promptHint.textContent = 'Erinnere die nächste Zeile';
-  }else if(session.mode==='type'){
-    promptSpeaker.textContent = `${l.speaker}`;
-    promptHint.textContent = 'Tippe deine Zeile';
-    typeInput.value='';
-    feedback.textContent='';
+  // 5) Fortschritt + Reveal zurücksetzen
+  if(session.mode === 'context'){
+    const totalMy = (session.askIdxs || []).length;
+    stepInfo.textContent = `${Math.min(session.askPtr+1, totalMy)} / ${totalMy}`;
+  } else {
+    const n = (session.lines || []).length;
+    stepInfo.textContent = `${session.idx+1} / ${n}`;
   }
-
-  stepInfo.textContent = `${session.idx+1} / ${n}`;
   revealText.classList.add('hidden');
   revealLine.textContent = '';
 }
 
-/* ---------- Reveal-Button ---------- */
+
+/* ---------- Hilfsfunktion: aktuelle Zielzeile holen ---------- */
+function currentTargetLine(){
+  if(session.mode === 'context'){
+    const idx = (session.askIdxs || [])[session.askPtr];
+    return (session.linesFull || [])[idx] || {};
+  }
+  return (session.lines || [])[session.idx] || {};
+}
+
+/* ---------- Reveal ---------- */
 revealBtn.addEventListener('click', ()=>{
-  const l = session.lines[session.idx] || {};
+  const l = currentTargetLine();
   if(l.type === 'stage'){
-    revealLine.innerHTML = `<em>${escapeHtml(l.text||'')}</em>`;
+    revealLine.innerHTML = `<em>${escapeHtml(l.text || '')}</em>`;
   } else {
     revealLine.textContent = l.text || '';
   }
   revealText.classList.remove('hidden');
 });
 
-/* ---------- Wrong / Right ---------- */
+/* ---------- Wrong ---------- */
 wrongBtn.addEventListener('click', ()=>{
-  session.hearts = Math.max(0, session.hearts-1);
+  session.hearts = Math.max(0, session.hearts - 1);
   heartsBox.innerHTML = heartsSvg(session.hearts);
-  if(session.hearts===0){
+  if(session.hearts === 0){
     alert('💔 Keine Herzen mehr – Runde vorbei.');
     show('textSetup');
     return;
@@ -663,9 +752,10 @@ wrongBtn.addEventListener('click', ()=>{
   nextStep();
 });
 
+/* ---------- Right (kein XP bei Regie) ---------- */
 rightBtn.addEventListener('click', ()=>{
-  const l = session.lines[session.idx] || {};
-  if(l.type !== 'stage'){   // ✅ nur XP bei Dialog/Song
+  const l = currentTargetLine();
+  if(l.type !== 'stage'){
     state.meta.xp += 8;
     saveSilently();
   }
@@ -674,45 +764,56 @@ rightBtn.addEventListener('click', ()=>{
 
 /* ---------- Check (Type-Modus) ---------- */
 checkBtn.addEventListener('click', ()=>{
-  const l = (session.mode==='context' && session.lines[session.idx+1]) 
-              ? session.lines[session.idx+1] 
-              : session.lines[session.idx];
+  const l = currentTargetLine();
 
-  if(l.type==='stage'){   // ✅ Regie-Zeilen automatisch überspringen
+  // Regiezeilen werden im Type-Modus nicht abgefragt -> einfach weiter
+  if(l.type === 'stage'){
     nextStep();
     return;
   }
 
-  const ok = similarEnough(typeInput.value, l.text);
+  const ok = similarEnough(typeInput.value, l.text || '');
   feedback.textContent = ok ? '✅ Richtig!' : '❌ Nicht ganz.';
   if(ok){
     state.meta.xp += 10;
     saveSilently();
     setTimeout(nextStep, 300);
-  }
-  else {
-    session.hearts=Math.max(0,session.hearts-1);
+  } else {
+    session.hearts = Math.max(0, session.hearts - 1);
     heartsBox.innerHTML = heartsSvg(session.hearts);
-    if(session.hearts===0){
+    if(session.hearts === 0){
       alert('💔 Keine Herzen mehr – Runde vorbei.');
       show('textSetup');
     }
   }
 });
 
+/* ---------- Hint ---------- */
 hintBtn.addEventListener('click', ()=>{
-  const l = (session.mode==='context' && session.lines[session.idx+1]) 
-              ? session.lines[session.idx+1] 
-              : session.lines[session.idx];
-  feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text, typeInput.value);
+  const l = currentTargetLine();
+  feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text || '', typeInput.value || '');
 });
 
 skipBtn.addEventListener('click', nextStep);
 prevBtn.addEventListener('click', prevStep);
 nextBtn.addEventListener('click', nextStep);
 
-function prevStep(){ session.idx = Math.max(0, session.idx-1); renderStep(); }
-function nextStep(){ session.idx = Math.min(session.lines.length, session.idx+1); renderStep(); }
+function prevStep(){
+  if(session.mode==='context'){
+    session.askPtr = Math.max(0, session.askPtr-1);
+  } else {
+    session.idx = Math.max(0, session.idx-1);
+  }
+  renderStep();
+}
+function nextStep(){
+  if(session.mode==='context'){
+    session.askPtr = Math.min((session.askIdxs.length||1)-1, session.askPtr+1);
+  } else {
+    session.idx = Math.min((session.lines.length||1)-1, session.idx+1);
+  }
+  renderStep();
+}
 
 
 /* ---------------------- Song Session -------------------------- */
