@@ -588,22 +588,27 @@ function startSession(){
   session.mode   = state.prefs.mode;
   session.hearts = 3;
 
+  // 1) Status-Filter (Cuts/Optional raus)
   const all = filterByStatus(scene.lines, state.prefs.hideCuts, state.prefs.includeOpt);
 
   if(session.mode==='context'){
-    // Kontext nutzt ALLE Zeilen, aber abfragen nur eigene:
-    session.linesFull = all;                           // kompletter Fluss
-    session.askIdxs   = all.map((l,i)=> isMyLine(l, role, state.prefs.includeAlle)? i : -1).filter(i=>i>=0);
-    session.askPtr    = 0;                             // Zeiger auf die n-te eigene Zeile
+    // Kontext-Modus → kompletter Fluss sichtbar
+    const grouped = groupConsecutiveBySpeaker(all);
+    session.linesFull = grouped;
+
+    // Merke nur die Blöcke, die meine Rolle (oder ALLE, wenn gewünscht) enthalten
+    session.askIdxs = grouped.map((blk,i)=> isMyLine(blk, role, state.prefs.includeAlle) ? i : -1).filter(i=>i>=0);
+    session.askPtr  = 0;
   } else {
-    // Flash/Type fragen nur eigene Zeilen ab (wie bisher)
-    session.lines     = all.filter(l=> isMyLine(l, role, state.prefs.includeAlle));
-    session.idx       = 0;
+    // Flashcards / Type → nur meine Blöcke übrig
+    session.lines = groupConsecutiveBySpeaker(all).filter(blk=> isMyLine(blk, role, state.prefs.includeAlle));
+    session.idx   = 0;
   }
 
   sessionScenePill.textContent = displaySceneName(scene);
   sessionRolePill.textContent  = role;
   heartsBox.innerHTML = heartsSvg(session.hearts);
+
   revealText.classList.add('hidden');
   typeArea.classList.toggle('hidden', session.mode!=='type');
   revealArea.classList.toggle('hidden', session.mode==='type');
@@ -1098,7 +1103,7 @@ function fixLines(lines){
 }
 
 
-/* ---------------------- Utils -------------------------------- */
+/* ---------------------- Utils (bereinigt) ---------------------- */
 function heartsSvg(n){
   let html=''; for(let i=0;i<3;i++){
     const c = i<n ? '#ff6b6b' : '#3a4057';
@@ -1107,76 +1112,10 @@ function heartsSvg(n){
   return html;
 }
 function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-function parseSceneId(id){
-  // akzeptiert "1.1", "1.10", "2.3", "01.02", "1", "2"
-  const m = String(id||'').match(/^(\d+)(?:\.(\d+))?$/);
-  if(!m) return {act: 9999, num: 9999};
-  return {act: Number(m[1]||0), num: Number(m[2]||0)};
-}
 
-function sortScenes(list){
-  // Bevorzugt vorhandenes "order", sonst natürliche Sortierung nach id
-  return (list||[]).slice().sort((a,b)=>{
-    const ao = (typeof a.order==='number') ? a.order : null;
-    const bo = (typeof b.order==='number') ? b.order : null;
-    if(ao!=null && bo!=null) return ao - bo;
-    if(ao!=null) return -1;
-    if(bo!=null) return 1;
-
-    const A = parseSceneId(a.id);
-    const B = parseSceneId(b.id);
-    if(A.act!==B.act) return A.act - B.act;
-    if(A.num!==B.num) return A.num - B.num;
-
-    // fallback: Name natürlich sortieren
-    return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true,sensitivity:'base'});
-  });
-}
-
-function parseSceneIdParts(idOrName){
-  // versucht "1.2", "2.3", "1. SZENE", "ZWEITER AKT – 3. SZENE" etc. zu erkennen
-  const s = String(idOrName||'').toUpperCase();
-  // 1) "2.5" -> act=2, num=5
-  let m = s.match(/^(\d+)\.(\d+)$/);
-  if(m) return {act:Number(m[1]), num:Number(m[2])};
-  // 2) "1. SZENE" / "3. SZENE"
-  m = s.match(/^(\d+)\s*[\.\-]?\s*SZENE/);
-  if(m) return {act:1, num:Number(m[1])}; // default Akt 1, wenn nicht explizit
-  // 3) "ZWEITER AKT – 3. SZENE"
-  m = s.match(/(ERSTER|ZWEITER)\s+AKT.*?(\d+)\s*[\.\-]?\s*SZENE/);
-  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:Number(m[2])};
-  // 4) nur Akt (z. B. "ZWEITER AKT")
-  m = s.match(/(ERSTER|ZWEITER)\s+AKT/);
-  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:0};
-  return {act:9999, num:9999};
-}
-function aktLabel(act){ return act===2 ? 'ZWEITER AKT' : 'ERSTER AKT'; }
-
-// entfernt führende Nummern/„Szene“-Worte aus einem Namen
-function detailTitle(name){
-  return String(name||'')
-    .replace(/^\s*(ERSTER|ZWEITER)\s+AKT\s*[\-–—]?\s*/i,'')
-    .replace(/^\s*\d+\s*[\.\-]?\s*SZENE\s*[\-–—:]?\s*/i,'')
-    .replace(/^\s*\d+(?:\.\d+)?\s*[\-–—:]?\s*/,'')
-    .trim();
-}
-
-// baut die Anzeige "AKT – N. SZENE — Detail"
-function displaySceneName(scene){
-  const idHint = scene.id || scene.name || '';
-  const {act,num} = parseSceneIdParts(idHint || scene.name);
-  const head = `${aktLabel(act)}${num?` – ${num}. SZENE`:''}`;
-  const detail = detailTitle(scene.name||'');
-  return detail ? `${head} — ${detail}` : head;
-}
-
-
-function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
-function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
-function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); return (1 - d/Math.max(1,maxLen)) >= .88; }
-function firstNCharsHint(target, typed){ const T=normalize(target), U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
 const toast = document.getElementById('toast'); let toastTimer=null;
 function showToast(txt){ toast.textContent=txt; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'), 850); }
+function toastOK(t){ showToast(t||'Geladen'); }
 function showLoadError(msg){
   const box = document.getElementById('edList') || document.body;
   const div = document.createElement('div');
@@ -1185,92 +1124,121 @@ function showLoadError(msg){
   box.prepend(div);
   alert(msg);
 }
-function toastOK(t){ showToast(t||'Geladen'); }
 
-  function parseSceneId(id){
+/* ---- Szene-IDs / Anzeige ---- */
+function parseSceneId(id){
   // akzeptiert "1.1", "2.10", "2", auch "01.02"
   const m = String(id||'').trim().match(/^(\d+)(?:\.(\d+))?$/);
-  if(!m) return {act: 9999, num: 9999};           // unsortierbar -> ans Ende
+  if(!m) return {act: 9999, num: 9999};
   return {act: Number(m[1]||0), num: Number(m[2]||0)};
 }
-
 function sortScenes(list){
   return (list||[]).slice().sort((a,b)=>{
-    // 1) explizite order bevorzugen
     if(typeof a.order==='number' && typeof b.order==='number') return a.order-b.order;
     if(typeof a.order==='number') return -1;
     if(typeof b.order==='number') return 1;
-    // 2) natürliche Sortierung nach ID (Akt/Nummer)
     const A=parseSceneId(a.id), B=parseSceneId(b.id);
     if(A.act!==B.act) return A.act - B.act;
     if(A.num!==B.num) return A.num - B.num;
-    // 3) Fallback: natürlicher Name
     return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true, sensitivity:'base'});
   });
 }
-
-function sceneHasRole(scene, role, includeAlle){
-  if(!role) return true;
-  return (scene?.lines||[]).some(l =>
-    l.speaker===role || (includeAlle && l.speaker==='ALLE')
-  );
+function parseSceneIdParts(idOrName){
+  const s = String(idOrName||'').toUpperCase();
+  let m = s.match(/^(\d+)\.(\d+)$/);
+  if(m) return {act:Number(m[1]), num:Number(m[2])};
+  m = s.match(/^(\d+)\s*[\.\-]?\s*SZENE/);
+  if(m) return {act:1, num:Number(m[1])};
+  m = s.match(/(ERSTER|ZWEITER)\s+AKT.*?(\d+)\s*[\.\-]?\s*SZENE/);
+  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:Number(m[2])};
+  m = s.match(/(ERSTER|ZWEITER)\s+AKT/);
+  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:0};
+  return {act:9999, num:9999};
+}
+function aktLabel(act){ return act===2 ? 'ZWEITER AKT' : 'ERSTER AKT'; }
+function detailTitle(name){
+  return String(name||'')
+    .replace(/^\s*(ERSTER|ZWEITER)\s+AKT\s*[\-–—]?\s*/i,'')
+    .replace(/^\s*\d+\s*[\.\-]?\s*SZENE\s*[\-–—:]?\s*/i,'')
+    .replace(/^\s*\d+(?:\.\d+)?\s*[\-–—:]?\s*/,'')
+    .trim();
+}
+function displaySceneName(scene){
+  const idHint = scene.id || scene.name || '';
+  const {act,num} = parseSceneIdParts(idHint || scene.name);
+  const head = `${aktLabel(act)}${num?` – ${num}. SZENE`:''}`;
+  const detail = detailTitle(scene.name||'');
+  return detail ? `${head} — ${detail}` : head;
 }
 
-/* ---------------------- Bekannte Songs (fuzzy) ------------------------ */
-const KNOWN_SONGS = [
-  "KLEINER HORRORLADEN",
-  "VORSTADT",
-  "DA – DOO",
-  "WACHS FÜR MICH",
-  "WUNDER GIBT ES DOCH",          // gestrichen? später per Editor ausblendbar
-  "IM GRÜNEN IRGENDWO",
-  "WIR MÜSSEN RENOVIEREN",
-  "ZAHNARZT",
-  "MUSHNIK UND SOHN",
-  "SCHICKSAL, WELCH EINE WENDUNG",
-  "GIB’S MIR",
-  "JETZT",
-  "JETZT HAST DU SEYMOUR",
-  "ESSENSZEIT",
-  "DIE LETZTEN WERDEN DIE ERSTEN SEIN",
-  "FINALE"
-  // "MEAN GREEN MOTHER" lassen wir weg (gestrichen)
-];
+/* ---- Text-Ähnlichkeit ---- */
+function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
+function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
+function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); return (1 - d/Math.max(1,maxLen)) >= .88; }
+function firstNCharsHint(target, typed){ const T=normalize(target), U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
 
-// Hilfen: Titel normieren (Groß-/Kleinschreibung, Anführungen, Doppelpunkte, „Nr. 19c) Reprise:“ etc.)
+/* ---- Rollen-/Szenen-Helfer ---- */
+function sceneHasRole(scene, role, includeAlle){
+  if(!role) return true;
+  return (scene?.lines||[]).some(l => l.speaker===role || (includeAlle && l.speaker==='ALLE'));
+}
+function isMyLine(line, role, includeAlle){
+  if(!line) return false;
+  return (line.speaker===role) || (includeAlle && line.speaker==='ALLE');
+}
+function filterByStatus(lines, hideCuts, includeOpt){
+  return (lines||[]).filter(l=>{
+    if(hideCuts && l.status==='cut') return false;
+    if(!includeOpt && l.status==='optional') return false;
+    return true;
+  });
+}
+
+/* ---- Song-Erkennung / Normalisierung ---- */
+const KNOWN_SONGS = [
+  "KLEINER HORRORLADEN","VORSTADT","DA – DOO","WACHS FÜR MICH",
+  "WUNDER GIBT ES DOCH","IM GRÜNEN IRGENDWO","WIR MÜSSEN RENOVIEREN",
+  "ZAHNARZT","MUSHNIK UND SOHN","SCHICKSAL, WELCH EINE WENDUNG",
+  "GIB’S MIR","JETZT","JETZT HAST DU SEYMOUR",
+  "ESSENSZEIT","DIE LETZTEN WERDEN DIE ERSTEN SEIN","FINALE"
+];
 const _canon = s => String(s||'')
   .toUpperCase()
   .replace(/[„“"']/g,'')
   .replace(/\s+/g,' ')
-  .replace(/\bNR\.\s*\d+[A-Z]?\)?\s*/g,'')     // NR. 19a)
-  .replace(/\bREPRISE:?/g,'')                   // REPRISE:
-  .replace(/\bLIED:?/g,'')                      // LIED:
+  .replace(/\bNR\.\s*\d+[A-Z]?\)?\s*/g,'')
+  .replace(/\bREPRISE:?/g,'')
+  .replace(/\bLIED:?/g,'')
   .replace(/^\s*[:–—-]\s*/,'')
   .trim();
-
 const KNOWN_SONGS_CANON = KNOWN_SONGS.map(_canon);
-
-// Prüft, ob ein Szenen-/Songname einen der bekannten Songs enthält
 function isKnownSongTitle(name){
   const n = _canon(name);
   return KNOWN_SONGS_CANON.some(k => n.includes(k));
 }
 
+/* ---- Script-Normalisierung (Songs vs. Dialog) ---- */
 function normalizeScript(j){
-  const roles = j.roles || [];
+  const roles = Array.isArray(j.roles) ? j.roles.slice() : [];
   const scenesRaw = Array.isArray(j.scenes) ? j.scenes.filter(s => Array.isArray(s.lines)) : [];
   const songsRaw  = Array.isArray(j.songs)  ? j.songs.filter(s => Array.isArray(s.lines))  : [];
 
-  const dialogScenes = [];
-  const songsMerged = [];
+  const isSongByType = s => String(s.type||'').toLowerCase()==='song';
+  const isSongByName = s => /^(\d+\.\s*)?lied\b/i.test(String(s.name||''));
+  const cleanTitle = name => String(name||'')
+    .replace(/^(\d+\.\s*)?/,'')
+    .replace(/^lied[: ]*/i,'')
+    .replace(/^["„]|["“]$/g,'')
+    .trim();
 
-  // 1) Scenes in Dialog vs. Songs trennen – NUR anhand deiner festen Liste (fuzzy)
+  const dialogScenes = [];
+  const detectedSongs = [];
+
   for(const s of scenesRaw){
-    const name = s.title || s.name || '';
-    if(isKnownSongTitle(name)){
-      songsMerged.push({
-        id: s.id || ('song-' + (name||'').replace(/\s+/g,'-')),
-        title: name,
+    if(isSongByType(s) || isSongByName(s) || isKnownSongTitle(s.name||'')){
+      detectedSongs.push({
+        id: s.id || ('song-' + (s.name||'').replace(/\s+/g,'-')),
+        title: s.title || cleanTitle(s.name),
         status: s.status || 'keep',
         lines: s.lines
       });
@@ -1279,40 +1247,57 @@ function normalizeScript(j){
     }
   }
 
-  // 2) Alles aus j.songs zusätzlich aufnehmen und nach Titel zusammenführen
   const byTitle = new Map();
-  const addSong = (sg) => {
-    const title = sg.title || sg.name || sg.id || '';
-    if(!title) return;
-    const key = _canon(title);                 // kanonisierter Schlüssel
-    if(!byTitle.has(key)){
-      byTitle.set(key, { id: sg.id||('song-'+key), title: title, status: sg.status||'keep', lines: [] });
-    }
+  const addSong = sg => {
+    const key = (sg.title || sg.name || sg.id || '').toLowerCase();
+    if(!key) return;
+    if(!byTitle.has(key)) byTitle.set(key, { id: sg.id || ('song-'+key), title: sg.title || sg.name || sg.id, status: sg.status || 'keep', lines: [] });
     byTitle.get(key).lines.push(...(sg.lines||[]));
   };
   songsRaw.forEach(addSong);
-  songsMerged.forEach(addSong);
-
-  // 3) Sonderfall "ESSENSZEIT": Mushniks Sprechtext im Dialog lassen
-  const essKey = _canon("ESSENSZEIT");
-  if(byTitle.has(essKey)){
-    const song = byTitle.get(essKey);
-    const keepInDialog = [];
-    const rest = [];
-    for(const l of (song.lines||[])){
-      const sp = String(l.speaker||'').toUpperCase();
-      if(sp.includes("MUSHNIK")) keepInDialog.push(l);
-      else rest.push(l);
-    }
-    song.lines = rest;
-    if(keepInDialog.length && dialogScenes.length){
-      dialogScenes[dialogScenes.length-1].lines.push(...keepInDialog);
-    }
-  }
+  detectedSongs.forEach(addSong);
 
   return { roles, scenes: dialogScenes, songs: Array.from(byTitle.values()) };
 }
 
+/* ---- ABAB-Blockbildung ---- */
+// Fasst aufeinanderfolgende Zeilen mit gleichem Sprecher zu EINEM Block zusammen.
+// Regie (type:'stage') bleibt als eigener Block.
+// Status wird „streng“ gemerged: cut > optional > keep.
+function groupConsecutiveBySpeaker(lines){
+  const out = [];
+  const rank = s => (s==='cut'?2 : s==='optional'?1 : 0);
+  let cur = null; // {speaker, text, status, type}
+
+  for(const L of (lines||[])){
+    const type = L.type || 'dialogue'; // 'dialogue' | 'stage' | 'song'
+    const speaker = (L.speaker || (type==='stage' ? 'REGIE' : '—')).toString();
+
+    if(type === 'stage'){
+      if(cur) { out.push(cur); cur=null; }
+      out.push({ speaker:'REGIE', text:String(L.text||''), status:L.status||'keep', type:'stage' });
+      continue;
+    }
+
+    if(cur && cur.type!=='stage' && cur.speaker === speaker){
+      const add = String(L.text||'').trim();
+      cur.text = add ? (cur.text ? (cur.text + '\n' + add) : add) : cur.text;
+      const worst = rank(L.status||'keep') > rank(cur.status||'keep') ? (L.status||'keep') : cur.status;
+      cur.status = worst;
+      if((L.type||'dialogue')==='song') cur.type = 'song';
+    }else{
+      if(cur) out.push(cur);
+      cur = {
+        speaker,
+        text: String(L.text||'').trim(),
+        status: L.status || 'keep',
+        type: (L.type || 'dialogue')
+      };
+    }
+  }
+  if(cur) out.push(cur);
+  return out;
+}
 
 
 
