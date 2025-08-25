@@ -411,8 +411,9 @@ async function initLoad(){
 
     // In den State schreiben
     state.data.roles  = norm.roles || [];
-    state.data.scenes = norm.scenes || [];
-    state.data.songs  = norm.songs  || [];
+    // neu: Songs BLEIBEN in den Szenen, songs[] bleibt zusätzlich für den Song-Tab
+    state.data.scenes = scenes;       // alles drin lassen, inkl. song-Scenes
+    state.data.songs  = songs;        // parallel nutzbar
 
     // Defaults
     if(!state.prefs.role      && state.data.roles[0])  state.prefs.role     = state.data.roles[0];
@@ -471,8 +472,8 @@ function populateTextSetup(){
   }
 
   sceneSel.innerHTML = list
-    .map((s, i)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${i+1}. ${s.name}</option>`)
-    .join('');
+  .map((s)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${displaySceneName(s)}</option>`)
+  .join('');
 
   // Schalter syncen
   includeAlle.checked = !!state.prefs.includeAlle;
@@ -527,9 +528,9 @@ scenesSorted.forEach((s, i)=>{
   const div = document.createElement('div');
   div.className='item';
   div.innerHTML = `<div class="row" style="justify-content:space-between">
-      <b>${i+1}. ${s.name}</b>
-      <span class="small">${(s.lines||[]).length} Zeilen</span>
-    </div>`;
+  <b>${displaySceneName(s)}</b>
+  <span class="small">${(s.lines||[]).length} Zeilen</span>
+</div>`;
   div.addEventListener('click', ()=>{
     state.prefs.sceneId = s.id;
     show('textSetup'); 
@@ -574,7 +575,7 @@ function startSession(){
   session.hearts = 3;
   session.lines = filterLinesForSession(scene.lines, role, state.prefs.includeAlle, state.prefs.hideCuts, state.prefs.includeOpt);
   session.idx = 0;
-  sessionScenePill.textContent = scene.name;
+  sessionScenePill.textContent = displaySceneName(scene);
   sessionRolePill.textContent = role;
   heartsBox.innerHTML = heartsSvg(session.hearts);
   revealText.classList.add('hidden');
@@ -596,18 +597,35 @@ function filterLinesForSession(lines, role, includeAlle, hideCuts, includeOpt){
 
 function renderStep(){
   const n = session.lines.length;
-  if(n===0){ promptHint.textContent='Keine Zeilen nach Filter.'; promptSpeaker.textContent='—'; stepInfo.textContent='0/0'; return; }
+  if(n===0){
+    promptHint.textContent='Keine Zeilen nach Filter.';
+    promptSpeaker.textContent='—';
+    stepInfo.textContent='0/0';
+    return;
+  }
   if(session.idx>=n) { session.idx=n-1; }
   const l = session.lines[session.idx];
-  const ctx = Math.max(0, Math.min(2, session.idx)); // 2 Zeilen Kontext
+
+  // Regie-Zeile
+  if (l.type === 'stage') {
+    promptSpeaker.textContent = 'Regie';
+    promptHint.textContent = 'Info';
+  } else {
+    promptSpeaker.textContent = (l.type==='song' ? `🎵 ${l.speaker||'ENSEMBLE'}` : `${l.speaker}`);
+    promptHint.textContent    = (l.type==='song' ? 'Songzeile' : (session.mode==='type' ? 'Tippe deine Zeile' : 'Deine Zeile'));
+  }
+
+  // Kontext (2 Zeilen vorher)
+  const ctx = Math.max(0, Math.min(2, session.idx));
   contextBox.innerHTML = '';
   for(let i=Math.max(0, session.idx-ctx); i<session.idx; i++){
     const c = session.lines[i];
-    contextBox.innerHTML += `<div class="cue"><div class="spk">${c.speaker}</div><div class="line">${escapeHtml(c.text)}</div></div>`;
+    const cText = (c.type==='stage') ? `<em>${escapeHtml(c.text)}</em>` : escapeHtml(c.text);
+    contextBox.innerHTML += `<div class="cue"><div class="spk">${c.speaker}</div><div class="line">${cText}</div></div>`;
   }
+
   // Prompt
   if(session.mode==='context'){
-    // Frage: Nächste Zeile (unabhängig von Sprecher)
     promptSpeaker.textContent = (session.idx+1<n) ? (session.lines[session.idx+1].speaker + ' – Nächste Zeile?') : 'Ende der Szene';
     promptHint.textContent = 'Erinnere die nächste Zeile';
   }else if(session.mode==='type'){
@@ -615,40 +633,87 @@ function renderStep(){
     promptHint.textContent = 'Tippe deine Zeile';
     typeInput.value='';
     feedback.textContent='';
-  }else{
-    promptSpeaker.textContent = `${l.speaker}`;
-    promptHint.textContent = 'Deine Zeile';
   }
+
   stepInfo.textContent = `${session.idx+1} / ${n}`;
   revealText.classList.add('hidden');
   revealLine.textContent = '';
 }
 
-// Controls
+/* ---------- Reveal-Button ---------- */
 revealBtn.addEventListener('click', ()=>{
-  const l = session.lines[session.idx];
-  revealLine.textContent = l.text; revealText.classList.remove('hidden');
+  const l = session.lines[session.idx] || {};
+  if(l.type === 'stage'){
+    revealLine.innerHTML = `<em>${escapeHtml(l.text||'')}</em>`;
+  } else {
+    revealLine.textContent = l.text || '';
+  }
+  revealText.classList.remove('hidden');
 });
-wrongBtn.addEventListener('click', ()=>{ session.hearts=Math.max(0,session.hearts-1); heartsBox.innerHTML = heartsSvg(session.hearts); if(session.hearts===0){ alert('💔 Keine Herzen mehr – Runde vorbei.'); show('textSetup'); return; } nextStep(); });
-rightBtn.addEventListener('click', ()=>{ state.meta.xp += 8; saveSilently(); nextStep(); });
 
+/* ---------- Wrong / Right ---------- */
+wrongBtn.addEventListener('click', ()=>{
+  session.hearts = Math.max(0, session.hearts-1);
+  heartsBox.innerHTML = heartsSvg(session.hearts);
+  if(session.hearts===0){
+    alert('💔 Keine Herzen mehr – Runde vorbei.');
+    show('textSetup');
+    return;
+  }
+  nextStep();
+});
+
+rightBtn.addEventListener('click', ()=>{
+  const l = session.lines[session.idx] || {};
+  if(l.type !== 'stage'){   // ✅ nur XP bei Dialog/Song
+    state.meta.xp += 8;
+    saveSilently();
+  }
+  nextStep();
+});
+
+/* ---------- Check (Type-Modus) ---------- */
 checkBtn.addEventListener('click', ()=>{
-  const l = (session.mode==='context' && session.lines[session.idx+1]) ? session.lines[session.idx+1] : session.lines[session.idx];
+  const l = (session.mode==='context' && session.lines[session.idx+1]) 
+              ? session.lines[session.idx+1] 
+              : session.lines[session.idx];
+
+  if(l.type==='stage'){   // ✅ Regie-Zeilen automatisch überspringen
+    nextStep();
+    return;
+  }
+
   const ok = similarEnough(typeInput.value, l.text);
   feedback.textContent = ok ? '✅ Richtig!' : '❌ Nicht ganz.';
-  if(ok){ state.meta.xp += 10; saveSilently(); setTimeout(nextStep, 300); }
-  else { session.hearts=Math.max(0,session.hearts-1); heartsBox.innerHTML = heartsSvg(session.hearts); if(session.hearts===0){ alert('💔 Keine Herzen mehr – Runde vorbei.'); show('textSetup'); } }
+  if(ok){
+    state.meta.xp += 10;
+    saveSilently();
+    setTimeout(nextStep, 300);
+  }
+  else {
+    session.hearts=Math.max(0,session.hearts-1);
+    heartsBox.innerHTML = heartsSvg(session.hearts);
+    if(session.hearts===0){
+      alert('💔 Keine Herzen mehr – Runde vorbei.');
+      show('textSetup');
+    }
+  }
 });
+
 hintBtn.addEventListener('click', ()=>{
-  const l = (session.mode==='context' && session.lines[session.idx+1]) ? session.lines[session.idx+1] : session.lines[session.idx];
+  const l = (session.mode==='context' && session.lines[session.idx+1]) 
+              ? session.lines[session.idx+1] 
+              : session.lines[session.idx];
   feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text, typeInput.value);
 });
+
 skipBtn.addEventListener('click', nextStep);
 prevBtn.addEventListener('click', prevStep);
 nextBtn.addEventListener('click', nextStep);
 
 function prevStep(){ session.idx = Math.max(0, session.idx-1); renderStep(); }
 function nextStep(){ session.idx = Math.min(session.lines.length, session.idx+1); renderStep(); }
+
 
 /* ---------------------- Song Session -------------------------- */
 const songTitlePill = document.getElementById('songTitlePill');
@@ -966,6 +1031,44 @@ function sortScenes(list){
     return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true,sensitivity:'base'});
   });
 }
+
+function parseSceneIdParts(idOrName){
+  // versucht "1.2", "2.3", "1. SZENE", "ZWEITER AKT – 3. SZENE" etc. zu erkennen
+  const s = String(idOrName||'').toUpperCase();
+  // 1) "2.5" -> act=2, num=5
+  let m = s.match(/^(\d+)\.(\d+)$/);
+  if(m) return {act:Number(m[1]), num:Number(m[2])};
+  // 2) "1. SZENE" / "3. SZENE"
+  m = s.match(/^(\d+)\s*[\.\-]?\s*SZENE/);
+  if(m) return {act:1, num:Number(m[1])}; // default Akt 1, wenn nicht explizit
+  // 3) "ZWEITER AKT – 3. SZENE"
+  m = s.match(/(ERSTER|ZWEITER)\s+AKT.*?(\d+)\s*[\.\-]?\s*SZENE/);
+  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:Number(m[2])};
+  // 4) nur Akt (z. B. "ZWEITER AKT")
+  m = s.match(/(ERSTER|ZWEITER)\s+AKT/);
+  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:0};
+  return {act:9999, num:9999};
+}
+function aktLabel(act){ return act===2 ? 'ZWEITER AKT' : 'ERSTER AKT'; }
+
+// entfernt führende Nummern/„Szene“-Worte aus einem Namen
+function detailTitle(name){
+  return String(name||'')
+    .replace(/^\s*(ERSTER|ZWEITER)\s+AKT\s*[\-–—]?\s*/i,'')
+    .replace(/^\s*\d+\s*[\.\-]?\s*SZENE\s*[\-–—:]?\s*/i,'')
+    .replace(/^\s*\d+(?:\.\d+)?\s*[\-–—:]?\s*/,'')
+    .trim();
+}
+
+// baut die Anzeige "AKT – N. SZENE — Detail"
+function displaySceneName(scene){
+  const idHint = scene.id || scene.name || '';
+  const {act,num} = parseSceneIdParts(idHint || scene.name);
+  const head = `${aktLabel(act)}${num?` – ${num}. SZENE`:''}`;
+  const detail = detailTitle(scene.name||'');
+  return detail ? `${head} — ${detail}` : head;
+}
+
 
 function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
 function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
