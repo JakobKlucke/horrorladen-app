@@ -409,11 +409,14 @@ async function initLoad(){
     norm.scenes = (norm.scenes||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
     norm.songs  = (norm.songs||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
 
-    // In den State schreiben
-    state.data.roles  = norm.roles || [];
-    // neu: Songs BLEIBEN in den Szenen, songs[] bleibt zusätzlich für den Song-Tab
-    state.data.scenes = scenes;       // alles drin lassen, inkl. song-Scenes
-    state.data.songs  = songs;        // parallel nutzbar
+    // In den State schreiben (aus der Normalisierung!)
+    state.data.roles  = norm.roles  || [];
+    state.data.scenes = norm.scenes || [];
+    state.data.songs  = norm.songs  || [];
+
+    // Falls du Songs zusätzlich im Szenen-Browser sichtbar haben willst,
+    // lass sie in scenes, UND parallel im Song-Tab (so wie jetzt).
+    // (norm.scenes enthält bei uns bereits Dialog+Songs inline, je nach JSON)
 
     // Defaults
     if(!state.prefs.role      && state.data.roles[0])  state.prefs.role     = state.data.roles[0];
@@ -581,38 +584,44 @@ function filterByStatus(lines, hideCuts, includeOpt){
 
 
 function startSession(){
-  const role   = state.prefs.role;
-  const scene  = state.data.scenes.find(s=>s.id===state.prefs.sceneId);
+  const role  = state.prefs.role;
+  const scene = state.data.scenes.find(s => s.id === state.prefs.sceneId);
   if(!scene){ alert('Keine Szene gefunden.'); return; }
 
-  session.mode   = state.prefs.mode;
+  session.mode   = state.prefs.mode || 'flash';  // 'flash' | 'context' | 'type'
   session.hearts = 3;
 
-  // 1) Status-Filter (Cuts/Optional raus)
-  const all = filterByStatus(scene.lines, state.prefs.hideCuts, state.prefs.includeOpt);
+  // 1) Rohzeilen holen & ABAB-Blöcke bilden
+  const raw      = Array.isArray(scene.lines) ? scene.lines : [];
+  const grouped  = groupConsecutiveBySpeaker(raw); // zusammenhängende Sprecherblöcke
+  // 2) Nach Status filtern (cut optional raus / optional ggf. raus)
+  const all      = filterByStatus(grouped, !!state.prefs.hideCuts, !!state.prefs.includeOpt);
 
-  if(session.mode==='context'){
-    // Kontext-Modus → kompletter Fluss sichtbar
-    const grouped = groupConsecutiveBySpeaker(all);
-    session.linesFull = grouped;
-
-    // Merke nur die Blöcke, die meine Rolle (oder ALLE, wenn gewünscht) enthalten
-    session.askIdxs = grouped.map((blk,i)=> isMyLine(blk, role, state.prefs.includeAlle) ? i : -1).filter(i=>i>=0);
-    session.askPtr  = 0;
+  if(session.mode === 'context'){
+    // Kontext: kompletter Fluss sichtbar, ABER Abfrage nur auf eigene Blöcke
+    session.linesFull = all.slice();  // kompletter Ablauf
+    session.askIdxs   = all.map((l,i)=> isMyLine(l, role, !!state.prefs.includeAlle) ? i : -1)
+                           .filter(i => i >= 0);
+    session.askPtr    = 0;            // Zeiger auf nächste eigene Block-Index-Position
   } else {
-    // Flashcards / Type → nur meine Blöcke übrig
-    session.lines = groupConsecutiveBySpeaker(all).filter(blk=> isMyLine(blk, role, state.prefs.includeAlle));
+    // Flash/Type: nur eigene Blöcke werden nacheinander abgefragt
+    session.lines = all.filter(l => isMyLine(l, role, !!state.prefs.includeAlle));
     session.idx   = 0;
   }
 
-  sessionScenePill.textContent = displaySceneName(scene);
-  sessionRolePill.textContent  = role;
-  heartsBox.innerHTML = heartsSvg(session.hearts);
+  // UI Header
+  sessionScenePill.textContent = (typeof displaySceneName === 'function')
+    ? displaySceneName(scene)
+    : (scene.name || scene.id || 'Szene');
+  sessionRolePill.textContent  = role || '—';
+  heartsBox.innerHTML          = heartsSvg(session.hearts);
 
+  // UI Bereiche toggeln
   revealText.classList.add('hidden');
-  typeArea.classList.toggle('hidden', session.mode!=='type');
-  revealArea.classList.toggle('hidden', session.mode==='type');
+  typeArea.classList.toggle('hidden', session.mode !== 'type');
+  revealArea.classList.toggle('hidden', session.mode === 'type');
 
+  // Seite zeigen & ersten Schritt rendern
   show('textSess');
   renderStep();
 }
