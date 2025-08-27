@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Horrorladen – Lernapp</title>
-  <meta name="description" content="Webbasierte Lernapp für Musical-Text. JSON wird extern geladen." />
+  <title>Horrorladen – Lernapp (Plus)</title>
   <meta name="theme-color" content="#0f172a" />
   <style>
     :root {
@@ -17,94 +16,103 @@
       --panel: #0b1220;
       --text: #e5f7ef;
       --muted: #bfe7d3;
+      --radius: 16px;
+      --blur: 12px;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --ios-vel: cubic-bezier(.22,.61,.36,1);
     }
-    /* Fluid, legible typography for phones */
     html { font-size: 16px; }
     @media (max-width: 380px) { html { font-size: 15px; } }
     @media (min-width: 420px) { html { font-size: clamp(16px, 2.2vw, 18px); } }
     body {
-      margin: 0;
-      min-height: 100dvh;
-      background: linear-gradient(180deg, var(--bg), #0a192f);
+      margin: 0; min-height: 100dvh;
+      background: radial-gradient(1200px 600px at 50% -200px, rgba(128,237,153,.08), transparent 60%),
+                  linear-gradient(180deg, var(--bg), #0a192f);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-    .wrap { max-width: 56rem; margin: 0 auto; padding: 12px; }
+    .wrap { max-width: 60rem; margin: 0 auto; padding: 12px; }
     header {
-      position: sticky; top: 0;
+      position: sticky; top: 0; z-index: 20;
       padding-top: env(safe-area-inset-top);
-      background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.6));
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(var(--blur));
+      background: color-mix(in srgb, #0b1220 70%, transparent);
       border-bottom: 1px solid rgba(199,249,204,.15);
-      z-index: 10;
     }
-    .title { display:flex; gap:.75rem; align-items:center; padding: .5rem .25rem; }
+    .title { display:flex; gap: .75rem; align-items:center; padding: .5rem .25rem; }
     .logo {
-      width: 2.25rem; height: 2.25rem; border-radius: .75rem;
+      width: 2.4rem; height: 2.4rem; border-radius: .9rem;
       background: linear-gradient(135deg, var(--c-light), var(--c-emerald));
       display:flex; align-items:center; justify-content:center; color:#0b1220; font-weight:900;
-      flex: 0 0 auto;
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
     }
-    .badge { font-size:.75rem; padding:.2rem .5rem; border-radius: 999px; background: rgba(87,204,153,.15); color: var(--c-light); }
+    .badge { font-size:.78rem; padding:.2rem .5rem; border-radius: 999px; background: rgba(87,204,153,.15); color: var(--c-light); }
     .panel {
       background: linear-gradient(180deg, rgba(34,87,122,.12), rgba(56,163,165,.08));
       border: 1px solid rgba(199,249,204,.18);
-      border-radius: 16px; padding: .75rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      border-radius: var(--radius); padding: .85rem;
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
     }
-    .controls { display:grid; grid-template-columns: 1fr; gap: .5rem; }
-    @media (min-width: 700px) { .controls { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; } }
-    label { font-size:.8rem; color: var(--muted); display:block; margin-bottom:.25rem; }
+    .controls { display:grid; grid-template-columns: 1fr; gap: .6rem; }
+    @media (min-width: 760px) { .controls { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; } }
+    label { font-size:.9rem; color: var(--muted); display:block; margin-bottom:.25rem; }
     select, input[type=number], button {
-      width: 100%; padding: .65rem .75rem; border-radius: 12px;
-      border: 1px solid rgba(199,249,204,.25);
+      width: 100%; padding: .85rem 1rem; border-radius: 14px;
+      border: 1px solid rgba(199,249,204,.28);
       background: rgba(11,18,32,.6); color: var(--text);
-      outline: none; transition: transform .12s ease, border-color .2s ease, background .2s ease;
+      outline: none; transition: transform .18s var(--ios-vel), box-shadow .25s ease, border-color .25s ease, background .25s ease;
       -webkit-tap-highlight-color: transparent;
+      min-height: 48px; font-size: 1rem;
     }
-    button { font-weight: 700; }
+    button { font-weight: 800; letter-spacing: .01em; }
     select:hover, input:hover, button:hover { transform: translateY(-1px); }
+    select:focus, input:focus, button:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-emerald) 25%, transparent); }
     button.primary {
       background: linear-gradient(180deg, var(--c-emerald), var(--c-verdigris));
       color:#0b1220;
     }
     button.secondary { background: rgba(199,249,204,.1); }
-    .toolbar { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem; align-items:center; }
-    .pill { display:inline-flex; align-items:center; gap:.4rem; padding: .4rem .65rem; border-radius: 999px; background: rgba(199,249,204,.08); border: 1px solid rgba(199,249,204,.2); font-size:.8rem; }
-    .info { font-size:.8rem; color: var(--muted); margin-top:.35rem; }
+    .toolbar { display:flex; gap:.6rem; flex-wrap: wrap; margin-top:.6rem; align-items:center; }
+    .pill { display:inline-flex; align-items:center; gap:.45rem; padding: .5rem .75rem; border-radius: 999px; background: rgba(199,249,204,.08); border: 1px solid rgba(199,249,204,.2); font-size:.9rem; }
+    .info { font-size:.9rem; color: var(--muted); margin-top:.4rem; }
     main { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-    .exchange { margin: .9rem 0; padding: .9rem; border-radius: 14px; background: rgba(34,87,122,.14); border: 1px solid rgba(199,249,204,.2); animation: fade .35s ease both; }
-    .ctx, .you { display:grid; gap: .5rem; margin: .35rem 0; }
-    .line { padding: .65rem .75rem; border-radius: 12px; background: rgba(11,18,32,.5); border: 1px solid rgba(199,249,204,.18); }
-    .line.you { background: rgba(128,237,153,.12); border-color: rgba(128,237,153,.4); }
-    .speaker { font-size:.8rem; letter-spacing:.04em; color: var(--c-light); }
+    .exchange {
+      margin: 1rem 0; padding: 1rem; border-radius: 16px;
+      background: rgba(34,87,122,.14); border: 1px solid rgba(199,249,204,.2);
+      animation: cardIn .5s var(--ios-vel) both;
+    }
+    .ctx, .you { display:grid; gap: .6rem; margin: .45rem 0; }
+    .line { padding: .8rem .9rem; border-radius: 14px; background: rgba(11,18,32,.55); border: 1px solid rgba(199,249,204,.2); transform: translateZ(0); }
+    .line.you { background: rgba(128,237,153,.14); border-color: rgba(128,237,153,.45); }
+    .speaker { font-size:.9rem; letter-spacing:.04em; color: var(--c-light); }
     .speaker u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
-    .footer { margin: 1rem 0; font-size: .8rem; color: var(--muted); }
+    .footer { margin: 1rem 0; font-size: .85rem; color: var(--muted); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-    @keyframes fade { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
-    /* Reduce motion if user prefers */
+    @keyframes cardIn { from { opacity:0; transform: translateY(8px) scale(.992); } to { opacity:1; transform:none; } }
+    @keyframes btnTap { from { transform: scale(.98); } to { transform: scale(1); } }
+    .progressbar-wrap {
+      position: sticky; top: calc(env(safe-area-inset-top) + 0px); z-index: 25;
+      height: 6px; background: rgba(199,249,204,.12);
+      backdrop-filter: blur(var(--blur)); border-bottom: 1px solid rgba(199,249,204,.1);
+    }
+    .progressbar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--c-light), var(--c-emerald)); transition: width .5s var(--ios-vel); }
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; }
     }
-    /* Improve readability for very narrow phones */
-    @media (max-width: 360px) {
-      .line { padding: .55rem .6rem; }
-      .exchange { padding: .7rem; }
-    }
-    /* Ensure large tap targets on mobile */
-    button, select, input { min-height: 44px; }
   </style>
 </head>
 <body>
+  <div class="progressbar-wrap"><div id="progress" class="progressbar"></div></div>
   <header>
     <div class="wrap">
       <div class="title">
         <div class="logo">🌱</div>
         <div>
-          <div style="font-weight:800; font-size:1.1rem;">Horrorladen – Lernapp</div>
-          <div class="badge">Externe JSON</div>
+          <div style="font-weight:800; font-size:1.15rem;">Horrorladen – Lernapp</div>
+          <div class="badge">JSON • Smooth • Gamification</div>
         </div>
       </div>
       <div class="panel">
@@ -124,15 +132,21 @@
               <option value="on">Einblenden</option>
             </select>
           </div>
-          <div>
+          <div style="display:flex; gap:.5rem;">
             <button class="primary" id="startBtn">Session starten</button>
+            <button class="secondary" id="resetBtn" title="Fortschritt zurücksetzen">Reset</button>
           </div>
         </div>
         <div class="toolbar">
           <button class="secondary" id="shareBtn">Link teilen</button>
           <button class="secondary" id="loadBtn">Eigenes Script JSON laden</button>
           <input id="fileInput" class="sr-only" type="file" accept="application/json" />
+          <label class="pill" style="gap:.3rem;">
+            🔊
+            <input id="soundToggle" type="checkbox" checked style="accent-color:#57cc99; width: 1.1rem; height:1.1rem;" aria-label="Sound an/aus" />
+          </label>
           <span id="statsPill" class="pill" role="status">Bereit</span>
+          <span id="xpPill" class="pill">⭐ XP: 0 • 🔥 Streak: 0</span>
         </div>
         <div class="info">
           Text ist schreibgeschützt. Sprecher <u>unterstrichen</u>. Regie <em>kursiv</em>.
@@ -150,10 +164,25 @@
     <span class="pill">Palette: #22577a · #38a3a5 · #57cc99 · #80ed99 · #c7f9cc</span>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
   <script>
     const q = new URLSearchParams(location.search);
-    const jsonSrc = q.get('src') || 'script.json'; // default neighbor file
+    const jsonSrc = q.get('src') || 'script.json';
     const norm = (s) => (s||'').trim().toUpperCase();
+    const audio = {
+      enabled: true,
+      click: new Audio('data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQwAAAABAQEBAQEBAQEBAQEBAQEBAP///wD///8A////AP///wD///8A////AP///wD///8A'),
+      success: new Audio('data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YSQAAAABAQEBAQEBAgICAwMDAwMDAgICAAAAAP///wAAAP///wAA'),
+      page: new Audio('data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YSQAAAABAQEBAQEBAgICAwMDAwMDAgICAAAAAP///wAAAP///wAA')
+    };
+    const soundToggle = document.getElementById('soundToggle');
+    soundToggle.addEventListener('change', () => audio.enabled = soundToggle.checked);
+    function playSound(kind) {
+      if (!audio.enabled) return;
+      const a = audio[kind]; if (!a) return;
+      try { a.currentTime = 0; a.play(); } catch { /* ignore */ }
+    }
     function treatSpeaker(sp) {
       const s = norm(sp);
       if (s === 'DIE ANDEREN') return 'ALLE';
@@ -211,6 +240,7 @@
     }
     function renderLine(line, isYou) {
       const wrap = el('div', {class: 'line' + (isYou ? ' you' : '')});
+      wrap.animate([{ transform: 'translateY(8px)', opacity: .0 }, { transform: 'translateY(0px)', opacity: 1 }], { duration: 420, easing: 'var(--ios-vel)', fill:'both' });
       const spk = el('div', {class: 'speaker'});
       spk.innerHTML = `<u>${escapeHtml(line.speaker || '')}</u>`;
       const txt = el('div');
@@ -218,17 +248,42 @@
       wrap.appendChild(spk); wrap.appendChild(txt);
       return wrap;
     }
-
     const root = document.getElementById('root');
     const roleSel = document.getElementById('roleSel');
     const sessionSize = document.getElementById('sessionSize');
     const toggleStage = document.getElementById('toggleStage');
     const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const shareBtn = document.getElementById('shareBtn');
     const loadBtn = document.getElementById('loadBtn');
     const fileInput = document.getElementById('fileInput');
     const statsPill = document.getElementById('statsPill');
-
+    const progressBar = document.getElementById('progress');
+    const xpPill = document.getElementById('xpPill');
+    const gam = {
+      xp: Number(localStorage.getItem('xp')||0),
+      streak: Number(localStorage.getItem('streak')||0),
+      lastDay: localStorage.getItem('lastDay') || '',
+      touch(gain=5) {
+        const today = new Date().toISOString().slice(0,10);
+        if (this.lastDay !== today) {
+          this.streak = (this.lastDay ? this.streak + 1 : 1);
+          this.lastDay = today;
+          localStorage.setItem('streak', String(this.streak));
+          localStorage.setItem('lastDay', today);
+        }
+        this.xp += gain;
+        localStorage.setItem('xp', String(this.xp));
+        updateXP();
+      },
+      reset() {
+        this.xp = 0; this.streak = 0; this.lastDay = '';
+        localStorage.removeItem('xp'); localStorage.removeItem('streak'); localStorage.removeItem('lastDay');
+        updateXP();
+      }
+    };
+    function updateXP() { xpPill.textContent = `⭐ XP: ${gam.xp} • 🔥 Streak: ${gam.streak}`; }
+    updateXP();
     function updateQuery() {
       const p = new URLSearchParams(location.search);
       p.set('role', roleSel.value);
@@ -236,7 +291,6 @@
       p.set('stage', toggleStage.value);
       history.replaceState(null, '', `?${p.toString()}`);
     }
-
     function groupRoles(data) {
       const seen = new Set(); const roles = [];
       if (data.roles_meta && Array.isArray(data.roles_meta.roles)) {
@@ -261,22 +315,18 @@
       });
       return roles.filter(r => r !== 'ALLE');
     }
-
     function attachControls(data) {
-      // roles
       const roles = groupRoles(data);
       roleSel.innerHTML = roles.map(r => `<option value="${r}">${r}</option>`).join('');
       const roleQ = q.get('role'); if (roleQ && roles.includes(norm(roleQ))) roleSel.value = norm(roleQ);
       else roleSel.value = roles[0] || 'SEYMOUR';
-      // N
       const nQ = parseInt(q.get('n')||'5', 10); sessionSize.value = String(isNaN(nQ) ? 5 : Math.min(25, Math.max(1, nQ)));
-      // stage
       const stageQ = q.get('stage'); toggleStage.value = stageQ === 'on' ? 'on' : 'off';
-
-      roleSel.onchange = updateQuery;
-      sessionSize.onchange = updateQuery;
-      toggleStage.onchange = render;
-
+      roleSel.onchange = () => { playSound('click'); updateQuery(); };
+      sessionSize.onchange = () => { playSound('click'); updateQuery(); };
+      toggleStage.onchange = () => { playSound('click'); render(); };
+      startBtn.onclick = () => { playSound('click'); const p = new URLSearchParams(location.search); p.set('page','0'); history.replaceState(null,'',`?${p.toString()}`); render(); };
+      resetBtn.onclick = () => { gam.reset(); localStorage.removeItem('seenPages'); playSound('page'); confetti(); };
       shareBtn.onclick = async () => {
         updateQuery();
         try { await navigator.clipboard.writeText(location.href); shareBtn.textContent='Link kopiert!'; setTimeout(()=>shareBtn.textContent='Link teilen',1200); }
@@ -285,14 +335,10 @@
       loadBtn.onclick = () => fileInput.click();
       fileInput.onchange = async (ev) => {
         const f = ev.target.files[0]; if (!f) return;
-        try {
-          const txt = await f.text(); const j = JSON.parse(txt);
-          window.__SCRIPT = j; render();
-        } catch(e) { alert('Ungültiges JSON: ' + e.message); }
+        try { const txt = await f.text(); const j = JSON.parse(txt); window.__SCRIPT = j; render(); }
+        catch(e) { alert('Ungültiges JSON: ' + e.message); }
       };
-      startBtn.onclick = () => { const p = new URLSearchParams(location.search); p.set('page','0'); history.replaceState(null,'',`?${p.toString()}`); render(); };
     }
-
     function render() {
       const chosen = roleSel.value;
       const items = (window.__SCRIPT && window.__SCRIPT.items) ? window.__SCRIPT.items : [];
@@ -300,29 +346,33 @@
       const N = parseInt(sessionSize.value||'5', 10);
       const total = ex.length;
       statsPill.textContent = `${total} Blöcke (Rolle: ${chosen})`;
-
-      // page calc
       let page = parseInt(q.get('page')||'0', 10);
       if (isNaN(page) || page < 0) page = 0;
       const pages = Math.max(1, Math.ceil(total / N));
       if (page >= pages) page = pages - 1;
-
+      const progress = pages ? ((page+1)/pages)*100 : 0;
+      progressBar.style.width = progress.toFixed(1) + '%';
+      const seenKey = 'seenPages';
+      const seen = new Set(JSON.parse(localStorage.getItem(seenKey) || '[]'));
+      const pageKey = `${chosen}-{${N}}-{${page}}`;
+      if (!seen.has(pageKey)) {
+        seen.add(pageKey);
+        localStorage.setItem(seenKey, JSON.stringify(Array.from(seen)));
+        gam.touch(8);
+        if ((page+1) === pages) { playSound('success'); confetti(); }
+      }
       const start = page * N;
       const slice = ex.slice(start, start + N);
-
       root.innerHTML = '';
-
       const navTop = el('div', {class:'toolbar'},
         el('button', {class:'secondary', id:'prevBtn'}, '← Zurück'),
         el('span', {class:'pill'}, `Seite ${page+1} / ${pages}`),
         el('button', {class:'secondary', id:'nextBtn'}, 'Weiter →')
       );
       root.appendChild(navTop);
-
-      // content
       for (const block of slice) {
         const box = el('div', {class:'exchange'});
-
+        box.animate([{ transform:'translateY(10px) scale(.995)', opacity:.0 }, { transform:'none', opacity:1 }], { duration: 420, easing: 'var(--ios-vel)', fill:'both' });
         if (block.context.length) {
           const ctx = el('div', {class:'ctx'});
           for (const line of block.context) ctx.appendChild(renderLine(line, false));
@@ -335,21 +385,18 @@
         }
         root.appendChild(box);
       }
-
       const navBottom = navTop.cloneNode(true);
       root.appendChild(navBottom);
-
       function setPage(p) {
         const P = new URLSearchParams(location.search);
         P.set('page', String(p));
         history.replaceState(null, '', `?${P.toString()}`);
-        location.reload(); // ensure q updates in this simple setup
+        playSound('page');
+        location.reload();
       }
       root.querySelectorAll('#prevBtn').forEach(b => b.addEventListener('click', () => setPage(Math.max(0, page-1))));
       root.querySelectorAll('#nextBtn').forEach(b => b.addEventListener('click', () => setPage(Math.min(pages-1, page+1))));
     }
-
-    // Load external JSON (default script.json or ?src=...)
     (async () => {
       try {
         const res = await fetch(jsonSrc, { cache: 'no-store' });
