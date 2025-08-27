@@ -1,0 +1,4046 @@
+{
+  "generated_at": "2025-08-27T14:23:57.421418Z",
+  "source": "Horrorladen Strichfassung 18.8.25 (1).docx",
+  "roles_meta": {
+    "title": "Der kleine Horrorladen – Meta-Daten",
+    "roles": [
+      {
+        "name": "SEYMOUR",
+        "description": "Schüchterner Angestellter eines Blumenladens, später Held der Geschichte."
+      },
+      {
+        "name": "AUDREY",
+        "description": "Kollegin von Seymour, etwas unbedarft, seine große Liebe."
+      },
+      {
+        "name": "MR. MUSHNIK",
+        "description": "Besitzer des Blumenladens, Seymours Chef."
+      },
+      {
+        "name": "ORIN",
+        "description": "Sadistischer Zahnarzt, Freund von Audrey."
+      },
+      {
+        "name": "DIE PFLANZE",
+        "aliases": [
+          "STIMME (Matthias Manz)",
+          "PUPPENSPIEL (Colin Danderski)"
+        ],
+        "description": "Anthropomorphe, fleischfressende Pflanze. Wächst über das Stück hinweg immer weiter."
+      },
+      {
+        "name": "SOULGIRLS",
+        "aliases": [
+          "CRYSTAL",
+          "CHIFFON",
+          "RONETTE"
+        ],
+        "description": "Eine Art griechischer Chor im Dreamgirls-Stil."
+      },
+      {
+        "name": "PENNER 1"
+      },
+      {
+        "name": "PENNER 2"
+      },
+      {
+        "name": "KUNDE"
+      },
+      {
+        "name": "PATIENT"
+      },
+      {
+        "name": "MRS. LUCE"
+      },
+      {
+        "name": "MRS. BERNSTEIN"
+      },
+      {
+        "name": "MR. MARTIN"
+      },
+      {
+        "name": "ALLE",
+        "rule": "ALLE-Zeilen gelten für sämtliche Rollen gleichzeitig. Beim Lernen erscheinen sie immer zusätzlich für den ausgewählten Charakter."
+      }
+    ],
+    "special_rules": {
+      "ALLE": "Zeilen mit Sprecher 'ALLE' sind für jede Rolle sichtbar und zu lernen.",
+      "SOULGIRLS": "Wenn CRYSTAL, CHIFFON oder RONETTE ausgewählt ist, erscheinen automatisch auch die Zeilen der SOULGIRLS."
+    },
+    "songs": [
+      "KLEINER HORRORLADEN",
+      "VORSTADT",
+      "DA – DOO",
+      "WACHS FÜR MICH",
+      {
+        "title": "WUNDER GIBT ES DOCH",
+        "status": "gestrichen"
+      },
+      "IM GRÜNEN IRGENDWO",
+      "WIR MÜSSEN RENOVIEREN",
+      "ZAHNARZT",
+      "MUSHNIK UND SOHN",
+      "SCHICKSAL, WELCH EINE WENDUNG",
+      "GIB’S MIR",
+      "JETZT",
+      "JETZT HAST DU SEYMOUR",
+      "ESSENSZEIT",
+      "DIE LETZTEN WERDEN DIE ERSTEN SEIN",
+      "FINALE",
+      {
+        "title": "MEAN GREEN MOTHER",
+        "status": "gestrichen"
+      }
+    ]
+  },
+  "items": [
+    {
+      "type": "stage",
+      "section": null,
+      "speaker": null,
+      "text": "(bestehend aus CRYSTAL, RONETTE, CHIFFON)"
+    },
+    {
+      "type": "header",
+      "section": "PROLOG",
+      "speaker": null,
+      "text": "PROLOG"
+    },
+    {
+      "type": "stage",
+      "section": "PROLOG",
+      "speaker": null,
+      "text": "Donner und Blitz. Der eiserne Vorhang öffnet sich. Musik. In der Dunkelheit eine Stimme."
+    },
+    {
+      "type": "dialogue",
+      "section": "PROLOG",
+      "speaker": "DIE PFLANZE",
+      "text": "Am einundzwanzigsten Tag des Monats September in einem der frühen Jahre eines noch nicht allzu weit zurückliegenden Jahrzehnts sah sich die Menschheit unversehens einer tödlichen Bedrohung ihrer Existenz ausgesetzt. Der unheilvolle Widersacher, von dem die Gefahr ausging, tauchte an einem scheinbar höchst unschuldigen, ganz unwahrscheinlichen Ort auf."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 1) Lied: „KLEINER HORRORLADEN“",
+      "speaker": null,
+      "text": "Nr. 1) Lied: „KLEINER HORRORLADEN“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 1) Lied: „KLEINER HORRORLADEN“",
+      "speaker": "GIRLS",
+      "text": "HOP – LA – HOP\nKLEINER HORRORLADEN, BLUMENSHOP\nMIT ´NEM HORRORSCHADEN\nHOLT DEN COP\nIN DEN HORRORLADEN NO!\nOH-OH-OH, NO-OH\nBLUMENSHOP\nKLEINER HORRORLADEN\nBOP SH´BOP\nMIT ´NEM HORRORSCHADEN\nGRUSELSHOP\nLITTLE SHOP OF HORRORS\nNO!\nOH-OH-OH, NO-OH!\nSHING-A-LING\nIN DEM LADEN DRIN\nWÄCHST EIN SCHLIMMES DING\nPass auf! Pass auf! Pass auf! Pass auf!\nSHANG –A-LANG\nSCHLINGEN ZIEHEN SICH ENG\nUM DEN HALS\nYEAH-YEAH-YEAH\nSHA-LA-LA\nSTOP – KOMMT NICHT ZU NAH\nBEWEGT EUCH NICHT\nWIR WARNEN\nWIR WARNEN\nLASST EUCH NICHT UMGARNEN\nVON DEN BÖSEN\nMÄCHTEN, DIE SICH TARNEN\nWIR WARNEN\nEUCH VOR PFLANZENARMEN\nPASST AUF\nBLUMENSHOP\nKLEINER HORRORLADEN\nBOP SH´BOP\nLITTLE SHOP OF HORRORS\nUND JETZT HOP\nIN DEN HORRORLADEN\nNO NO NO N´NO!\nNO NO N´NO\nNO NO N´NO-OH OH OH!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 1) Lied: „KLEINER HORRORLADEN“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "header",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "ERSTER AKT, 1. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "In der Skid Row. Die Uhr tickt. Mr. Mushnik in seinem Blumenladen. Er wartet auf Kunden, die nicht kommen. Die wenigen Blumen sind verwelkt, vertrocknet, verkümmert. Plötzlich hören wir ein Getöse aus dem hinter dem Laden liegenden Arbeitsraum. Mushnik ruft, ohne aufzustehen nach hinten."
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "GIRLS",
+      "text": "MUSHNIK\nWas haben Sie jetzt wieder zerdeppert, Krelbourn?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(hinter der Bühne) Nichts, Mr. Mushnik.\nMUSHNIK\nHeilige Scheiße!"
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "Mushnik blickt auf seine Armbanduhr und das „Tick Tack“ der Musik setzt wieder ein. Audrey kommt in Eile auf die Bühne. Sie hat ein blaues Auge. Sie betritt den Laden."
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ding Dong.\nMUSHNIK\nEntzückend. Die gnädige Dame geruhen zur Arbeit zu kommen.\nGuten Morgen, Mr. Mushnik.\nMUSHNIK\nMorgen? Es ist zwei Uhr nach Mittag. Nicht, dass wir einen Kunden gehabt hätten. Für einen Blumenladen im Pennerviertel gibt´s keine Kunden nicht.\n´tschuldigung,"
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "Sie zieht den Mantel aus, während wir erneut lautes Getöse aus dem Hinterzimmer hören. Sie nimmt eine Rose aus der Auslage."
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "MUSHNIK\nSeymour! Du Trottel!"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(hinter der Bühne) Aaah!\nMUSHNIK\nWas ist denn los da hinten?\n(hinter der Bühne) Och, nichts Besonderes, Mr. Mushnik!\nMUSHNIK\nAudrey. Gehen Sie lieber mal nach hinten und sehen Sie nach, was dieser… – Audrey! Woher haben Sie das Veilchen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "(sieht auf die Rose) Veilchen?\nMUSHNIK\nIhr Auge, mein ich. Audrey, der schmierige Typ, mit dem Sie gehen – hat er Sie wieder verprügelt? (Sie gibt keine Antwort). Also, ich weiß ja, dass es mich nichts angeht, aber ich hab langsam den Verdacht, er ist kein besonders netter Bursche.\nMan trifft keine netten Burschen, wenn man in Skid Row wohnt, Mr.\nMushnik."
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "Seymour kommt aus dem Hinterzimmer mit einem Blumentopf."
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Die hab ich für Sie umgetopft, Mr. Mushnik\nEr lässt den Topf fallen.\nMUSHNIK\nSeymour! Sehen Sie sich das an. Cholera jasna!"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Brüllen Sie Seymour nicht an, Mr. Mushnik!"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Hi, Audrey. Ist das ein neues Augen-Makeup?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich mach schnell sauber, bevor der nächste Kunde kommt.\nMUSHNIK\nDann haben Sie ja jede Menge Zeit. Mein Leben ist die Hölle."
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "(Zwei Penner kommen in die Skid Row und durchsuchen die Mülleimer. Ein Polizeiwagen fährt mit Blaulicht und Sirene vorbei.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Willkommen in der Skid Row!\nIdioten im Laden, Penner vor der Tür und lausige Geschäfte."
+    },
+    {
+      "type": "stage",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": null,
+      "text": "(Er tritt aus dem Laden und beschimpft die Penner)"
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ding Dong. Haut ab, ihr Penner!\nHaut ab! Weg vom Gehsteig! Auf diese Weise wird nie wieder etwas aus euch werden."
+    },
+    {
+      "type": "dialogue",
+      "section": "ERSTER AKT, 1. SZENE",
+      "speaker": "PENNER 1",
+      "text": "Was soll schon aus uns werden? Wenn man aus der Skid Row kommt, wird sowieso nichts aus einem."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": null,
+      "text": "Nr. 2) Lied: „VORSTADT“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "CRYSTAL",
+      "text": "UM VIER UHR MUSST DU AUFSTEHN\nUND ZUR ARBEIT FAHRN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "CHIFFON",
+      "text": "FORT AUS DEM ARMENVIERTEL\nIN DEN BESSERN TEIL DER GROSSEN STADT\nCHIFFON/CRYSTAL\nSING IT CHILD"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "RONETTE",
+      "text": "BIS ZUM NACHMITTAG"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "PENNER",
+      "text": "DANN GEHT´S ZUR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "GIRLS",
+      "text": "VORSTADT\nWO´S NACH ARMUT STINKT\nIN DIE VORSTADT\nDIE IM DRECK VERSINKT\nIN DIE VORSTADT\nNICHT INS VILLENVIERTEL – ACH, WO\nHEIM ZUR SKID ROW\nHEIM ZUR SKID ROW"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "PENNER",
+      "text": "HEIM IN DIE"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "GIRLS",
+      "text": "WO KEIN TAXI HÄLT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "VORSTADT\nMUSHNIK\nWO DER PUTZ ZERFÄLLT\nVORSTADT\nFÜR DEN REST DER WELT WIE DAS KLO\nIN DER SKID ROW"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "GIRLS",
+      "text": "OBEN IM BESSERN TEIL DER STADT BIST DU\nLAUFBURSCHE, PUTZFRAU ODER KÜCHENKUH\nSCHIEBST DIR MITTAGS SCHNELL WAS BEI MCDONALDS REIN\nUND LÄSST DICH OHNE GRUND VON DEINEM CHEF ANSCHREIN\nUND OBEN IM BESSERN TEIL DER STADT PUTZT DU\nDEN LEUTEN AUF DER STRASSE IHRE LEDERSCHUH\nDEN GANZEN LANGEN TAG TUST DU DIR SELBER LEID"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "DOCH 5 UHR IST DIE SCHLIMMSTE ZEIT."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "PENNER",
+      "text": "DANN GEHT´S IN DIE"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "WO MAN NIMMT STATT WÄHLT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "WO MAN KATZEN QUÄLT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "WO DAS MITLEID FEHLT – MAN IST ROH IN DER SKID ROW"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "IN DER SKID ROW"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "ARM!\nSEIT ICH LEB, WAR ICH IMMER ARM\nICH BITT GOTT, DASS ER SICH ERBARM\nUND ER SAGT MIR:\n„STELL DICH NICHT AN!\nSCHRUBB DEN BODEN!“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "OH!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "ICH WAR EIN KIND OHNE ELTERN\nUND MEIN ZUHAUS WAR DIE SKID"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "ALLE",
+      "text": "ROW!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "ER NAHM MICH AUF, GAB MIR ESSEN\nEIN BETT, EINEN JOB, EIN STÜCK BROT\nSAGT MIR, ICH WÄR\nEIN IDIOT –\nUND HAT RECHT!\nBIN IN DER"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "DIE ANDEREN",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "KEINE CHANCE FÜR MICH. IN DER"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "DIE ANDEREN",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "LÄSST DICH GOTT IM STICH. IN DER"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "DIE ANDEREN",
+      "text": "VORSTADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "WIRD EIN MANN WIE ICH NIEMALS FROH"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "DIE ANDEREN",
+      "text": "IN DER SKID ROW"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "UND ICH HOFF IRGENDWER, HOLT MICH HIER MAL RAUS\nDENN ICH MERK MEHR UND MEHR, ICH HALT´S NICHT MEHR AUS.\nJEDER TAG FÄLLT MIR SCHWER, ICH MUSS ENDLICH RAUS\nICH MUSS RAUS AUS DEM DRECK, ICH VERRECK SONST"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": null,
+      "text": "Am Schluss des Songs kehren alle zurück in ihre vorherige Position. Die Penner und die Soulgirls gehen ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "MUSHNIK\nSeht euch das an!\nAUDREY/SEYMOUR\nHä?\nMUSHNIK\nSechs Uhr und wir haben noch nicht mal verkauft eine Schachtel Kresse. (Alle seufzen.) Ich glaub, das war´s. Morgen braucht ihr gar nicht mehr zu kommen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Meinen Sie das Ernst?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Das können Sie nicht ernst meinen.\nMUSHNIK\nWas, was, was kann ich nicht ernst meinen? Ich bin fertig, erledigt, bankrut!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Aber Sie können doch nicht...\nMUSHNIK\nFertig, Schluss, aus! Ich mach diesen von Gott und allen Kunden verlassenen Laden dicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Mr. Mushnik…entschuldigen Sie, wenn ich was sage, aber ist Ihnen je der Gedanke gekommen, dass die Firma vielleicht ein neues Konzept, etwas ... Innovation brauchen könnte?\nMUSHNIK\nHä?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Was Seymour sagen will, Mr. Mushnik, ist … naja, wir haben uns darüber unterhalten und sind zu dem Schluss gekommen ... Seymour, warum läufst du nicht nach hinten und holst diese merkwürdige Pflanze, die du gezüchtet hast?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": null,
+      "text": "(Seymour ab in den Hinterraum.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Wissen Sie, Mr. Mushnik, einige dieser exotischen Gewächse, mit denen Seymour herumexperimentiert, sind wirklich extraordinär. Wir sind beide der Ansicht, dass vielleicht einige dieser merkwürdigen Pflanzen das Geschäft beleben könnten – man müsste nur ein bisschen Werbung dafür machen.\nSeymour kommt zurück mit der Pflanze im ersten Stadium ihres Wachstums.\nBitte sehr! Ta-dah!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Ich fürchte, sie fühlt sich heut nicht besonders."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Ist die nicht… grotesk?\nMUSHNIK\nMindestens. Was für eine merkwürdige Pflanze ist das denn, Seymour?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Keine Ahnung. Scheint zum Typus der Fleischfresser zu gehören…\nMUSHNIK\nAha.\n…aber ich hab sie nach keinem meiner Fachbücher bestimmen können.\nDarum hab ich ihr selbst einen Namen gegeben. Ich nenne sie Audrey Zwo."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Nach mir?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Es macht dir hoffentlich nichts aus? (Zu Mushnik) Verstehen Sie, Chef.\nWenn man so eine merkwürdige Pflanze wie die hier ins Schaufenster stellt, dann würden die Leute vielleicht…\nMUSHNIK\nVielleicht was? Sie machen sich ja lächerlich, Krelbourn. Meinen Sie etwa, bloß weil Sie eine merkwürdige Pflanze ins Schaufenster stellen, würden die Leute auf einmal –"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": null,
+      "text": "Überraschend betritt ein Kunde den Laden."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "KUNDE",
+      "text": "Ding Dong. Entschuldigen Sie. Was ist denn das für eine merkwürdige Pflanze, die Sie da im Schaufenster haben?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Das ist eine Audrey Zwo."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "KUNDE",
+      "text": "Sowas hab ich noch nie gesehn."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "AUDREY",
+      "text": "Sowas hat noch niemand je gesehn."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "KUNDE",
+      "text": "Und woher haben Sie die?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 2) Lied: „VORSTADT“",
+      "speaker": "SEYMOUR",
+      "text": "Ähm... Sie erinnern sich vielleicht an die totale Sonnenfinsternis vor ein paar Wochen?"
+    },
+    {
+      "type": "header",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Nr. 3b) Lied: „DA – DOO“"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Auftritt der Soulgirls."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "An jenem Tag spazierte ich über den Blumen-Großmarkt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "SHOOP – DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Und kam zu dem Stand von diesem alten Chinesen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "CHANG – DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Der verkauft mir manchmal schräge exotische Kreuzungen –"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "SNIP – DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "– denn er weiß, seltene Pflanzen sind mein Hobby."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "DA – DA – DA – DA – DA – DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Er hat nichts Ungewöhnliches gehabt an jenem Tag."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "NOPE – DA – DOO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Und wissen Sie, ich wollt grad weitergehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "DAS WAR GUT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "In diesem Augenblick und völlig unerwartet schob sich der Mond vor die Sonne und –\nSEYMOUR/GIRLS\nDA FING DIE FINSTERNIS AN!\nPlötzlich war es sehr dunkel. Und ich hörte ein seltsames Summen. Wie Sphärenklang aus einer anderen Welt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "NA – NU"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Und als es wieder hell wurde, saß diese merkwürdige Pflanze da."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "OOPS – DI – DO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Sie steckte, wissen Sie, genau zwischen den Zynien."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "Audrey – Zwo"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Ich hätte schwören können, dass sie vor der Finsternis noch nicht da war.\nTrotzdem hat er mir drei Dollar abgeknöpft."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "GIRLS",
+      "text": "SHA – LA – LA – LA – LA – LA – DOO – DOO – DOO – DOO!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Musikende. Alle kehren wieder zurück in ihre vorherige Position."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Naja. Eine ungewöhnliche Geschichte und eine merkwürdige Pflanze."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "(Er verlässt den Laden.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "(Kehrt aber wieder um.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Ding Dong. Wenn ich schon mal hier bin, kann ich auch gleich für 50 Dollar Rosen mitnehmen.\nMUSHNIK\nJesus Maria! Für 50 Dollar Rosen?! Natürlich, mein Herr, sofort! schnell, schnell!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Hektische Betriebsamkeit."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Können Sie einen Hunderter wechseln?\nMUSHNIK\nÄh ... nein ... tut mir leid, wir, äh, haben die Kasse schon abgerechnet heute."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Alle vier seufzen enttäuscht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Na ja, dann muss ich eben für 100 Dollar Rosen nehmen, hab ich recht?\nMUSHNIK\nJesus Maria! Für 100 Dollar Rosen?! Natürlich, mein Herr, sofort! Schnell, Schnell!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Seymour hat die Rosen aus dem Hinterzimmer geholt und wickelt sie in eine Zeitung ein."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "Vielen Dank. Tja, da haben Sie eine wirklich merkwürdige Pflanze. Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Der Kunde geht ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "KUNDE",
+      "text": "MUSHNIK\nMein Gott! Kinder, ich lad uns alle zum Abendessen ein!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "AUDREY",
+      "text": "Oh, ich käm gern mit, Mr. Mushnik, aber ich hab eine Verabredung.\nMUSHNIK\nMit diesem Nichtsnutz? Ich sag Ihnen eins, Audrey. Sie sollten lieber zu einem Psychiater gehen als zu dem. Der Bursche taugt doch nichts.\nEr ist sehr erfolgreich in seinem Beruf\nMUSHNIK\nWas für einen Erfolgsmensch! Fährt auf dem Motorrad durch die Gegend und kommt im Lederdress daher?\nEr passt sich nicht an, Mr. Mushnik. Aber er verdient gut und außerdem hab ich keinen anderen. Gute Nacht, Seymour."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Gute Nacht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "AUDREY",
+      "text": "Guten Appetit wünsch ich. Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Audrey ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "AUDREY",
+      "text": "MUSHNIK\nArmes Ding."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "Gehen wir immer noch essen?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Musik. Die Pflanze welkt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": "SEYMOUR",
+      "text": "MUSHNIK\nSie gehen nirgends hin, Krelbourn. Sie bleiben hier und kümmern sich um diese kranke Pflanze. Warum wird sie immer schwächer?\nKeine Ahnung, Chef! Sie welkt manchmal - einfach so. Audrey Zwo ist kein gesundes Mädchen.\nMUSHNIK\nUnter uns gesagt: Audrey Eins auch nicht.\nWenn ich nur wüsste, welcher Gattung sie angehört. Aber sie steht in keinem Buch.\nMUSHNIK\nAlso, ich rat Ihnen, das schleunigst herauszufinden. Unglaublich, wie diese kleine exotische Schönheit das Geschäft belebt.\nStimmt.\nMUSHNIK\nDann an die Arbeit, Krelbourn! Pflegen Sie die Pflanze wieder gesund. Ich verlass mich auf Sie.\nIch weiß, Chef.\nMUSHNIK\nWirklich?\nAber ja, Chef!\nMUSHNIK\nDann an´s Werk. Gute Nacht.\nNacht, Chef!\nMUSHNIK\nDing Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 3b) Lied: „DA – DOO“",
+      "speaker": null,
+      "text": "Seymour löscht das Licht und bleibt allein im Laden zurück. Auftritt der Soulgirls."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": null,
+      "text": "Nr. 4) Lied: „WACHS FÜR MICH“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": "GIRLS",
+      "text": "UH SHALALA UH WAP WAP UH SHALALA UH WAP WAP UH SHALALA UH WAP WAP UH SHALALA UH WAP WAP"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": "SEYMOUR",
+      "text": "Oh, Zwoey, was soll ich denn noch für dich tun? Mr. Mushnik und Audrey haben dich grad erst kennengelernt, aber ich mach das jetzt schon wochenlang durch. Wachsen und Welken, Keimen und Kümmern. Bist du echt krank, Pflänzlein, oder einfach nur stur? Was fehlt dir? Was brauchst du?\nICH HAB DICH GEGOSSEN – ICH HAB DICH BEWACHT DOCH DU HAST MIR BISHER – NUR KUMMER GEMACHT ICH BITT DICH VON HERZEN\nFOLG ENDLICH DEM TRIEB SEI LIEB – WACHS FÜR MICH\nICH HABE DICH CHEMISCH – GESTÄRKT UND VERJÜNGT ICH HAB DICH MIT STALLMIST UND ASCHE GEDÜNGT ZEIG MIR, DASS DIR´S GUT TUT\nICH MEIN, IM PRINZIP – SEI LIEB – WACHS FÜR MICH\nICH HAB DIR DEN TOPF AUSGEWECHSELT IN WELCHEM DU STECKST\nUND ICH HAB DIR LAUB KLEIN GEHÄCKSELT DASS DU ENDLICH WÄCHST\nICH HAB DICH GESCHOCKT UND GEPÄPPELT UND MEINTE ES GUT\nICH GAB DIR FERMENTE UND SPUR´N-ELEMENTE SAG, WAS WILLST DU NOCH VON MIR – BLUT?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": null,
+      "text": "Die Pflanze richtet sich merklich auf, aber Seymour sieht es nicht. Er verletzt sich am Finger."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": "SEYMOUR",
+      "text": "Autsch! Wie ungeschickt von mir. – Hey, du öffnest dich. Warum? –\nIch glaub, ich weiß warum. – Na ja, ein paar Tropfen werden nicht schaden. Aber nicht, dass mir das zur Gewohnheit wird.\nWAS IMMER ICH ANSTELL ES IST WOHL EIN WITZ\nDU BIST ERST ZUFRIEDEN\nWENN ICH BLUT FÜR DICH SCHWITZ HIER NIMM EIN PAAR TROPFEN JETZT GRÜNER POLYP\nSEI LIEB – SEI LIEB –\nWACHS FÜR MICH."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": null,
+      "text": "Seymour verschwindet in den Hinterraum. Die Musik steigert sich und die Pflanze beginnt zu wachsen. Sie wird immer größer und lacht schließlich zart."
+    },
+    {
+      "type": "light",
+      "section": "Nr. 4) Lied: „WACHS FÜR MICH“",
+      "speaker": "SEYMOUR",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "2. SZENE",
+      "speaker": null,
+      "text": "2. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "2. SZENE",
+      "speaker": null,
+      "text": "Musik. Mushnik, der Penner 2, Crystal, Chiffon und Ronette hören auf der Straße gemeinsam eine Sendung in einem kleinen Transistorradio. Wir hören den Schluss eines Rundfunk-Interviews."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "INTERVIEWER",
+      "text": "(im Radio) Und damit beenden wir unser Gespräch mit Seymour Krelbourn, dem jungen botanischen – stört es Sie, wenn ich Sie ein Genie nenne?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(im Radio) Äh ... Nein."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "INTERVIEWER",
+      "text": "(im Radio) Dem Genie, das pflanzliches Leben gezüchtet hat, wie es auf diesem Planeten bisher unbekannt war. Oh, noch eine letzte Frage, Mr. Krelbourn. Nähren Sie Ihre Pflanze mit irgendetwas Besonderem?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(im Radio) Mit was Besonderem? Äh – nein. Mit einer geheim gehaltenen Flüssigkeit, aber diese ist ... äh ... nicht schwer zu beschaffen."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "INTERVIEWER",
+      "text": "(im Radio) Ich verstehe. Nun, dann danke ich Ihnen für Ihren Besuch bei uns und –"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(im Radio) Ich möchte die Hörer nochmals darauf hinweisen, dass die Audrey Zwo ausschließlich bei uns im Blumenladen besichtigt werden kann, geöffnet werktags von neun bis sechs!\nMUSHNIK\nDie Adresse, die Adresse! Mann, was nützt die beste Werbung ohne Adresse!\nNa, wie war ich?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "PENNER 2",
+      "text": "Super, Seymour.\nMUSHNIK\nAber Du hast die Adresse nicht genannt. Wie oft hab ich Dir gesagt..."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Tut mir leid. Ich war so nervös. Wo ist Audrey? Sie wollte doch hier sein.\nMUSHNIK\nVergiss Audrey! Ich hab für Morgen noch drei Radio-Interviews ausgemacht und die Zeitung will ein Foto!\nMeine Mutter wär´ stolz auf mich – wenn ich eine hätte."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "PENNER 2",
+      "text": "Wahnsinn. Du bist der Aufsteiger des Jahres, Seymour.\n„WUNDER GIBT ES DOCH“ (FORTS.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Unglaublich!"
+    },
+    {
+      "type": "stage",
+      "section": "2. SZENE",
+      "speaker": null,
+      "text": "Seymour geht ab in den Hinterraum des Ladens. Die Girls jammen noch eine Strophe mit der Band. Dann Musikende, denn Audrey kommt außer Atem hereingestürzt. Sie trägt eine Halskrause."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Komm ich zu spät?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Aaaah..."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hab ich´s verpasst?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "CHIFFON",
+      "text": "Klar hast du´s verpasst."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Seymour im Radio. Zum ersten Mal. Ich hab mich beeilt, aber –"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "RONETTE",
+      "text": "Er hat dir Fesseln angelegt?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Nein! ... Handschellen."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Oh, Mädel."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "CRYSTAL",
+      "text": "Der Typ gefährdet deine Gesundheit."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Weiß ich ja. Aber Schluss machen mit ihm kann ich nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Und warum nicht?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Er würde wütend werden. Und wenn er mir das aus Liebe antut, stellt euch vor, was er mit mir macht, wenn er wütend ist."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Dann such dir einen anderen, der dich beschützt."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hä?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Na?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Seymour?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "GIRLS",
+      "text": "Volltreffer."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ach, wir sind gute Freunde, nichts weiter. Das wird nichts mit uns. Ich bin ein Mädchen mit Vergangenheit."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "CRYSTAL",
+      "text": "Ist hier irgendwer ohne Vergangenheit?"
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "AUDREY",
+      "text": "Nein, ich verdiene keinen so netten, vernünftigen und plötzlich so erfolgreichen Mann wie Seymour."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": null,
+      "text": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": "AUDREY",
+      "text": "SEYMOUR IST IDEALISTISCH\nDOCH MEIN BOYFRIEND IST HALT SADISTISCH DRUM IST MEIN AUGE BLAU\nUND DER ARM BEINAH HIN\nICH FIND SEYMOUR ZUM KÜSSEN\nWEIL JA MÄNNER NICHT SCHÖN SEIN MÜSSEN UND ICH TRÄUM VON DEM ORT\nWO ICH ENDLICH ALLEIN MIT IHM BIN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": "CHIFFON",
+      "text": "Was für ein Ort soll das sein?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": "RONETTE",
+      "text": "Ein Erste-Hilfe-Raum?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": "AUDREY",
+      "text": "Nein. Ich träum ja nur. Von einem Häuschen in einer kleinen Siedlung.\nGleich neben der Autobahn. Nichts Besonderes, eine kleine Straße in einem kleinen Vorort. Weit, weit weg von Skid Row. Ein bezaubernder grüner Ort – wo jeder dasselbe kleine Stück Rasen vor dem Haus hat und denselben kleinen Hof dahinter mit denselben Steinfliesen. Alle Häuschen so sauber und hübsch ... weil eins wie´s andre aussieht. Oh, ich träum immerzu davon. Nur ich, der Toaster und ein lieber Mann, wie Seymour ...\nEIN HÄUSCHEN FÜR UNS ZWEI MIT EINEM WEISSEN ZAUN\nMIT SPROSSENFENSTERN ÜBERALL DIE AUF GERANIEN SCHAUN GEHÄKELTE GARDINEN\nSELBST AUF DEM GÄSTEKLO EIN HÄUSCHEN IM GRÜNEN IRGENDWO\nER MÄHT VORM HAUS DAS GRAS DAS MACHT ER GERN ALLEIN UND ICH STEH IN DER KÜCHE UND SCHNEIDE ZWIEBELN KLEIN\nDIE MÖBEL SIND BEDECKT MIT PLASTIK PRAKTISCH, ABWASCHBAR\nSO BLEIBT ALLES SCHÖN UND SAUBER JAHR FÜR JAHR\nZWISCHEN DOSENWÜRSTCHEN\nUND DER ZEIT ZUM SCHLAFENGEHN SIND WIR DAMIT BESCHÄFTIGT SALZGEBÄCK VERTILGEND FERNZUSEHN\nIM BEET EIN GARTENZWERG EIN ZINNPOKAL IM SCHRANK UND IN DER ABENDSONNE\nSITZ ICH BEI IHM AUF DER BANK\nEIN BILD WIE AUS DEM GOLDEN BLATT DAS WIR DANN ABONNIEREN\nWEIT VON DER SKID ROW IM GRÜNEN, WO\nWIR RESIDIEREN"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "light",
+      "section": "Nr. 6) Lied: „IM GRÜNEN IRGENWO“",
+      "speaker": "AUDREY",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "3. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Der Laden. Mushnik, Seymour und Audrey sind dabei, das Geschäft zu renovieren."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "WIR BITTEN UM VERSTÄNDNIS"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "WIR MÜSSEN RENOVIEREN\nMUSHNIK\nWEIL PLÖTZLICH DIE GESCHÄFTE WIE NIE ZUVOR FLORIEREN\nDIE NEUE KÜHLVITRINE IST AB MORGEN UNSER CLOU DOCH HEUT, WEIL WIR RENOVIEREN IST ZU"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Das Telefon klingelt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "MUSHNIK\nSchnell, Schnell! Ding Dong.\nDing Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong.\nMUSHNIK\nMushniks Blumenladen. Ja, die Audrey Zwo können Sie ab morgen bei uns besichtigen."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Seymour bringt auf einer Sackkarre die weiter gewachsene Audrey Zwo herein. Sie ist mit einem Laken abgedeckt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "GIRLS",
+      "text": "WIR MÜSSEN RENOVIEREN DEN NEUEN SEGEN PFLEGEN POLIEREN, INSTALLIEREN UND NEUE FLIESEN LEGEN AUF WÄNDE UND AUF TÜREN\nETWAS FRISCHE FARBE DRAUF\nUND MORGEN MACHEN WIR WIEDER AUF"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "(noch eine lautmalerische Strophe)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "BARAPAPAPABA",
+      "text": "MUSHNIK\n(Zu Seymour) Sind Sie noch nicht fertig?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "(Hat Pflaster an allen zehn Fingern.) Ich tu, was ich kann. Aber mit den ganzen Pflastern ist es ein bisschen schwierig."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Du hast dich in letzter Zeit ziemlich oft verletzt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Äh, stimmt. ((Jedes Mal, wenn ich nach der Gartenschere greife, geht´s schief.))"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "ALLE",
+      "text": "WIR MÜSSEN RENOVIEREN\nWAS EINFACH ZU VERSTEHEN IST WIR KÖNNEN EXPANDIEREN\nSEIT AUDREY ZWO ZU SEHEN IST DIE LEUTE RUFEN AN UND SIE BESTELLEN IMMERZU"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "EIN DUTZEND PELARGONIEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "GIRLS",
+      "text": "ZWEI TÖPFE MIT BEGONIEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "KAMELIEN UND MAGNOLIEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "GIRLS",
+      "text": "IN SCHACHTELN UND FOLIEN\nMUSHNIK\nFÜR JEDEN ANLASS EINEN STRAUSS"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "ALLE",
+      "text": "WIR LIEFERN PROMPT IN JEDES HAUS HEUT, WEIL WIR RENOVIEREN\nIST ZU"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Am Schluss des Titels wird das Tuch von dem verhüllten Gegenstand gezogen: Audrey Zwo kommt im dritten Wachstumsstadium zum Vorschein."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "ALLE",
+      "text": "MUSHNIK\nSeymour, haben Sie die Bestellung für Mrs. Shiva erledigt?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Äh, das hab ich vergessen.\nMUSHNIK\nVergessen! Verdammt noch mal! Wie kann man so eine Bestellung vergessen? Die Shivas sind wichtige Begräbniskundschaft! Eine Riesenfamilie und nicht gerade gesund. Sterben weg wie die Fliegen. (holt den Kranz) Ich sag Ihnen eins, Krelbourn, wenn wir durch Ihre Schlamperei diesen Kunden verlieren, ist es aus mit Ihnen. Ding Dong.\nDing Dong. Entschuldigung, Chef!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Ding Dong. Weißt du, manchmal denk ich, Mr. Mushnik ist zu streng mit dir."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Das macht mir nichts aus. Ihm verdank ich ja alles. Er hat mich aus dem Skid Row Kinderheim geholt, als ich ein Dreikäsehoch war. Ich durfte bei ihm unterm Ladentisch schlafen. Er ließ mich die Böden fegen und das Klo schrubben ... und jeden zweiten Sonntag hatte ich frei."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Irgendwie hab ich das Gefühl, du solltest deine Ansprüche höherschrauben, Seymour. Ich meine, jetzt wo der Erfolg kommt. Vielleicht kaufst du dir erstmal was zum Anziehen. Sei mir nicht böse, aber bei so vielen Interviews und Fototerminen muss ein bedeutendes botanisches Genie doch nach etwas aussehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Mit dem Einkaufen tu ich mich schwer, Audrey. Ich hab nicht so nen tollen Geschmack wie du."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Na ja. Ich könnte dir ja helfen, das Richtige zu finden."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Wirklich?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Klar."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Du würdest mit mir einkaufen gehen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Klar."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Du würdest dich mit mir in der Öffentlichkeit zeigen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Klar!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Heute Abend?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Aaaah – heute Abend geht´s nicht. Ich hab eine Verabredung. Aber ein andermal?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Okay."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Du hast jetzt auch bestimmt jede Menge Verabredungen, ja?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Verabredungen nicht direkt. Aber einige Kleingärtner-Vereine haben angerufen. Ich soll Vorträge halten."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Toll."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Stell dir mal vor. Ich soll Vorträge halten. Dabei hab ich nicht mal nen Schulabschluss."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Das macht nichts. Du hast Lebenserfahrung."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Bisschen. Aber ich bin noch nie mit einem Flugzeug geflogen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Ich auch nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Oder bei der Freiheitsstatue gewesen.\nOder Motorrad gefahren."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Oh, das ist nichts Besonderes. Außerdem ist es gefährlich."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Ehrlich?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "AUDREY",
+      "text": "Extrem gefährlich. Aah! Ich muss schleunigst mein Gesicht herrichten. Mein Freund muss jeden Augenblick hier sein. Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 7) Lied: „WIR MÜSSEN RENOVIEREN“",
+      "speaker": null,
+      "text": "Die Musik setzt ein. Audrey geht in den Hinterraum des Ladens. Orin Scrivello kommt auf dem Motorrad. Die Girls kommen dazu."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "Nr. 8) Lied: „ZAHNARZT“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "SCHON ALS ICH KLEIN WAR WAR MAMA OFT SCHOCKIERT\nDENN ICH HAB IMMER ALLES MASSAKRIERT\nICH SCHOSS AUF PUPPEN MIT DEM SCHIESS–BUMBUM UND STREUTE GIFT IN DAS AQUARIUM\nICH SCHMISS DIE KATZE AUS SPASS AN DIE WAND DA HAT DIE MAMA ERKANNT."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "GIRLS",
+      "text": "WAS DENN ERKANNT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "SIE HAT ERKANNT, WELCH EIN TALENT TIEF IN MIR BRENNT –\nSIE SPRACH: DU MACHST DIE FAMILIE SOLVENT\nSOHN, DU WIRST ZAHNARZT\nDU HAST KEIN MITLEID, DEIN HERZ WIRD NICHT WEICH SOHN, DU WIRST ZAHNARZT\nDAS MACHT DICH GLÜCKLICH UND OBENDREIN REICH DU TAUGST GANZ BESTIMMT NICHT ZUM LEHRER UND WIRST NIE ZUM PRIESTER GEWEIHT\nSOHN, DU WIRST ZAHNARZT DANN BRINGST DU ES WEIT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "RONETTE",
+      "text": "STELLT EUCH VOR, GIRLS, EIN SADO GANZ IN WEISS."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "CHIFFON",
+      "text": "SEHT HER, JETZT GIBT ER GAS, O MEIN GOTT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "CRYSTAL",
+      "text": "ER IST ZAHNARZT UND DER SCHRECKEN DER GANZEN STADT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "GIRLS",
+      "text": "WER WILL DEN BOHRER SPÜREN VON MARQUIS DE SADE WURZELTIEF -\nUNBETÄUBT!\nORIN/GIRLS\nGANZ WEIT AUF, NICHT GEZUCKT, KOPF ZURÜCK\nICH BIN DEIN ZAHNARZT"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(GNADE, GNADE!)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "UND MEIN BERUF MACHT MIR SCHRECKLICHEN SPASS"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(WIE HERRLICH)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "ICH BIN DEIN ZAHNARZT"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(MIT DER ZANGE)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "KEINER VERGISST MICH, DER JE BEI MIR SASS"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(ES IST FANTASTISCH)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "BEGINN ICH DIE WURZEL ZU ZIEHEN\nDANN WIRD VON EUCH MÄDELS UMSONST GESCHRIEN"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(ZAHNARZT)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "BOHR ICH MEINE PATIENTEN AUCH WEICH WEISS ICH DOCH, IM HIMMEL DA DROBEN\nWIRD MAMA MICH INSGEHEIM LOBEN – Oh, Mama! DENN ICH BIN ZAHNARZT\nUND ICH BIN REICH\nSAG AH!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(AH!)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "SAG AH!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(AH!)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "UND SPUCK"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "Musikende. Orin betritt den Laden."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Ding Dong. Ding Dong. Ding Dong. Dong. Dong. Dong. Hallo, wie geht’s?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Danke gut. Aber der Laden ist geschlossen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Hey. Das muss die Pflanze sein, über die sie in den Nachrichten sprechen.\nWie heißt sie gleich wieder?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Audrey Zwo."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Stimmt. Hübscher Name. Eingängig. Nettes Ding. Groß."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Danke, hab ich selbst gezüchtet. Doch wenn Sie jetzt bitte so freundlich sein wollen – ich darf wirklich niemanden…"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Wie man hört, ist das eine neue Gattung oder sowas."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Das sagt man. Aber Sie müssen jetzt gehen, wir…"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Ist schon okay, Seymour. Das ist mein Freund, Dr. med. dent. Orin Scrivello."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Ich will dir was sagen, Junge. Du hast dieses Ding gezüchtet, stimmt´s?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Stimmt."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "Mushnik kommt auf der Straße und bleibt unbemerkt lauschend vor dem Laden stehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Also, wenn ich du wäre, würd ich dieses Gemüse todsicher nicht in einem Loch wie dem hier verstecken. Diese Avocado ist dein Ticket zu den Sternen, Junge. Geh damit zu irgendeinem Blumengeschäft der Stadt – such dir das Beste aus und verlang, was du willst. Jeder Blumenhändler, der dich nicht sofort zum Teilhaber macht, gehört in die Klappsmühle. (lachen)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Kann schon sein. Aber ich bin zufrieden hier."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Seymour ist sehr treu."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Wer hat mit dir gesprochen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Oh... niemand... Entschuldigung."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Entschuldigung, was?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Entschuldigung, Doktor."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "(Zu Seymour.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Ich will dir mal was verraten, Kleiner: Das Ding da ist eine große, grüne Goldmine. Mach, dass du raus kommst aus diesem Loch und nimm deinen Blumentopf mit.\nMUSHNIK\nHeilige Scheiße!\nMushniks Blumenladen an der Skid Row? Mann das ist ein Witz, (lachen)\nglaub’s mir."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Ich glaub´s.\nMUSHNIK\nEr glaubt´s."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Vielleicht sollten wir jetzt besser gehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Wir quasseln heut ein bisschen viel, gnädiges Fräulein."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Verzeihung."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Verzeihung, was?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Verzeihung, Doktor."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Gut, dann gehen wir. Also, denk über meine Worte nach, Mann – ehrlich.\nÜberleg‘s dir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "SEYMOUR",
+      "text": "Gut, gut. Ich überleg’s mir."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Tu das. Okay, Audrey. Hast du die Handschellen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "In der Handtasche."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Abmarsch!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "AUDREY",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": "ORIN",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 8) Lied: „ZAHNARZT“",
+      "speaker": null,
+      "text": "Sie fahren zusammen ab."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": null,
+      "text": "Nr. 9) Lied: „MUSHNIK UND SOHN“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": "ORIN",
+      "text": "MUSHNIK\nER ÜBERLEGT SICH´S\nER ÜBERLEGT SICH´S"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": "SEYMOUR",
+      "text": "Der Kerl ist mir unsympathisch. Und wie der mit Audrey spricht.\nMUSHNIK\nGOTT IM HIMMEL, NEIN\nER DENKT DRAN, DRÜBER NACHZUDENKEN\nKein Wunder, dass sie so ungesund aussieht. Von dem Kerl wird man ja krank.\nMUSHNIK\nWENN ER FORTGEHT\nWENN SEYMOUR FORTGEHT WENN DAS FESTSTEHT SCHWÖR ICH TAUSEND EIDE ICH BIN\nWIEDER PLEITE\nSo lieb, gut und schön wie sie ist, verdient sie einen Prinzen, keinen Sadisten wie den!\nMUSHNIK\nWIEDER PLEITE\nWas für ein Widerling!\nMUSHNIK\nBERAUBT, GEFLEDDERT UND VERSCHMÄHT\nSO STEH ICH DA, WENN SEYMOUR GEHT\nDer ist eine Schande für den Berufsstand der Zahnärzte.\nMUSHNIK\nSeymour!\n(bemerkt jetzt Mushnik) Chef? Ding Dong.\nMUSHNIK\nSEYMOUR –\nICH WÜNSCHTE MIR DU WÄRST MEIN SOHN! WENN´S DIR GEFÄLLT\nWÜRD ICH DICH GERNE ADOPTIERN\nAUCH WENN ER MIR NICHT SEHR GEFÄLLT SCHAU IN DIE KASSE – ER BRINGT GELD DER KLUGE LIEBT, WAS IHN ERHÄLT\nSAG JA!\nWOZU?\nMUSHNIK\nSEYMOUR ICH WÄR GERN DEIN PAPA\nWILL DICH BEHANDELN WIE MEIN EIGEN FLEISCH UND BLUT\nMIT SYMPATHIE UND OHNE ZANK\nMUSHNIK\nMIT EINER VOLLMACHT FÜR DIE BANK.\nOH, IST DAS WAHR\nICH WERD DEIN SOHN\nMUSHNIK\nMUSHNIK UND SOHN KLINGT TOLL\nUND JETZT SCHON VERHEISSUNGSVOLL\nES KOMMT WIE ES KOMMEN SOLL\nWIE FEIN\nMUSHNIK/SEYMOUR\nEIN BLUMENTRAUM WIRD WAHR MEIN GOTT ES IST WUNDERBAR.\nUND HERRLICH WIRD UNS´RE ZUKUNFT SEIN"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": null,
+      "text": "(Dancebreak.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": "SEYMOUR",
+      "text": "OH JA, ICH BIN AB JETZT DEIN SOHN\nPAPA, SCHREIB DEN VERTRAG ICH WEIN VOR RÜHRUNG\nSCHON BIST DU MAL ALT UND TATTERIG\nVERSORG´ ICH UND ERNÄHR´ ICH DICH\nMUSHNIK\nVersprich´s!\nIch schwör´s!\nMUSHNIK\nWELCH EIN SOHN!\nMUSHNIK\nMUSHNIK\nUND SOHN\nMUSHNIK/SEYMOUR\nNA KLAR!\nAB JETZT BIST DU MEIN / BIN ICH DEIN PAPA\nDAS WOLLTEN WIR DOCH SEIT LANGEM SCHON.\nJETZT IST ES OFFIZIELL\nGESCHÄFTLICH UND IDEELL\nDUETT STATT DUELL\nFAMILIENMODELL\nNUN KOMM, KÜSS MICH SCHNELL\nMUSHNIK\nNa Na Na…!\nMUSHNIK/SEYMOUR\nMUSHNIK UND SOHN!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": null,
+      "text": "Ende Song"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": null,
+      "text": "Mushnik umarmt Seymour väterlich und geht ab. Die Musik wechselt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 9) Lied: „MUSHNIK UND SOHN“",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": null,
+      "text": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "SCHICKSAL, WELCH EINE WENDUNG\nDU ERFÜLLST IN VOLLENDUNG\nDEINE HIMMLISCHE SENDUNG NUN ENDLICH AN MIR\nDANK DIR, WUCHERNDER SCHÖSSLING\nBIN ICH JETZT MUSHNIKS SPRÖSSLING\nWENN MIR MAL DIESER LADEN GEHÖRT DANN VERDANK ICH\nDAS GANZ ALLEIN DIR –\nAch Zwoey. Was macht es schon, dass ich ein bisschen blutarm bin in letzter Zeit. Gut, mir ist manchmal schwindelig.  Zwoey, ich hab Hunger. Ich lauf mal rüber zu Schmendrick´s und hol mir was zu essen. (Er geht zur Tür. Die Pflanze welkt.) Oh je, schon wieder. Zwoey, ich hab selber nicht mehr viel. Komm gönn mir noch ein paar Tage Erholung, okay? Dann fangen wir mit der linken Hand wieder an."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": null,
+      "text": "Auf einmal öffnet die Pflanze ihre „Schnauze“ und spricht. Seymour ist verblüfft."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Fütter mich."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Wie bitte!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Fütter mich!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Sag das noch mal!?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "(schnell) Fütter mich."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Zwoey, du hast gesprochen. Du hast deinen ... deine Öffnung, dein Ding ... aufgemacht und gesagt…"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Fütter mich, Krelbourn! Gib´s mir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Das geht nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Ich verhungre!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Junge, Junge.    Was soll ich denn tun? Mir die Pulsadern aufschneiden?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": null,
+      "text": "(Die Pflanze signalisiert starkes Interesse.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Okay, was hältst du davon, wenn ich dir an der Ecke eine Portion Hackfleisch besorge."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Bäh! Ich will Blut."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Zwoey, das ist unanständig."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "DIE PFLANZE",
+      "text": "Frisches Blut!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 10) Lied: “SCHICKSAL, WELCH EINE WENDUNG”",
+      "speaker": "SEYMOUR",
+      "text": "Ich will das nicht hören."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": null,
+      "text": "Nr. 11) Lied: GIB’S MIR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Gib´s mir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Menschenblut?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Gib´s mir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Muss es von mir sein?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Gib´s mir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Woher soll ich´s denn nehmen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "GIB´S MIR, SEYMOUR\nGIB´S MIR HEUTE NACHT\nDU SCHAFFST ES, TU´S FÜR MICH, MANN\nGIB´S MIR, SEYMOUR\nGIB´S MIR HEUTE NACHT\nHahahahaha\nDENN ICH MUSS HABEN, SEYMOUR\nWAS MICH GROSS UND KRÄFTIG MACHT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Audrey Zwo. Wir woll´n uns nichts vormachen, du trinkst Blut. Wie soll ich dich ernähren? Soll ich die Leute umbringen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Wird dein Schaden nicht sein."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "So?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Ja, hältst du das alles für Zufall, was hier passiert? Dein Aufstieg? Deine Adoption? Junge, Junge, du bist naiv."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Und du bist nichts weiter als eine Pflanze."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "ich kann alles, was ich will."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Zum Beispiel."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Dafür sorgen, dass du alles kriegst, wonach du dich heimlich sehnst."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Danke, nein, Zwoey. Nett gemeint von dir, aber –"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Du warst eine Null, bevor ich gekommen bin. Und jetzt? Sag, was du willst, Junge, und schon hast du´s. Geld?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Quatsch."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Mädels?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Was denn für Mädels?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Ein besonderes Mädchen? Wie wär´s mit Audrey? Überleg´s dir. Du wirst schon jemanden finden, den du abmurksen kannst, damit ich was zum Frühstück krieg.\nSTELL DIR VOR, EIN ZIMMER IM RITZ\nURLAUB AUF HAWAII UND IN KITZ\nUND ALLE TUSSIS SIND AUF DICH SPITZ\nDU KANNST ES HABEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "GIRLS",
+      "text": "DU KANNST ES HABEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "MANN, ICH WÜRD GERN LEDER ANZIEHN\nMOTORRAD FAHR´N, ALS WÄR ICH JAMES DEAN\nUND VOR NEID WÜRD JEDER IN DER STRASSE HIER GRÜN."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "DU KANNST ES HABEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "GIRLS",
+      "text": "DU KANNST ES HABEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "UND WENN´S DICH BERUHIGEN KANN\nMANCHER MORD IST EINE GUTE TAT\nSCHAU DIR NUR DIE MENSCHEN AN\nUM VIELE IST´S WEISS GOTT NICHT SCHAD"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Moment, Moment! So was sagt man nun wirklich nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Aber es stimmt doch, oder?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "Nein. Ich wüsste keinen, der es verdient, dass man ihn zu Hackfleisch macht und an eine hungrige Pflanze verfüttert."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Mmmh. Aber klar weißt du einen."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": null,
+      "text": "Genau in diesem Augenblick erscheint Orin mit Audrey auf dem Gehsteig vor dem Laden."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Dumme Gans! Gott, was für eine blöde Nuss."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "AUDREY",
+      "text": "Entschuldigung, Doktor! Entschuldigung Doktor!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Und jetzt zum Teufel, geh schon in den Laden und hol deinen saudummen Mantel, du blöde Kuh!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": null,
+      "text": "Audrey betritt den Laden, Orin bleibt in der Tür stehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "AUDREY",
+      "text": "Ja, Doktor! Sofort, Doktor! Ding Dong. Hi, Seymour. Ich hab meinen Mantel hier vergessen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Ding Dong. Los, beweg dich, Schnalle. Was sagt man zu so einer doofen Henne. Vergisst ihren bescheuerten Mantel. Würde glatt ihren Holzkopf vergessen, wenn er nicht festgeschraubt wär!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "AUDREY",
+      "text": "Entschuldigung."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Entschuldigung was?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": null,
+      "text": "Orin holt aus und versetzt ihr in einer krassen COMIC Zeitlupe einen Schlag."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "AUDREY",
+      "text": "Orin! Das hat weh getan."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Abmarsch!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "AUDREY",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "ORIN",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": null,
+      "text": "Sie gehen ab. Seymour und die Pflanze wechseln einen langen, düsteren Blick gegenseitigen Einverständnisses."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "MMM HMM …\nPFLANZE/SEYMOUR\nGIB DEM HERZEN EINEN STOSS\nDER KOPF HAT ES SCHON LÄNGST KAPIERT\nDIESER KERL IST ZWEIFELLOS\nZU PFLANZENFUTTER PRÄDESTINIERT\nZU PFLANZENFUTTER PRÄDESTINIERT\nZU PFLANZENFUTTER PRÄDESTINIERT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "DIESER MISTKERL QUÄLT SIE SO SEHR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "SCHREIT SIE DAUERND AN UND MACHT DAS LEBEN IHR SCHWER"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "SEYMOUR",
+      "text": "DU BRAUCHST BLUT UND DER GIBT GANZ SCHÖN WAS HER"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "ICH BRAUCH BLUT UND DER GIBT GANZ SCHÖN WAS HER\nPFLANZE/SEYMOUR\nDU BRAUCHST/ICH BRAUCH BLUT UND DER GIBT GANZ SCHÖN\nWAS HER\nICH WILL´S HABEN!"
+    },
+    {
+      "type": "light",
+      "section": "Nr. 11) Lied: GIB’S MIR",
+      "speaker": "DIE PFLANZE",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "4. SZENE",
+      "speaker": null,
+      "text": "4. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "4. SZENE",
+      "speaker": null,
+      "text": "Verwandlung. Ein Paravent und ein elektrischer Zahnarzt-Behandlungsstuhl erscheinen. Wir befinden uns in der Praxis von Dr. med. dent. Orin Scrivello. Seymour kommt herein mit einer abgesägten Schrotflinte in einer Mushniks-Blumenladen-Papiertüte."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Der Nächste bitte."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Das bin vermutlich ich, Dr. Scrivello."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Haben Sie einen Termin?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Wir haben uns gestern getroffen. Seymour Krelbourn."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Ach, ja. Stimmt. Der Typ mit der Pflanze."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Genau."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Und den Pflastern."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Genau."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Und dem Gewehr."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Sch-Stimmt."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Und warum zielen Sie mit dem Gewehr auf mich, Seymour?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ich – äh – ich –"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Hey, Wir werden doch keine Angst vorm Zahnarzt haben."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nein – ich – äh – ich hab keine Angst, ich –"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Es tut nur ein kleines bisschen weh."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nein, Sie missverstehen mich. Ich komm nicht wegen meiner Zähne, ich –"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Natürlich kommst Du wegen der Zähne. Sag´ „Ah“."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(schüttelt den Kopf.) Mmm-Mmm."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Sag´ Ah!"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nein! (Polizeigriff) Aaaahhh!"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Uuuuuhhhh. Deine Zähne sind eine Katastrophe, Junge."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Wirklich?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Wir müssen das komplette Gebiss sanieren. Fangen wir gleich mit dem Weisheitszahn an."
+    },
+    {
+      "type": "stage",
+      "section": "4. SZENE",
+      "speaker": null,
+      "text": "Orin schiebt Seymour auf den Behandlungsstuhl."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nein."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Wir reißen den kleinen Tunichtgut einfach raus. Was halten Sie davon?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ich muss jetzt gehen."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Für Zahnpflege muss immer Zeit sein, Seymour! Besser ich unternehme sofort etwas. Fangen wir an."
+    },
+    {
+      "type": "stage",
+      "section": "4. SZENE",
+      "speaker": null,
+      "text": "Er ergreift den Elektrobohrer. Dieser beginnt bedrohlich zu surren."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Moment mal! Moment! Wollen Sie mir keine Spritze geben?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Wozu? Die stumpft bloß das Gefühl ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Aber es tut doch weh."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Nur, bis Sie bewusstlos werden."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Was ist das?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Das, Seymour, ist Hagen, mein Lieblingsbohrer."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Aber der ist verrostet."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Ein antikes Stück. Heutzutage werden solche prächtigen Werkzeuge gar nicht mehr hergestellt. Klotzig, kantig, stumpf! Das ist eine echte Aufgabe für mich. Wird mir Spaß machen. Ich werde ein bisschen Gas dafür brauchen."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Gas?"
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Lachgas."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Gott sei Dank. Ich dachte schon Sie machen es ganz ohne Betäubung."
+    },
+    {
+      "type": "dialogue",
+      "section": "4. SZENE",
+      "speaker": "ORIN",
+      "text": "Oh, das Gas ist nicht für Sie, Seymour. Es ist für mich. Ich will das hier richtig genießen. Entspannen Sie, Seymour, ich bin gleich für sie da."
+    },
+    {
+      "type": "stage",
+      "section": "4. SZENE",
+      "speaker": null,
+      "text": "Orin verschwindet hinter dem Paravent. Seymour ist allein. Er greift nach dem Gewehr."
+    },
+    {
+      "type": "header",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": null,
+      "text": "Nr 13) Lied: „JETZT“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "JETZT!\nMACH ES JETZT!\nDENN JETZT IST ER VERMUTLICH\nVOM GAS GANZ BENOMMEN\nES KANN GAR KEIN BESSERER ZEITPUNKT MEHR KOMMEN\nEIN SCHUSS UND DER SPUK MIT DEM IRREN\nIST ENDLICH VORBEI"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "(Lacht hinter der Bühne.) Hahahahahahaha –"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "JETZT\nMACH ES JETZT\nMIT DEM FINGER AM ABZUG\nEIN KLEIN WENIG ZUCKEN\nUND AUDREY MUSS SICH VOR DEM\nSCHWEIN NICHT MEHR DUCKEN\nDANN IST SIE FREI\nJETZT ... FOLG DEM PLAN\nJETZT ... FOLG DER PFLICHT\nICH WILL, DOCH ICH\nKANN ES NICHT"
+    },
+    {
+      "type": "stage",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": null,
+      "text": "Orin kommt völlig high hinter der Wand hervor mit einer Gasmaske über dem Kopf."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Ooohhh, Mann! Seymour, ich schwebe! Was werden wir alles anstellen in Ihrem Mäulchen! Hähähähä! Okay, ich hab wohl jetzt genug von dem Zeug. Ich nehm mir nur noch die Maske ab und dann …"
+    },
+    {
+      "type": "stage",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": null,
+      "text": "(Er will sich die Maske vom Kopf ziehen, aber es gelingt ihm nicht.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Hey – (Versucht es noch mal.) Seymour – (Und noch mal.) Verdammt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "Was?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Sie hängt fest!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "Was?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Die Maske – sie hängt fest. Krieg sie nicht mehr runter. Lieber Gott, ich erstick gleich hier drin! Seymour – helfen Sie mir – bitte."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "Ich weiß nicht..."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Was? Wie? Er sagt, er weiß nicht? Seymour... ah ... Sie begreifen nicht...\nHahaha\nLASSEN SIE SICH NICHT VERWIRREN\nWEIL ICH DAUERND KICHERN MUSS\nDAS KOMMT VOM GAS\nDAS MACHT MICH HIGH\nDOCH ICH KÄMPFE HIER UM MEIN LEBEN\nNICHT AUS JUX UND TOLLEREI\nUND AUCH WENN ICH DABEI LACHE\nES IST KEINE LEICHTE SACHE\nWENN MAN STIRBT – ES IST NICHT KOMISCH FINDE ICH\nHahahaha\nES IST DURCHAUS NICHT SEHR ANGENEHM FÜR MICH"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "HIER HABEN WIR NUN EIN ETHISCHES DILEMMA\nWENN ICH IHM NICHT HELF, DANN WIRD ER DIESEN\nTRIP NICHT ÜBERSTEHEN\nSTIMMT, ICH HABE NICHT GEFEUERT\nDOCH DER LAUF DER DINGE STEUERT\nAUF SEIN ENDE ZU, ICH BRAUCH NUR\nZUZUSEHN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Hahahahaha\nLASSEN SIE SICH NICHT VERWIRREN\nWEIL ICH GACKER WIE EIN HUHN\nDAS KOMMT VOM GAS\nES TÖRNT MICH AN\nAUCH WENN ICH VOR LACHEN GLUCKSE\nGLEICH BIN ICH EIN TOTER MANN\nSCHON FÜHL ICH DAS LEBEN WEICHEN\nUND ALS LETZTES LEBENSZEICHEN\nJAPS UND HAPS ICH HIER IN SCHLIMMSTER ATEMNOT (Keucht.)\nSIND SIE TAUB! NOCH UNENTSCHIEDEN?\nODER ETWA GANZ ZUFRIEDEN\nDASS ES MICH ERWISCHT?\nICH LACH MICH (Er kichert.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "SEYMOUR",
+      "text": "Tot?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Hahaha\nOrin ist tot. Es klingelt."
+    },
+    {
+      "type": "light",
+      "section": "Nr 13) Lied: „JETZT“",
+      "speaker": "ORIN",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "5. SZENE",
+      "speaker": null,
+      "text": "5. SZENE"
+    },
+    {
+      "type": "dialogue",
+      "section": "5. SZENE",
+      "speaker": "ORIN",
+      "text": "Nr 13a) CODA"
+    },
+    {
+      "type": "stage",
+      "section": "5. SZENE",
+      "speaker": null,
+      "text": "Seymour zerhackt die Leiche von Orin. Er geht mit einer Mülltüte gefüllt mit Orins Leichenteilen in den Laden."
+    },
+    {
+      "type": "dialogue",
+      "section": "5. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "5. SZENE",
+      "speaker": "CRYSTAL",
+      "text": "SHING – A – LING UNHEILVOLLES DING\nDAS DEN RAUM DURCHDRINGT\nRONETTE/CHIFFON SHANG – A – LANG\nSCHLINGEN ZIEHEN SICH ENG UM DEN HALS\nSeymour füttert die Pflanze. Angeekelt von diesem Geschäft hebt Seymour ein weißes Bündel vom Boden auf: Orins blutiger Arztkittel. Er läuft aus dem Laden, auf den Zuschauerraum zu. Er stopft das Bündel in eine Mülltonne, die vorne links steht und stürzt wie ein Wahnsinniger davon."
+    },
+    {
+      "type": "light",
+      "section": "5. SZENE",
+      "speaker": "CRYSTAL",
+      "text": "PAUSE"
+    },
+    {
+      "type": "header",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "ZWEITER AKT 1. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Der eiserne Vorhang öffnet sich. Audrey Zwo hat jetzt im vierten Stadium enorme Ausmaße. Sie nimmt fast den gesamten Laden ein."
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Das Telefon im Laden klingelt. Audrey kommt aus dem Hinterraum. Sie nimmt genervt ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hallo und Willkommen, Mushnik und Sohn, Audrey am Apparat! Nein, wir haben schon geschlossen. Die Filiale am Hauptbahnhof ist 24 Stunden geöffnet. Wiederhörn!"
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Sie legt auf. Das Telefon klingelt wieder."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hallo und Willkommen, Mushnik und Sohn, Audrey am Apparat! Ja, die Audrey Zwo T-Shirts bekommen Sie in allen unseren Filialen. Wir haben geschlossen. Wiederhörn."
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Sie legt auf. Das Telefon klingelt wieder."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hallo und Willkommen, Audrey und Sohn und... guten Tag! Was? Zwei Busse Japaner morgen um 12? Na gut, aber sagen Sie dem Busfahrer, er soll bitte nicht wieder vor dem Schaufenster parken! Wiederhör´n."
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Sie legt auf. Bevor es wieder klingeln kann, legt sie den Hörer neben die Gabel."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Was für ein Tag, was für ein Tag. (Sie ruft nach hinten) Seymour, kannst du heut abschließen? Ich bin völlig fertig."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "(Kommt aus dem Hinterzimmer.) Ah, einen Augenblick, Audrey. Ich will dir was zeigen."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hat das nicht Zeit bis morgen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Es dauert nicht lang."
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Seymour verschwindet einen Augenblick lang im Nebenraum und kommt zurück in einer Lederjacke."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ta-daaaa!"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "(Schockiert.) Aaaah! (Sie läuft in Panik auf die Straße.) Ding Dong. Aaah!"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong. Gefällt´s dir nicht? Ich zieh sie aus. Ich bring sie zurück. Ich verbrenn sie. (Audrey kommt zurück.) Weißt du ... Ich hab sie nur gekauft, um dir zu imponieren. Nur deshalb."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich auch weiß nicht, warum ich so reagiert hab. Wahrscheinlich vertrag ich das Wetter momentan nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Es ist wegen Orin, stimmt´s? Du bist ganz fertig seit... seinem geheimnisvollen Verschwinden. Er fehlt dir, hab ich recht?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Der mir fehlen? Ich fühl mich total erleichtert, seit er weg ist. Ganz abgesehen davon, dass ich eine Menge Geld spare, seit ich keine Schmerztabletten und Pflaster mehr brauche."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Aber was ist es dann?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Wahrscheinlich fühl ich mich schuldig. Weißt du, wenn ihm was zugestoßen sein sollte... dann ist es auch meine Schuld, weil... weil ich es mir heimlich gewünscht habe."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Audrey, du solltest gar keinen Gedanken mehr verschwenden an diesen Widerling. Es gibt Männer, die würden alles dafür geben, einmal mit dir auszugehen. Nette Männer."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich verdiene keinen netten Mann, Seymour."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Audrey, bitte…"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich verdien nichts Besseres als so einen widerlichen Kerl wie diesen Orin Scrivello. Weißt du, wo ich ihn kennengelernt hab? Im Mülleimer."
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Im Mülleimer?"
+    },
+    {
+      "type": "dialogue",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": "AUDREY",
+      "text": "Das ist ein Nachtlokal. In dem ich nachts gearbeitet habe, als es im Laden so wenig zu verdienen gab. Ich hab mir unanständige Kleider angezogen. Nicht so was Hübsches, wie das hier. So was Billiges, was die Kerle scharf macht. Und ich…"
+    },
+    {
+      "type": "stage",
+      "section": "ZWEITER AKT 1. SZENE",
+      "speaker": null,
+      "text": "Audrey weint und setzt sich. Seymour geht zu ihr."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": null,
+      "text": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "Audrey, das ist doch vorbei. Du musst dich für nichts schämen. Du bist ein wunderbarer Mensch, und ich weiß, du bist es immer gewesen. Hinter den Pflastern und Verbänden – weißt du, was ich da sah? Einen Menschen den ich verehrt hab. Den ich immer noch verehre.\nHOCH MIT DEM KOPF\nUND WEG MIT DER SCHMINKE\nHIER NIMM MEIN TEMPO\nREIB DIE AUGEN DIR FREI\nZEIG DEIN GESICHT\nAUCH WENN´S VERWEINT IST\nES GING DIR NICHT GUT\nDOCH DAS IST VORBEI\nJETZT HAST DU SEYMOUR\nNUN BIST DU GEBORGEN\nUND AUCH OHNE MAKEUP\nKANNST DU SICHER SEIN\nJETZT HAST DU SEYMOUR\nER WIRD FÜR DICH SORGEN\nDENN NIE MEHR LÄSST DICH\nSEYMOUR ALLEIN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "AUDREY",
+      "text": "NIE KAM ES JEMALS\nWIE´S KOMMEN SOLLTE\nDADDY VERLIESS UNS\nMAMA WAR KRANK\nUND KAM EIN MANN\nDANN TAT ICH, WAS ER WOLLTE\nUND BEKAM MEISTENS\nPRÜGEL ALS DANK\nJETZT HAB ICH SEYMOUR\nNUN BIN ICH GEBORGEN\nMICH SCHLECHT ZU BEHANDELN\nFÄLLT IHM NIEMALS EIN\nJETZT HAB ICH SEYMOUR\nER WIRD FÜR MICH SORGEN\nDENN NIE MEHR LÄSST MICH\nSEYMOUR ALLEIN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "ZWICK MICH UND SAG MIR\nDASS ICH NICHT TRÄUME\nDAS PECH IST VORÜBER\nMEIN GOTT, IST ES WAHR"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": null,
+      "text": "Crystal, Ronette und Chiffon kommen als Chor dazu."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "AUDREY",
+      "text": "ICH MUSS MICH AUCH AN\nDAS GLÜCK ERST GEWÖHNEN\nOB SO ETWAS DAUERT\nIST MIR NOCH NICHT KLAR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "ALLE",
+      "text": "DAS KAM NOCH NIE VOR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "AUDREY",
+      "text": "NACH SO VIELEN SORGEN\nSEYMOUR/GIRLS\nUH, UH, UH\nAUF EINMAL VERSTÄNDNIS"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "SO VIEL VERSTÄNDNIS"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "ALLE",
+      "text": "DENN NUN IST SEYMOUR\nSEYMOUR DEIN/MEIN MANN"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": null,
+      "text": "Seymour und Audrey in leidenschaftlicher Umarmung ineinander verschlungen. Mushnik kommt herein und betrachtet das Paar feindselig."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "ALLE",
+      "text": "MUSHNIK\nHah. Die Verschwörung meiner Angestellten wird immer schamloser."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "Bitte Mr. … Dad?\nMUSHNIK\nLassen Sie gefälligst dieses Mr. Dad, Krelbourn. Audrey würden Sie bitte Seymour und mich einen Moment allein lassen. Vielleicht gehen Sie ja inzwischen zu ihrem Zahnarzt.\nDas ist nicht komisch, Dad. Du weißt doch, dass er verschwunden ist.\nMUSHNIK\nOh, stimmt ja. Verschwunden ist er, nicht wahr? Wie konnte ich das nur vergessen, Sohn. Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "AUDREY",
+      "text": "Seymour, wovon spricht er? Was wird hier gespielt?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "Bitte tu, tu was er gesagt hat. Lass uns allein Audrey.\nWir sehn uns später. Ich komm zu dir, wenn´s dir recht ist."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "AUDREY",
+      "text": "Natürlich ist es mir recht."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": null,
+      "text": "Audrey ab."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong.\nMUSHNIK\nKleine rote Flecken. Überall auf dem Boden.\nDu benimmst dich etwas seltsam, Dad.\nMUSHNIK\nIch hatte auch einen etwas seltsamen Nachmittag, Sohn. Nach dem Termin beim Anwalt wurde ich aufs Polizeirevier bestellt.\nAufs Polizeirevier?\nMUSHNIK\nJa. Anscheinend haben die die Praxis von diesem motorradfahrenden Zahnarzt durchsucht. Und was meinst du, was sie da gefunden haben? Eine Tüte.\nEine Tüte?\nMUSHNIK\nJawohl! Eine Tute von Mushniks Blumenladen in Skid Row.\nUnd ich hab mir so meine Gedanken gemacht über gewisse Dinge, die mir hier in letzter Zeit aufgefallen sind. Kleine rote Flecken – überall auf dem Linoleum.\nMUSHNIK\nDing Dong.\nWo gehst du denn hin? Ding Dong.\nMUSHNIK\nWenn man´s eilig hat, etwas loszuwerden, sollte man es nicht in die Mulltonne in Skid Row stecken.\nWovon redest du eigentlich?\nMUSHNIK\nDavon!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 15) Lied: „JETZT HAST DU SEYMOUR“",
+      "speaker": null,
+      "text": "Sie stehen jetzt beide auf der Straße. Mushnik greift in die Mülltonne und zieht Orins blutigen Zahnarztkittel heraus."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": null,
+      "text": "Nr. 16) Lied: „ESSENSZEIT“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "DIE PFLANZE",
+      "text": "JETZT HAT ER DICH DURCHSCHAUT\nMUSHNIK\nHab ich letzte Woche entdeckt und weiter nicht drüber nachgedacht.\nJETZT HAT ER DICH IM ECK\nMUSHNIK\nUnd die kleinen roten Flecken war´n ja ganz harmlos.\nDU KOMMST IHM NICHT MEHR AUS\nMUSHNIK\nAber jetzt erwisch ich dich mit der Freundin vom Zahnarzt.\nUND FLIEHN HAT KEINEN ZWECK\nMUSHNIK\nUnd seh auf einmal ein Motiv.\nER WEISS GENAU BESCHEID\nMUSHNIK\nWenn er erst beseitigt ist, hast du freie Bahn, stimmt´s?\nUND JETZT IST ESSENSZEIT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Ich bin unschuldig, ich schwöre.\nMUSHNIK\nUnd wie erklärst du dann das hier?"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": null,
+      "text": "Er zeigt ihm ein polizeiliches Beweisfoto von Seymours Mütze."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Ein Foto von einer Mütze?\nMUSHNIK\nVon deiner Mütze. Die Polizei hat sie in Scrivellos Praxis gefunden, mir gezeigt und mich gefragt, ob ich sie identifizieren kann.\nUnd?\nMUSHNIK\nIch hab nichts gesagt. Sie haben nicht den leisesten Verdacht gegen dich, Seymour. Aber sie wissen nichts von den Flecken, dem Kittel, der Freundin…\nIch war´s nicht.\nMUSHNIK\nDann geh mit mir zur Polizei und sag´s ihnen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "DIE PFLANZE",
+      "text": "ER HAT DIE SPUREN ERKANNT\nMUSHNIK\nNur damit ich mein Gewissen beruhige.\nUND ALLES STIMMT UND PASST\nMUSHNIK\nWenn du´s nicht tust, muss ich´s tun.\nER ZEIGT DICH SICHER AN\nMUSHNIK\nAlso, was ist?\nSIE STECKEN DICH IN DEN KNAST"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Gut... ich... ich geh."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "DIE PFLANZE",
+      "text": "DU TUST IHM NICHT MAL LEID\nMUSHNIK\nIch schließ noch die Hintertür ab, dann gehen wir.\nALSO DANN – ESSENSZEIT!\nMUSHNIK\nDing Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": null,
+      "text": "Mushnik verschwindet in den Nebenraum. Seymour ist verzweifelt, während die Pflanze singt."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "DIE PFLANZE",
+      "text": "WART NICHT, WART NICHT\nDENK DOCH AN DEINE ZUKUNFT\nWART NICHT, WART NICHT\nDENK DOCH AN AUDREY\nWART NICHT, WART NICHT\nHÖR BLOSS AUF, DICH ZU ZIEREN\nWART NICHT, WART NICHT\nLASS IHN ZUM JORDAN GEHN\nDANN WIRD DIR\nDIE WELT OFFEN STEHN\nMUSHNIK\nOkay, Seymour, gehen wir."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Äh... willst du nicht die Tageseinnahmen mitnehmen? Dann kannst du sie morgen früh gleich zur Bank bringen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "WART NICHT, WART NICHT!\nMUSHNIK\nDu hast sie doch in den Safe gegeben?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Äh – nein."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "WART NICHT, WART NICHT!\nMUSHNIK\nWarum denn nicht?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Hab die Kombination vergessen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "WART NICHT, WART NICHT!\nMUSHNIK\nDas sind ein paar tausend Dollar. Wo ist das Geld?\nESSENSZEIT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "In der Pflanze."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "ESSENSZEIT!\nMUSHNIK\nIn der Pflanze?\nWART NICHT, WART NICHT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Hab mir gedacht, da ist es am sichersten."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "WART NICHT, WART NICHT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Kein Dieb würde da reinschauen, oder?"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "WART NICHT, WART NICHT!\nMUSHNIK\nDas Geld ist in der Pflanze? (Seymour nickt.)\nWART NICHT, WART NICHT!\nMUSHNIK\nUnd wie soll ich es da rausholen?\nESSENSZEIT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Äääääh."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "ESSENSZEIT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "SEYMOUR",
+      "text": "Einfach anklopfen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "EHE – SSEHENSZEIHEI – HEIT!"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": null,
+      "text": "Mushnik klopft auf die Pflanze, die daraufhin ihren Rachen weit öffnet. Mushnik klettert hinein, um nach dem Geld zu suchen. Die Pflanze schließt sich über ihm. Schreie. Die Pflanze kaut, rülpst und spuckt dann das Toupé von Mushnik aus."
+    },
+    {
+      "type": "light",
+      "section": "Nr. 16) Lied: „ESSENSZEIT“",
+      "speaker": "GIRLS",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "2. SZENE",
+      "speaker": null,
+      "text": "2. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "2. SZENE",
+      "speaker": null,
+      "text": "Am nächsten Morgen. Als Seymour aus Audreys Wohnung kommt, wird er von Mrs. Bernstein abgefangen."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "MRS. BERNSTEIN",
+      "text": "Seymour Krelbourn! Mein Lieber, mein Bester."
+    },
+    {
+      "type": "dialogue",
+      "section": "2. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Äh... kennen wir uns?"
+    },
+    {
+      "type": "header",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": null,
+      "text": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "SEYMOUR",
+      "text": "BERNSTEIN\nNoch nicht. Babette Bernstein. Programmdirektorin der KBC.\nSEYMOUR KRELBOURN BEIM FERNSEH´N\nWARTEN WIR LANG SCHON AUF DIESES FORMAT\nALLE WERDEN SIE GERN SEHN\nMILLIONEN DRAUSSEN VOR DEM APPARAT\n„SEYMOUR KRELBOURN´S GÄRTNER DUELL“\nEIN GUTER RAT – UNTERSCHREIBEN SIE SCHNELL\nJEDEN TAG UM VIERTEL VOR VIER\nDAS MACHT UNS REICH – UNTERSCHREIBEN SIE HIER"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": null,
+      "text": "Sie gibt Seymour einen Vertrag. Crystal, Ronette und Chiffon sind dazu gekommen."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "SEYMOUR",
+      "text": "BERNSTEIN/GIRLS\nDIE LETZTEN WERDEN DIE ERSTEN\nDAS WORT DER BIBEL IST WAHR\nVOR REICHTUM WIRST DU BALD BERSTEN\nDU WIRST BERÜHMT WIE EIN STAR\nDIE SCHWACHEN WERDEN DIE STARKEN\nUND LANG GENUG WARST DU SCHWACH\nDIE SCHRIFT SAGT: WER DER LETZTE WAR, WIRD ERSTER\nWERDEN NACH UND NACH"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": null,
+      "text": "Auftritt Mrs. Luce"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. LUCE",
+      "text": "Ah! Seymour Krelbourn!? Reizend, Sie kennenzulernen, junger Mann.\nEntzückend, wirklich, Seymour, bezaubernd.\nICH LEGE MICH HIER INS MITTEL\nFÜR MEINEN MANN\nDEN VERLEGER VON „LIFE“\nWIR WOLL´N IHR BILD AUF DEM TITEL\nWIR GLAUBEN ALLE, SIE SIND DAFÜR REIF\nDAMIT EHR´N WIR SIE ALS GENIE\nSO WAS TUN WIR SELTEN, FAST NIE\nKEIN GERING ´RER ALS ANDY WARHOL\nPHOTOGRAPHIERT IHRE PFLANZE UND SIE"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": null,
+      "text": "Sie gibt Seymour einen Vertrag."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. LUCE",
+      "text": "BERNSTEIN/LUCE/GIRLS\nDIE LETZTEN WERDEN DIE ERSTEN\nDAS WORT DER BIBEL IST WAHR\nVOR REICHTUM WIRST DU BALD BERSTEN\nDU WIRST BERÜHMT WIE EIN STAR\nDIE SCHWACHEN WERDEN DIE STARKEN\nUND LANG GENUG WARST DU SCHWACH\nDIE SCHRIFT SAGT: WER DER LETZTE WAR, WIRD ERSTER\nWERDEN – NACH UND NACH"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "SEYMOUR",
+      "text": "MEIN NEUES LEBEN\nWIRD WUNDERBAR SEIN\nDANK DIESER PFLANZE\nWERD ICH REICH UND ANGESEHN\nMEIN GOTT, WAS SAG ICH\nDAS DARF NICHT WAHR SEIN\nSOLANG DIE PFLANZE LEBT\nKANN SCHRECKLICHES GESCHEHN\nDAS UNTERSCHREIBEN\nHEISST: ES GEHT WEITER\nDANN IST DAS BLUTIGE GESCHÄFT NOCH NICHT VORBEI\nERFOLGREICH BLEIBEN\nBEDEUTET LEIDER\nEIN BISSCHEN MORD UND MANCHE ÜBLE SCHWEINEREI\nNEIN! NEIN!\nICH WERD ENDLICH TUN, WAS ICH MUSS\nNEIN! NEIN!\nICH MACH MIT DEM ALBTRAUM JETZT SCHLUSS!\nNEIN! NEIN!\nSICH WEITER ZU WINDEN\nHAT GAR KEINEN ZWECK\nBIST DU MORGEN AUCH WIEDER\nBANKROTT UND IM DRECK\nKEINE ALTERNATIVE\nDIE EINZIGE LÖSUNG:\nDAS ÜBLE GEMÜSE MUSS WEG\nDOCH HALT! WAS WIRD DANN\nBLOSS AUS AUDREY\nWENN´S WIEDER SO WIE\nDAMALS WIRD – ES TRÄF SIE SCHWER\nSIE WIRD ENTTÄUSCHT SEIN\nSIE WIRD VERZWEIFELN\nOHNE DIE PFLANZE LIEBT SIE MICH VIELLEICHT\nNICHT MEHR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "DIE LETZTEN WERDEN DIE ERSTEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "SEYMOUR",
+      "text": "ICH UNTERSCHREIB"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "DAS WORT DER BIBEL IST WAHR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. BERNSTEIN",
+      "text": "ICH BIN BEREIT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "VOR REICHTUM WIRST DU BALD BERSTEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. LUCE",
+      "text": "MEINE KOPIE"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "DU WIRST BERÜHMT WIE EIN STAR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. BERNSTEIN",
+      "text": "DIE IST FÜR SIE"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "DIE SCHWACHEN WERDEN DIE STARKEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "MRS. LUCE",
+      "text": "MACHT SICH BEZAHLT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "GIRLS",
+      "text": "UND LANG GENUG WARST DU SCHWACH"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "SEYMOUR",
+      "text": "ALSO, BIS BALD"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "ALLE",
+      "text": "DIE SCHRIFT SAGT: WER DER LETZTE WAR, WIRD ERSTER WERDEN\nDIE SCHRIFT SAGT: WER DER LETZTE WAR, WIRD ERSTER WERDEN\nDIE SCHRIFT SAGT: WER DER LETZTE WAR, WIRD ERSTER WERDEN\nNACH UND NACH"
+    },
+    {
+      "type": "light",
+      "section": "Nr. 17) Lied: „DIE LETZTEN WERDEN DIE ERSTEN SEIN“",
+      "speaker": "ALLE",
+      "text": "Blackout."
+    },
+    {
+      "type": "header",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "3. SZENE"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Im Laden. Eine stürmische Nacht. Seymour sitzt erschöpft und abgekämpft über eine Schreibmaschine gebeugt."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Krelbourn! Gib´s mir! Hunger! Fütter mich!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Zwoey. Du siehst doch, dass ich zu tun hab."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Gib´s mir!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Hör auf! Ich muss meinen Text für die Fernsehshow schreiben. Geht sowieso alles nur um dich. Lass mich in Ruhe und Frieden arbeiten oder ich sag allen die Wahrheit."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Ha! Werd nicht komisch. Ich hab dich gemacht und ich kann dich auch vernichten."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nur zu, vernichte mich. Ich hab nichts zu verlieren. Oder meinst du, es macht Spaß, mit einem schlechten Gewissen zu leben."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Red keinen Stuss und besorg Fleisch. Seit Mushnik hab ich kein Happi- happi mehr gehabt – und das ist jetzt eine Woche her... Futter. Happa Happa. Fresschen ... Hunger! Hunger! Hunger!..."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ich halt das nicht aus! Du machst mich wahnsinnig! Halt jetzt das Maul, um Himmelswillen. Ich kann nicht mehr! Hör auf! Hör auf! Hör auf!..."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "In diesem Moment kommt Audrey von der Straße herein und findet Seymour in völlig aufgelöstem Zustand."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ding Dong. Seymour! Was hast du?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Das hat mich, das da. Glaub bloß nicht, ich wüsste nicht, dass es was zu fressen braucht. Glaub bloß nicht, ich würd mir nicht dauernd... den Kopf zerbrechen, wie ich... (er bemerkt plötzlich was er da tut und lacht unsicher.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Warum so hysterisch, Seymour? Du wirst doch wohl noch eine Pflanze versorgen können. Ich hab den Eindruck, du bist überarbeitet. Allein mit dem Laden hier – das ist zu viel für dich. Wann wollte Mr. Mushnik wieder da sein?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Hä?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Du hast mir doch gesagt, er hätte dir eine Nachricht dagelassen. Dass er seine Schwester besuchen fährt in..."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "... Kasachstan. (Pause.) Ja, kann sein, dass er sehr lange wegbleibt."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Seymour?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Pscht. Audrey. Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Audrey! Darf ich dich was fragen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Alles, was du willst."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Also, nimm mal an, es hätte nie eine Audrey Zwo gegeben. Und ich wär wieder ein Nichts, ein Niemand. Würdest du mich trotzdem mögen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich würde dich trotzdem lieben."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Dann steht mein Entschluss fest."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Musik."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Was für ein Entschluss?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Das Gewehr, die Heckenschere, die Kettensäge! Morgen Vormittag – gleich nach dem Fototermin für „Life“ – beißt jemand ins Gras."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Seymour!?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Genau. Sie machen das Foto, wir werden berühmt, ich übernehm den Job beim Fernsehn und wir führen ein biederes, ruhiges, normales Leben. Keine nächtlichen Fütterungen mehr. Schluss mit dem Geschrei nach Blut!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Was für Fütterungen? Was für Blut? Ich komm nicht mit, Seymour.\nGewehr? Heckenschere? Kettensäge? Du machst mir Angst."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Du brauchst keine Angst zu haben. Wir ziehen weg von hier. Mieten uns was in der Siedlung, von der du immer geträumt hast. Hübscher Garten.\nHübsches Häuschen. Hübsches Autochen. Und keine Pflanzen. Keine einzige gottverdammte Pflanze."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Seymour, du redest merkwürdiges Zeug."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Morgen werd ich dir alles erklären. Aber jetzt geh nachhause, Audrey. Bitte."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich kann dich in diesem Zustand doch nicht allein lassen."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Mir geht´s gut."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Wirklich?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Doch, doch. Mach dir um mich keine Sorgen. Mach dir um überhaupt gar nichts mehr Sorgen. Nacht.\nAudrey geht ab.\nSo. Es reicht. Es muss aufhören. (Zur Pflanze) Ich geh jetzt rüber zu Schmendrick´s und hol dir eine Portion Rindfleisch."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Rindfleisch. Igitt."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Das ist mein letztes Angebot. Ja oder nein? … Na?!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Besser als gar nichts."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Gut. Abgemacht. Und bild dir bloß nicht ein, dass es noch Nachtisch gibt."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Seymour geht ab. Unheilvolle Musik. Audrey erscheint auf der Straße in einem Trenchcoat von Seymour. Die Pflanze dreht sich ein wenig und bemerkt den Auftritt von Audrey."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nr. 19a) Reprise: „ESSENSZEIT\""
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "ICH SCHLIEF NICHT EIN\nAUCH NICHT MIT BALDRIAN\nDENN EINE INN ´RE STIMME SAGTE\nGEH ZU SEYMOUR\nSPRICH MIT SEYMOUR\nDANN TRANK ICH TEE\nMIT DUNKLEN AHNUNGEN IN MIR\nSEYMOUR, LIEBLING\nSAG MIR BITTE\nWAS IST LOS MIT DIR"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "HE, JUNGE DAME, HALLO"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Wer – hat das gesagt?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "SIE WÄR´N GRAD RICHTIG FÜR MICH"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ist jemand drin?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "ICH FIND SIE WIRKLICH SÜSS!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "(Audrey kommt herein.) Ding Dong. Seymour?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "SEYMOUR IST NICHT HIER – NUR ICH!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "(Sieht die Pflanze reden.) Aaah. Großer Gott!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "NEIN, WUNDERN SIE SICH NICHT ICH BIN DIE PFLANZE, DIE SPRICHT"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich kann´s nicht glauben."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Glaub´s nur. Sie spricht."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Träum ich etwa?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Nein. Und ich bin auch nicht der Zauberer von Oz."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Irgendwas stimmt hier nicht."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Mmmh. Mach dir nicht in´s Hemd, Puppe. Aah, bitte tu mir einen Gefallen."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Einen Gefallen?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Ich brauch dringend Wasser. Schau meine Zweige an. Mir geht´s beschissen, Baby.\nDAS, WAS MIR FEHLT IST EIN DRINK"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich weiß nicht, ob ich…"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "MIR IST AUF EINMAL SO HEISS"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Normales Leitungswasser?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "NA KLAR, ICH TRINK ES PUR"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Die Zweige sind wirklich ausgetrocknet."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "ICH BRAUCH KEIN GLAS UND AUCH KEIN EIS"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ich hol die Gießkanne"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "NUR ETWAS FLÜSSIGKEIT"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hier bitteschön."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "UND JETZT IST ESSENSZEIT"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Ein sehr langer Kampf mit den Fangarmen."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Aaaaaah! Nein! Lassen Sie mich los!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Entspann dich, Süße, alles wird gut. Komm zu deinem Freund dem Zahnarzt und zu Mushnik, deinem Chef. Die sind beide schon hier drin."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Auf einmal öffnet die Pflanze ihren Rachen und fängt an, Audrey zu verspeisen. Sie befindet sich schon bis zur Hüfte im Inneren des Gewächses."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Hilfe!"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Seymour kommt, lässt das Paket mit dem Rindfleisch fallen und stürzt sich auf die Pflanze. Ein noch längerer Kampf mit den Fangarmen."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Audrey! Nein! Ding Dong. Lass sie los! Lass sie los! Audrey! Nein! Hör auf! (Er trägt sie aus dem Laden.)"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Ding Dong."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ding Dong.\nAudrey – bist du verletzt?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Nein. (Sie sackt noch weiter in sich zusammen.) Ja."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Nicht sterben, Audrey. Ich brauch dich. Bitte, bitte, nicht sterben."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Weißt du, die Pflanze hat gerade etwas sehr Merkwürdiges behauptet. Sie hat gesagt, dass Orin und Mr. Mushnik schon drin sind."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Das stimmt, Audrey. Ich hab´s getan. Ich hab die Pflanze mit den beiden gefüttert."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Und das hat sie so groß und stark und dich so berühmt gemacht?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Ich hab Schreckliches getan. Aber dir tu ich nichts. Niemals."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Aber... (Pause. Auch die Musik hält inne.) Ich will es, Seymour. Die Musik spielt weiter."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Was?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Wenn ich sterbe – und das wird sehr bald sein – überlass meinen Körper der Pflanze. Dann kann ich in ihr weiterleben und dir all das Wunderbare geben, das du so sehr verdienst."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Weißt du, was du da sagst?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "Aber ja. Das ist alles, was ich dir schenken kann. Und wenn ich in der Pflanze bin, dann bin ich Teil der Pflanze... und auf gewisse Art werden wir für immer zusammen sein.\nNr. 19c) Reprise: „IM GRÜNEN IRGENDWO“\nDANN WÄCHST MIR BLATT UM BLATT\nDU PFLEGST MICH SPÄT UND FRÜH\nDU DÜNGST MICH UND DU WÄSSERST MICH\nUND FREUST DICH, WENN ICH BLÜH\nOBWOHL ICH STERBE, BIN ICH SO\nZUFRIEDEN, STOLZ UND FROH\nDENN ENDLICH BIN –\nICH DOCH IM GRÜNEN –\nIRGENDWO –"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Audrey stirbt in Seymours Armen. Seymour trägt Audreys Leiche langsam auf die Pflanze zu. Die Szene einer Wagner-Oper! Ein Chor unsichtbarer Stimmen, während Seymour seine Geliebte in die Pflanze bettet und diese sich langsam schließt."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Patrick Martin, ein schmieriger Geschäftemacher."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "AUDREY",
+      "text": "MARTIN\nMister Krelbourn?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Lassen Sie mich in Ruhe.\nMARTIN\nPatrick Martin. Lizenz- und Marketing Abteilung der International Plants Corporation. Ich möchte Ihnen ein sehr lukratives Angebot machen.\nKein Interesse.\nMARTIN"
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "(lacht) Es geht im Grunde um einen ganz einfachen Lizenzvertrag. Wir nehmen Ableger, lassen kleine Audreys Zwos heranwachsen und verkaufen die dann an alle Blumenhändler der Welt. Es wird nicht lang dauern, bis in jedem zivilisierten Haushalt eine dieser Pflanzen steht. Gleich kommen die LKWs mit den Blumentöpfen. Wir können sofort mit dem Schneiden der Ableger anfangen. Stellen Sie sich das mal vor, guter Mann, Audrey Zwos überall. Ich übertreibe nicht – mit der richtigen Werbung kann Audrey Zwo noch bombiger einschlagen als Hula –Hoop. Jungs, hier drüben... (ab)"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Bombiger als Hula-Hoop."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Viel bombiger!"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "In jedem zivilisierten Haushalt... überall deine Ableger... mampfend und schmatzend. Das war von Anfang an dein Ziel, stimmt´s?"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Logisch, Sherlock."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Es geht hier gar nicht um eine hungrige Pflanze – es geht um die Eroberung der Welt.\nLied: „MEAN GREEN MOTHER”\nEs muss aufhören. Sofort.\nEs muss aufhören. Schluss damit, sofort."
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "DIE PFLANZE",
+      "text": "Gib’s auf, Krelbourn"
+    },
+    {
+      "type": "dialogue",
+      "section": "3. SZENE",
+      "speaker": "SEYMOUR",
+      "text": "Mach´s Maul auf! Ich krieg dich von innen.\nAaaaaaah…."
+    },
+    {
+      "type": "stage",
+      "section": "3. SZENE",
+      "speaker": null,
+      "text": "Seymour klettert hinein. Ein langer Kampf. Die Girls treten auf."
+    },
+    {
+      "type": "header",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": null,
+      "text": "Nr. 21) Lied: Finale"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "CRYSTAL",
+      "text": "NACH ALL DEM, VON DEM SIE EBEN ZEUGE WURDEN\nABLEGER\nZEUGE WURDEN"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "CHIFFON",
+      "text": "GAB ES MANCHEN FALL\nDER DIESEM VERBLÜFFEND ÄHNLICH WAR\nABLEGER\nÄHNLICH WAR"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "RONETTE",
+      "text": "ES WUCHSEN PFLANZEN, MENSCHEN VERSCHWANDEN\nABLEGER\nOH YEAH"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "GIRLS",
+      "text": "UND WER HAT SCHON DEN ZUSAMMENHANG VERSTANDEN?\nNACH ALL DEM, VON DEM SIE EBEN ZEUGE WURDEN\nABLEGER\nZEUGE WURDEN\nMACHTE MANCH EIN TROPF, DER SCHEINBAR VÖLLIG HARMLOS WAR\nABLEGER\nHARMLOS WAR.\nMIT EINER FLEISCHFRESSENDEN PFLANZE BEKANNTSCHAFT\nABLEGER\nOH YEAH\nDIE SIE SCHMEICHELND BAT UM MENSCHLICHES BLUT\nABLEGER\nMANCHER DUMMKOPF GAB SICH DAFÜR HER\nDOCH SCHON SCHRIEN DIESE PFLANZEN NACH MEHR UND DIE PFLANZEN WUCHSEN HERAN\nABLEGER\nUND DANN...\nFRASSEN SIE SICH DURCH DIE U.S.A. UND EINES TAGS WARN SIE DA\nIN ÖSTERREICH IN DER SCHWEIZ\nUND IN SENFTENBERG\nUND AUCH HIER – IM THEATER"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": null,
+      "text": "Die männlichen Opfer der Pflanze kehren zurück: Mushnik, Orin und Seymour."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "GIRLS",
+      "text": "DIE MÄNNER\nSIE VERSPRECHEN DIR LIEBE UND GELD\nGLÜCK UND GLANZ UND ERFOLG AUF DER WELT\nDOCH SIE WOLL´N DAFÜR BLUT VON DIR GIB´S IHNEN NICHT\nDIE MÄNNER\nSIE VERSPRECHEN DIR KASSE UND BOOM\nSEX UND FREUNDE UND EWIG RUHM\nDOCH SIE WOLLEN NUR BLUT VON DIR GIB´S IHNEN NICHT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "ALLE",
+      "text": "VORSICHT HIER KOMMT AUDREY ZWO VORSICHT!"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "DIE PFLANZE",
+      "text": "ACH, ICH MAG EUCH SO"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "ALLE",
+      "text": "HIER KOMMT AUDREY ZWO\nHIER KOMMT AUDREY ZWO\nHIER KOMMT AUDREY ZWO"
+    },
+    {
+      "type": "stage",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": null,
+      "text": "Nun schwebt Audrey als Engel in einer Schaukel vom Himmel herab."
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "ALLE",
+      "text": "HALTET AUS UND VERLIERT NICHT DEN MUT\nETWAS WILL UNSER HERZ, UNSER BLUT\nETWAS, DAS UNS DEN HIMMEL VERSPRICHT\nKEIN GESCHÄFT MIT GEWALT UND GIER\nSONST WIRD ALLES VERSCHLUNGEN HIER\nDRUM, WAS IMMER SIE WOLL´N VON DIR\nGIB´S IHNEN NICHT\nAUDREY/SEYMOUR\nWIR WERDEN SIEGEN!\nGIB´S IHNEN NICHT"
+    },
+    {
+      "type": "dialogue",
+      "section": "Nr. 21) Lied: Finale",
+      "speaker": "DIE PFLANZE",
+      "text": "Muahahaha…\nTHE END"
+    }
+  ]
+}
