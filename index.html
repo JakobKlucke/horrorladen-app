@@ -1,1327 +1,367 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Horrorladen – Line Coach</title>
-<meta name="theme-color" content="#0b0f17">
-<style>
-:root{
-  --bg:#0b0f17; --fg:#e9ecf3; --muted:#a9b3c5; --card:#121826; --card2:#0f1522;
-  --line:#1e2840; --brand:#6ea8ff; --ok:#58e39e; --warn:#ffd166; --cut:#66ff66;
-  --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--fg);
-  background:
-    radial-gradient(1000px 500px at 10% -10%, #2a2c7a40, transparent),
-    radial-gradient(900px 400px at 110% 0%, #7a2a7a40, transparent),
-    radial-gradient(900px 500px at 50% 120%, #1b7a7a30, transparent),
-    var(--bg);}
-a{color:inherit}
-button{font:inherit}
-.hidden{display:none!important}
-header{
-  position:sticky; top:0; z-index:20; backdrop-filter:saturate(120%) blur(14px);
-  background:linear-gradient(180deg, #0c0f17eb, #0c0f1700); border-bottom:1px solid #ffffff14;
-}
-.topbar{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
-#backBtn{border:none;background:transparent;color:var(--fg);opacity:.8;padding:6px 8px;border-radius:10px}
-#backBtn:active{transform:scale(.98)}
-h1{margin:0;font-weight:700;font-size:1.05rem;letter-spacing:.25px}
-.main{max-width:1100px;margin:14px auto;padding:0 16px 80px;display:grid;gap:14px}
-.card{background:var(--card); border:1px solid #ffffff18; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.grid{display:grid;gap:12px}
-.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media (max-width:860px){ .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:520px){ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
-h2{margin:0 0 8px 0;font-size:1.05rem}
-h3{margin:.6rem 0 .3rem 0;font-size:.95rem;color:#d6ddff}
-.small{font-size:.85rem;color:var(--muted)}
-select,input[type="range"],input[type="text"]{
-  width:100%;padding:10px 12px;border-radius:12px;border:1px solid #ffffff24;background:var(--card2);color:var(--fg);
-}
-label{font-size:.85rem;color:var(--muted)}
-.btn{
-  border:none;border-radius:12px;padding:11px 14px;font-weight:600;cursor:pointer;
-  color:#08121f;background:var(--brand); box-shadow:0 10px 26px rgba(110,168,255,.25);
-}
-.btn.secondary{background:#9bb8ff;color:#071425}
-.btn.ghost{background:transparent;color:var(--fg);border:1px solid #ffffff30}
-.btn.block{width:100%}
-.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#00000033;padding:2px 6px;border-radius:6px;border:1px solid #ffffff22}
-.list{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}
-.item{border:1px solid #ffffff18;background:#ffffff08;border-radius:14px;padding:10px}
-.badge{background:#ffffff14;border:1px solid #ffffff26;border-radius:999px;padding:5px 10px;color:#cdd7ef;font-size:.8rem}
-.pill{background:#ffffff10;border:1px solid #ffffff1f;border-radius:999px;padding:6px 9px}
-.status.keep{outline:2px solid var(--ok)}
-.status.optional{outline:2px solid var(--warn)}
-.status.cut{outline:2px solid var(--cut);opacity:.7}
-.line{font-size:1.12rem;line-height:1.6}
-.cue{background:var(--card2);border:1px dashed #ffffff22;padding:12px;border-radius:12px}
-.spk{font-weight:700;text-transform:uppercase;font-size:.8rem;color:#aecdff;margin-bottom:4px}
-.hearts{display:flex;gap:6px}
-.heart{width:20px;height:20px}
-.progressRow{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:10px}
-.bottomnav{
-  position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; gap:10px; padding:10px;
-  background:linear-gradient(0deg, #0c0f17f0, #0c0f1700); backdrop-filter:blur(14px);
-}
-.tabbtn{flex:1;border:1px solid #ffffff20;background:#ffffff10;color:#dfe7ff;border-radius:12px;padding:10px 6px;display:flex;gap:8px;justify-content:center;align-items:center}
-.tabbtn.active{background:var(--brand);color:#08121f}
-.center{display:flex;justify-content:center;align-items:center}
-.icon{width:18px;height:18px}
-.sep{height:1px;background:#ffffff18;margin:8px 0}
-.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#1c2333;border:1px solid #ffffff20;padding:8px 12px;border-radius:12px;opacity:0;transition:.3s}
-.toast.show{opacity:1}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Horrorladen – Lernapp</title>
+  <meta name="description" content="Webbasierte Lernapp für Musical-Text. JSON wird extern geladen." />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root {
+      --c-lapis: #22577a;
+      --c-verdigris: #38a3a5;
+      --c-emerald: #57cc99;
+      --c-light: #80ed99;
+      --c-tea: #c7f9cc;
+      --bg: #0f172a;
+      --panel: #0b1220;
+      --text: #e5f7ef;
+      --muted: #bfe7d3;
+    }
+    /* Fluid, legible typography for phones */
+    html { font-size: 16px; }
+    @media (max-width: 380px) { html { font-size: 15px; } }
+    @media (min-width: 420px) { html { font-size: clamp(16px, 2.2vw, 18px); } }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: linear-gradient(180deg, var(--bg), #0a192f);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .wrap { max-width: 56rem; margin: 0 auto; padding: 12px; }
+    header {
+      position: sticky; top: 0;
+      padding-top: env(safe-area-inset-top);
+      background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.6));
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(199,249,204,.15);
+      z-index: 10;
+    }
+    .title { display:flex; gap:.75rem; align-items:center; padding: .5rem .25rem; }
+    .logo {
+      width: 2.25rem; height: 2.25rem; border-radius: .75rem;
+      background: linear-gradient(135deg, var(--c-light), var(--c-emerald));
+      display:flex; align-items:center; justify-content:center; color:#0b1220; font-weight:900;
+      flex: 0 0 auto;
+    }
+    .badge { font-size:.75rem; padding:.2rem .5rem; border-radius: 999px; background: rgba(87,204,153,.15); color: var(--c-light); }
+    .panel {
+      background: linear-gradient(180deg, rgba(34,87,122,.12), rgba(56,163,165,.08));
+      border: 1px solid rgba(199,249,204,.18);
+      border-radius: 16px; padding: .75rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .controls { display:grid; grid-template-columns: 1fr; gap: .5rem; }
+    @media (min-width: 700px) { .controls { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; } }
+    label { font-size:.8rem; color: var(--muted); display:block; margin-bottom:.25rem; }
+    select, input[type=number], button {
+      width: 100%; padding: .65rem .75rem; border-radius: 12px;
+      border: 1px solid rgba(199,249,204,.25);
+      background: rgba(11,18,32,.6); color: var(--text);
+      outline: none; transition: transform .12s ease, border-color .2s ease, background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { font-weight: 700; }
+    select:hover, input:hover, button:hover { transform: translateY(-1px); }
+    button.primary {
+      background: linear-gradient(180deg, var(--c-emerald), var(--c-verdigris));
+      color:#0b1220;
+    }
+    button.secondary { background: rgba(199,249,204,.1); }
+    .toolbar { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem; align-items:center; }
+    .pill { display:inline-flex; align-items:center; gap:.4rem; padding: .4rem .65rem; border-radius: 999px; background: rgba(199,249,204,.08); border: 1px solid rgba(199,249,204,.2); font-size:.8rem; }
+    .info { font-size:.8rem; color: var(--muted); margin-top:.35rem; }
+    main { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    .exchange { margin: .9rem 0; padding: .9rem; border-radius: 14px; background: rgba(34,87,122,.14); border: 1px solid rgba(199,249,204,.2); animation: fade .35s ease both; }
+    .ctx, .you { display:grid; gap: .5rem; margin: .35rem 0; }
+    .line { padding: .65rem .75rem; border-radius: 12px; background: rgba(11,18,32,.5); border: 1px solid rgba(199,249,204,.18); }
+    .line.you { background: rgba(128,237,153,.12); border-color: rgba(128,237,153,.4); }
+    .speaker { font-size:.8rem; letter-spacing:.04em; color: var(--c-light); }
+    .speaker u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    .footer { margin: 1rem 0; font-size: .8rem; color: var(--muted); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @keyframes fade { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+    /* Reduce motion if user prefers */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+    /* Improve readability for very narrow phones */
+    @media (max-width: 360px) {
+      .line { padding: .55rem .6rem; }
+      .exchange { padding: .7rem; }
+    }
+    /* Ensure large tap targets on mobile */
+    button, select, input { min-height: 44px; }
+  </style>
 </head>
 <body>
-
-<header>
-  <div class="topbar">
-    <button id="backBtn" aria-label="Zurück" class="hidden">◀︎</button>
-    <h1 id="title">Hauptmenü</h1>
-    <span class="badge" style="margin-left:auto">Auto-Load</span>
-  </div>
-</header>
-
-<main class="main">
-
-  <!-- PAGE: HOME -->
-  <section id="page-home" class="grid grid-2">
-    <div class="card">
-      <h2>Text lernen</h2>
-      <p class="small">Wähle deinen Charakter & Szene, dann Lernmodus (Flashcards, Zusammenhang, Tippen).</p>
-      <div class="row"><button class="btn" id="goTextSetup">Los geht’s</button></div>
-    </div>
-    <div class="card">
-      <h2>Songs lernen</h2>
-      <p class="small">Song/Charakter auswählen, Text ansehen und üben.</p>
-      <div class="row"><button class="btn" id="goSongSetup">Song-Training</button></div>
-    </div>
-    <div class="card">
-      <h2>Skript-Browser</h2>
-      <p class="small">Szenen & Songs durchstöbern, Zeilen antippen, um zu springen.</p>
-      <div class="row"><button class="btn secondary" id="goBrowser">Öffnen</button></div>
-    </div>
-    <div class="card">
-      <h2>Datenquelle</h2>
-      <p class="small">Standard: <code>horrorladen_script.json</code>. Oder andere URL setzen.</p>
-      <div class="row" style="gap:8px">
-        <button class="btn ghost" id="setDataUrl">Daten-URL</button>
-        <button class="btn ghost" id="reloadData">Neu laden</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE: TEXT SETUP -->
-  <section id="page-text-setup" class="hidden grid grid-2">
-    <div class="card">
-      <h2>1) Charakter</h2>
-      <label for="roleSel">Meine Rolle</label>
-      <select id="roleSel"></select>
-      <div class="sep"></div>
-      <label class="row" style="gap:8px"><input type="checkbox" id="includeAlle" checked> <span>„ALLE“ zählt für mich</span></label>
-    </div>
-    <div class="card">
-      <h2>2) Szene</h2>
-      <label for="sceneSel">Szene</label>
-      <select id="sceneSel"></select>
-      <div class="sep"></div>
-      <label class="row" style="gap:8px"><input type="checkbox" id="hideCuts" checked> <span>grüne Striche (cut) ausblenden</span></label>
-      <label class="row" style="gap:8px"><input type="checkbox" id="includeOpt" checked> <span>optionale (gelb/orange) einbeziehen</span></label>
-      <label class="row" style="gap:8px"><input type="checkbox" id="onlyMyScenes" checked><span>nur Szenen mit Text für meine Rolle</span></label>
-    </div>
-    <div class="card">
-      <h2>3) Modus</h2>
-      <div class="grid grid-3">
-        <button class="btn block" id="modeFlash">Flashcards</button>
-        <button class="btn block" id="modeContext">Zusammenhang</button>
-        <button class="btn block" id="modeType">Tippen & Prüfen</button>
-      </div>
-      <p class="small" style="margin-top:6px">Du kannst jederzeit wischen: <span class="kbd">←</span>/<span class="kbd">→</span> oder **Swipe**.</p>
-    </div>
-  </section>
-
-  <!-- PAGE: TEXT SESSION -->
-  <section id="page-text-session" class="hidden grid">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <div class="row" style="gap:8px">
-          <span class="pill" id="sessionScenePill">Szene</span>
-          <span class="pill" id="sessionRolePill">Rolle</span>
-        </div>
-        <div class="hearts" id="hearts"></div>
-      </div>
-
-      <div id="contextBox" class="grid"></div>
-
-      <div class="cue" id="promptBox">
-        <div class="spk" id="promptSpeaker">–</div>
-        <div class="small" id="promptHint">Deine Zeile</div>
-      </div>
-
-      <div id="answerArea" class="grid" style="margin-top:8px">
-        <div id="revealArea" class="row">
-          <button class="btn secondary" id="revealBtn">Zeile anzeigen</button>
-          <button class="btn ghost" id="wrongBtn">Falsch</button>
-          <button class="btn" id="rightBtn">Richtig</button>
-        </div>
-        <div id="typeArea" class="hidden">
-          <input id="typeInput" type="text" placeholder="Tippe die Zeile (Groß/Klein egal)">
-          <div class="row" style="gap:8px">
-            <button class="btn" id="checkBtn">Prüfen</button>
-            <button class="btn ghost" id="skipBtn">Überspringen</button>
-            <button class="btn secondary" id="hintBtn">Hinweis</button>
-          </div>
-          <div class="small" id="feedback"></div>
-        </div>
-      </div>
-
-      <div id="revealText" class="hidden" style="margin-top:10px">
-        <div class="line" id="revealLine"></div>
-      </div>
-
-      <div class="progressRow">
-        <div class="small" id="stepInfo">0 / 0</div>
-        <div class="row" style="gap:8px">
-          <button class="btn ghost" id="prevBtn">Zurück</button>
-          <button class="btn" id="nextBtn">Weiter</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE: SONG SETUP -->
-  <section id="page-song-setup" class="hidden grid grid-2">
-    <div class="card">
-      <h2>1) Charakter</h2>
-      <select id="songRoleSel"></select>
-      <div class="small">„ALLE“ zählt optional per Schalter unten.</div>
-      <label class="row" style="gap:8px;margin-top:6px"><input type="checkbox" id="songIncludeAlle" checked> <span>„ALLE“ zählt für mich</span></label>
-    </div>
-    <div class="card">
-      <h2>2) Song</h2>
-      <select id="songSel"></select>
-      <div class="sep"></div>
-      <div class="row" style="gap:8px">
-        <button class="btn" id="startSongBtn">Song anzeigen</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE: SONG SESSION -->
-  <section id="page-song-session" class="hidden grid">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <div class="row" style="gap:8px">
-          <span class="pill" id="songTitlePill">Song</span>
-          <span class="pill" id="songRolePill">Rolle</span>
-        </div>
-        <div class="row" style="gap:6px">
-          <button class="btn ghost" id="songRevealAll">Alles zeigen</button>
-          <button class="btn ghost" id="songHideAll">Alles verbergen</button>
-        </div>
-      </div>
-      <div id="songLines" class="list"></div>
-    </div>
-  </section>
-
- <!-- PAGE: BROWSER (neu) -->
-  <section id="page-browser" class="hidden grid grid-2">
-    <div class="card">
-      <h2>Szenen</h2>
-      <div id="sceneList" class="list"></div>
-    </div>
-    <div class="card">
-      <h2>Songs</h2>
-      <div id="songList" class="list"></div>
-    </div>
-  </section>
-
-    <!-- PAGE: EDITOR -->
-  <section id="page-editor" class="hidden grid grid-2">
-    <div class="card">
-      <h2>Editor</h2>
-      <div class="grid">
+  <header>
+    <div class="wrap">
+      <div class="title">
+        <div class="logo">🌱</div>
         <div>
-          <label>Ansicht</label>
-          <select id="edView">
-            <option value="dialogue">Dialog-Szenen</option>
-            <option value="songs">Songs</option>
-          </select>
+          <div style="font-weight:800; font-size:1.1rem;">Horrorladen – Lernapp</div>
+          <div class="badge">Externe JSON</div>
         </div>
-        <div id="edSceneWrap">
-          <label>Szene</label>
-          <select id="edSceneSel"></select>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <div>
+            <label for="roleSel">Rolle</label>
+            <select id="roleSel" aria-label="Rollen-Auswahl"></select>
+          </div>
+          <div>
+            <label for="sessionSize">Blockgröße (AB-Wechsel)</label>
+            <input id="sessionSize" type="number" inputmode="numeric" min="1" max="25" value="5" />
+          </div>
+          <div>
+            <label for="toggleStage">Bühnenanweisungen</label>
+            <select id="toggleStage">
+              <option value="off">Ausblenden</option>
+              <option value="on">Einblenden</option>
+            </select>
+          </div>
+          <div>
+            <button class="primary" id="startBtn">Session starten</button>
+          </div>
         </div>
-        <div id="edSongWrap" class="hidden">
-          <label>Song</label>
-          <select id="edSongSel"></select>
+        <div class="toolbar">
+          <button class="secondary" id="shareBtn">Link teilen</button>
+          <button class="secondary" id="loadBtn">Eigenes Script JSON laden</button>
+          <input id="fileInput" class="sr-only" type="file" accept="application/json" />
+          <span id="statsPill" class="pill" role="status">Bereit</span>
         </div>
-        <div class="row" style="gap:8px;flex-wrap:wrap">
-          <button class="btn ghost" id="edSelectAll">Alle markieren</button>
-          <button class="btn ghost" id="edClearSel">Markierung löschen</button>
-          <span class="small">Markierte Zeilen → Status setzen:</span>
-          <button class="btn secondary" id="edSetKeep">keep</button>
-          <button class="btn secondary" id="edSetOptional">optional</button>
-          <button class="btn secondary" id="edSetCut">cut</button>
-        </div>
-        <div class="row" style="gap:8px;flex-wrap:wrap">
-          <button class="btn" id="edExportJson">Export JSON</button>
-          <button class="btn ghost" id="edSaveLocal">Speichern (Local)</button>
-          <button class="btn ghost" id="edReload">Neu laden</button>
+        <div class="info">
+          Text ist schreibgeschützt. Sprecher <u>unterstrichen</u>. Regie <em>kursiv</em>.
+          Lichtinfos <em><strong>kursiv &amp; fett</strong></em>. „DIE ANDEREN“ → „ALLE“. „BARAPAPAPA“ wird ignoriert.
         </div>
       </div>
     </div>
-    <div class="card">
-      <h2 id="edTitle">Zeilen</h2>
-      <div class="small">Tipp: Mehrfachauswahl am Desktop mit <span class="kbd">Shift</span>/<span class="kbd">Ctrl</span>. Auf dem Handy Zeilen einfach nacheinander antippen.</div>
-      <div id="edList" class="list" style="margin-top:8px"></div>
-    </div>
-  </section>
+  </header>
 
+  <main>
+    <div class="wrap" id="root" aria-live="polite"></div>
+  </main>
 
-</main>
+  <footer class="wrap footer">
+    <span class="pill">Palette: #22577a · #38a3a5 · #57cc99 · #80ed99 · #c7f9cc</span>
+  </footer>
 
-<!-- Bottom Nav -->
-<nav class="bottomnav">
-  <button class="tabbtn active" data-tab="home">🏠 <span>Home</span></button>
-  <button class="tabbtn" data-tab="text">🗣️ <span>Text</span></button>
-  <button class="tabbtn" data-tab="songs">🎵 <span>Songs</span></button>
-  <button class="tabbtn" data-tab="editor">✏️ <span>Editor</span></button>
-</nav>
-
-<div id="toast" class="toast">Gespeichert</div>
-
-<script>
-/* ---------------------- State + Storage ---------------------- */
-const STORAGE_KEY = 'hlc_state_v3';
-const state = loadState();
-function loadState(){
-  try{
-    const base = {
-      meta:{hearts:3, xp:0},
-      prefs:{
-        role:'', includeAlle:true, sceneId:'', hideCuts:true, includeOpt:true,
-        mode:'flash',
-        songRole:'', songId:'', songIncludeAlle:true,
-        onlyMyScenes: true      // <— NEU
-},
-      data:{ roles:[], scenes:[], songs:[] },
-      ui:{ page:'home' }
-    };
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? deepMerge(base, JSON.parse(raw)) : base;
-  }catch{ return {meta:{hearts:3,xp:0},prefs:{},data:{roles:[],scenes:[],songs:[]},ui:{page:'home'}}; }
-}
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showToast('Gespeichert'); }
-function deepMerge(a,b){ for(const k in b){ if(Array.isArray(b[k])) a[k]=b[k]; else if(b[k] && typeof b[k]==='object') a[k]=deepMerge(a[k]||{}, b[k]); else a[k]=b[k]; } return a; }
-
-/* ---------------------- Router / Pages ----------------------- */
-const titleEl = document.getElementById('title');
-const backBtn = document.getElementById('backBtn');
-const pages = {
-  home:     document.getElementById('page-home'),
-  textSetup:document.getElementById('page-text-setup'),
-  textSess: document.getElementById('page-text-session'),
-  songSetup:document.getElementById('page-song-setup'),
-  songSess: document.getElementById('page-song-session'),
-  browser:  document.getElementById('page-browser'),
-  editor:   document.getElementById('page-editor')
-};
-const tabbtns = Array.from(document.querySelectorAll('.tabbtn'));
-function show(page){
-  state.ui.page = page; saveSilently();
-  for(const k in pages){ pages[k].classList.toggle('hidden', k!==page); }
-  backBtn.classList.toggle('hidden', page==='home');
-  titleEl.textContent = ({
-  home:'Hauptmenü',
-  textSetup:'Text lernen',
-  textSess:'Training',
-  songSetup:'Songs lernen',
-  songSess:'Song',
-  browser:'Skript-Browser',
-  editor:'Editor'
-})[page] || 'Horrorladen';
-  tabbtns.forEach(b=> b.classList.toggle('active',
-  (page==='home' && b.dataset.tab==='home') ||
-  ((page==='textSetup'||page==='textSess') && b.dataset.tab==='text') ||
-  ((page==='songSetup'||page==='songSess') && b.dataset.tab==='songs') ||
-  ((page==='editor') && b.dataset.tab==='editor')
-));
-}
-function saveSilently(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-backBtn.addEventListener('click', ()=>{ if(state.ui.page==='textSess') show('textSetup'); else if(state.ui.page==='songSess') show('songSetup'); else show('home'); });
-tabbtns.forEach(b=> b.addEventListener('click', ()=>{
-  const t=b.dataset.tab;
-  if(t==='home')  show('home');
-  if(t==='text')  show('textSetup');
-  if(t==='songs') show('songSetup');
-  if(t==='editor'){ buildEditor(); show('editor'); }
-}));
-
-/* ---------------------- Data Loading ------------------------- */
-async function loadData(url){
-  const res = await fetch(url, {cache:'no-store'});
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const j = await res.json();
-  // Accept both top-level songs[] and scenes with type: "song"
-  const roles = j.roles||[];
-  const scenes = Array.isArray(j.scenes)? j.scenes.filter(s=>Array.isArray(s.lines)) : [];
-  let songs = Array.isArray(j.songs)? j.songs.filter(s=>Array.isArray(s.lines)) : [];
-  const songScenes = scenes.filter(s=> (s.type||'').toLowerCase()==='song');
-  if(songScenes.length && !songs.length){
-    songs = songScenes.map(s=>({id:s.id||('song-'+s.name), title:s.name.replace(/^Lied:\s*/i,''), status:'keep', lines:s.lines}));
-  }
-  state.data.roles = roles;
-  state.data.scenes = scenes.filter(s=> (s.type||'dialogue').toLowerCase()!=='song'); // dialogue only for scene list
-  state.data.songs  = songs;
-  // Defaults
-  if(!state.prefs.role && roles[0]) state.prefs.role = roles[0];
-  if(!state.prefs.songRole && roles[0]) state.prefs.songRole = roles[0];
-  if(!state.prefs.sceneId && state.data.scenes[0]) state.prefs.sceneId = state.data.scenes[0].id;
-  if(!state.prefs.songId && state.data.songs[0]) state.prefs.songId = state.data.songs[0].id;
-  saveSilently();
-  populateTextSetup(); populateSongSetup(); buildBrowser();
-}
-function detectDataUrl(){
-  const qs = new URLSearchParams(location.search);
-  return qs.get('data') || 'horrorladen_script.json';
-}
-
-async function initLoad(){
-  const url = detectDataUrl() || 'horrorladen_script.json';
-  try{
-    const res = await fetch(url, {cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
-    const raw = await res.json();
-
-    // normalisieren – Songs sauber trennen
-    const norm = normalizeScript(raw);
-
-    // Sprecherfehler korrigieren (ALLE → echte Sprecher, Label-Zeilen etc.)
-    norm.scenes = (norm.scenes||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
-    norm.songs  = (norm.songs||[]).map(s => ({ ...s, lines: fixLines(s.lines) }));
-
-    // In den State schreiben (aus der Normalisierung!)
-    state.data.roles  = norm.roles  || [];
-    state.data.scenes = norm.scenes || [];
-    state.data.songs  = norm.songs  || [];
-
-    // Falls du Songs zusätzlich im Szenen-Browser sichtbar haben willst,
-    // lass sie in scenes, UND parallel im Song-Tab (so wie jetzt).
-    // (norm.scenes enthält bei uns bereits Dialog+Songs inline, je nach JSON)
-
-    // Defaults
-    if(!state.prefs.role      && state.data.roles[0])  state.prefs.role     = state.data.roles[0];
-    if(!state.prefs.songRole  && state.data.roles[0])  state.prefs.songRole = state.data.roles[0];
-    if(!state.prefs.sceneId   && state.data.scenes[0]) state.prefs.sceneId  = state.data.scenes[0].id;
-    if(!state.prefs.songId    && state.data.songs[0])  state.prefs.songId   = state.data.songs[0].id;
-
-    saveSilently();
-    populateTextSetup();
-    populateSongSetup();
-    buildBrowser();
-    buildEditor();
-  } catch(e){
-    showLoadError('Konnte Script nicht laden: '+e.message+'\nURL: '+url);
-  }
-}
-
-/* ---------------------- UI: Text Setup ----------------------- */
-const roleSel = document.getElementById('roleSel');
-const includeAlle = document.getElementById('includeAlle');
-const sceneSel = document.getElementById('sceneSel');
-const hideCuts = document.getElementById('hideCuts');
-const includeOpt = document.getElementById('includeOpt');
-const goTextSetup = document.getElementById('goTextSetup');
-const modeFlash = document.getElementById('modeFlash');
-const modeContext = document.getElementById('modeContext');
-const modeType = document.getElementById('modeType');
-
-goTextSetup.addEventListener('click', ()=> show('textSetup'));
-modeFlash.addEventListener('click', ()=>{ state.prefs.mode='flash'; startSession(); });
-modeContext.addEventListener('click', ()=>{ state.prefs.mode='context'; startSession(); });
-modeType.addEventListener('click', ()=>{ state.prefs.mode='type'; startSession(); });
-
-function populateTextSetup(){
-  // Rollen
-  roleSel.innerHTML = (state.data.roles||[])
-    .map(r=>`<option ${r===state.prefs.role?'selected':''}>${r}</option>`)
-    .join('');
-
-  // Basis: alle Dialog-Szenen (Songs sind durch Fix 2 eh schon raus)
-  const allDialog = sortScenes(state.data.scenes || []);
-
-  // Optionaler Filter: nur Szenen, in denen meine Rolle Text hat
-  const role = state.prefs.role || roleSel.value;
-  const useFilter = !!state.prefs.onlyMyScenes;
-  const filtered = useFilter
-    ? allDialog.filter(s => sceneHasRole(s, role, state.prefs.includeAlle))
-    : allDialog;
-
-  // Fallback, falls Filter zu leer wird
-  const list = filtered.length ? filtered : allDialog;
-
-  if (!list.find(s => s.id === state.prefs.sceneId) && list[0]) {
-    state.prefs.sceneId = list[0].id;
-    saveSilently();
-  }
-
-  sceneSel.innerHTML = list
-  .map((s)=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${displaySceneName(s)}</option>`)
-  .join('');
-
-  // Schalter syncen
-  includeAlle.checked = !!state.prefs.includeAlle;
-  hideCuts.checked    = !!state.prefs.hideCuts;
-  includeOpt.checked  = !!state.prefs.includeOpt;
-  const onlyBox = document.getElementById('onlyMyScenes');
-  if(onlyBox){ onlyBox.checked = !!state.prefs.onlyMyScenes; }
-}
-
-
-roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); });
-sceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = sceneSel.value; saveSilently(); });
-includeAlle.addEventListener('change', ()=>{ state.prefs.includeAlle = includeAlle.checked; saveSilently(); });
-hideCuts.addEventListener('change', ()=>{ state.prefs.hideCuts = hideCuts.checked; saveSilently(); });
-includeOpt.addEventListener('change', ()=>{ state.prefs.includeOpt = includeOpt.checked; saveSilently(); });
-// reagiert, wenn Rolle/Alle-Schalter/Only-My-Scenes geändert wird
-roleSel.addEventListener('change', ()=>{ state.prefs.role = roleSel.value; saveSilently(); populateTextSetup(); });
-includeAlle.addEventListener('change', ()=>{ state.prefs.includeAlle = includeAlle.checked; saveSilently(); populateTextSetup(); });
-document.getElementById('onlyMyScenes')?.addEventListener('change', (e)=>{
-  state.prefs.onlyMyScenes = e.target.checked; saveSilently(); populateTextSetup();
-});
-
-/* ---------------------- UI: Song Setup ----------------------- */
-const goSongSetup = document.getElementById('goSongSetup');
-const songRoleSel = document.getElementById('songRoleSel');
-const songSel = document.getElementById('songSel');
-const songIncludeAlle = document.getElementById('songIncludeAlle');
-const startSongBtn = document.getElementById('startSongBtn');
-
-goSongSetup.addEventListener('click', ()=> show('songSetup'));
-startSongBtn.addEventListener('click', ()=> showSong());
-
-function populateSongSetup(){
-  songRoleSel.innerHTML = state.data.roles.map(r=>`<option ${r===state.prefs.songRole?'selected':''}>${r}</option>`).join('');
-  songSel.innerHTML = state.data.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title||s.name||s.id}</option>`).join('');
-  songIncludeAlle.checked = !!state.prefs.songIncludeAlle;
-}
-songRoleSel.addEventListener('change', ()=>{ state.prefs.songRole = songRoleSel.value; saveSilently(); });
-songSel.addEventListener('change', ()=>{ state.prefs.songId = songSel.value; saveSilently(); });
-songIncludeAlle.addEventListener('change', ()=>{ state.prefs.songIncludeAlle = songIncludeAlle.checked; saveSilently(); });
-
-/* ---------------------- Browser ------------------------------- */
-const sceneList = document.getElementById('sceneList');
-const songList = document.getElementById('songList');
-const goBrowser = document.getElementById('goBrowser');
-goBrowser.addEventListener('click', ()=> show('browser'));
-
-function buildBrowser(){
-  sceneList.innerHTML = '';
-const scenesSorted = sortScenes(state.data.scenes);
-scenesSorted.forEach((s, i)=>{
-  const div = document.createElement('div');
-  div.className='item';
-  div.innerHTML = `<div class="row" style="justify-content:space-between">
-  <b>${displaySceneName(s)}</b>
-  <span class="small">${(s.lines||[]).length} Zeilen</span>
-</div>`;
-  div.addEventListener('click', ()=>{
-    state.prefs.sceneId = s.id;
-    show('textSetup'); 
-    populateTextSetup();
-  });
-  sceneList.appendChild(div);
-});
-  songList.innerHTML = '';
-  state.data.songs.forEach(s=>{
-    const div = document.createElement('div');
-    div.className='item';
-    div.innerHTML = `<div class="row" style="justify-content:space-between"><b>🎵 ${s.title||s.name||s.id}</b><span class="small">${(s.lines||[]).length} Zeilen</span></div>`;
-    div.addEventListener('click', ()=>{ state.prefs.songId = s.id; show('songSetup'); populateSongSetup(); });
-    songList.appendChild(div);
-  });
-}
-
-/* ---------------------- Session (Text) ------------------------ */
-const heartsBox = document.getElementById('hearts');
-const sessionScenePill = document.getElementById('sessionScenePill');
-const sessionRolePill = document.getElementById('sessionRolePill');
-const contextBox = document.getElementById('contextBox');
-const promptSpeaker = document.getElementById('promptSpeaker');
-const promptHint = document.getElementById('promptHint');
-const revealBtn = document.getElementById('revealBtn');
-const wrongBtn = document.getElementById('wrongBtn');
-const rightBtn = document.getElementById('rightBtn');
-const revealArea = document.getElementById('revealArea');
-const typeArea = document.getElementById('typeArea');
-const typeInput = document.getElementById('typeInput'); const checkBtn = document.getElementById('checkBtn'); const hintBtn = document.getElementById('hintBtn'); const feedback = document.getElementById('feedback'); const skipBtn = document.getElementById('skipBtn');
-const revealText = document.getElementById('revealText'); const revealLine = document.getElementById('revealLine');
-const stepInfo = document.getElementById('stepInfo');
-const prevBtn = document.getElementById('prevBtn'); const nextBtn = document.getElementById('nextBtn');
-
-let session = { lines:[], idx:0, hearts:3, mode:'flash' };
-
-function isMyLine(l, role, includeAlle){
-  return (l.speaker===role) || (includeAlle && l.speaker==='ALLE');
-}
-
-function filterByStatus(lines, hideCuts, includeOpt){
-  return (lines||[]).filter(l=>{
-    if(hideCuts && l.status==='cut') return false;
-    if(!includeOpt && l.status==='optional') return false;
-    return true;
-  });
-}
-
-
-function startSession(){
-  const role  = state.prefs.role;
-  const scene = state.data.scenes.find(s => s.id === state.prefs.sceneId);
-  if(!scene){ alert('Keine Szene gefunden.'); return; }
-
-  session.mode   = state.prefs.mode || 'flash';  // 'flash' | 'context' | 'type'
-  session.hearts = 3;
-
-  // 1) Rohzeilen holen & ABAB-Blöcke bilden
-  const raw      = Array.isArray(scene.lines) ? scene.lines : [];
-  const grouped  = groupConsecutiveBySpeaker(raw); // zusammenhängende Sprecherblöcke
-  // 2) Nach Status filtern (cut optional raus / optional ggf. raus)
-  const all      = filterByStatus(grouped, !!state.prefs.hideCuts, !!state.prefs.includeOpt);
-
-  if(session.mode === 'context'){
-    // Kontext: kompletter Fluss sichtbar, ABER Abfrage nur auf eigene Blöcke
-    session.linesFull = all.slice();  // kompletter Ablauf
-    session.askIdxs   = all.map((l,i)=> isMyLine(l, role, !!state.prefs.includeAlle) ? i : -1)
-                           .filter(i => i >= 0);
-    session.askPtr    = 0;            // Zeiger auf nächste eigene Block-Index-Position
-  } else {
-    // Flash/Type: nur eigene Blöcke werden nacheinander abgefragt
-    session.lines = all.filter(l => isMyLine(l, role, !!state.prefs.includeAlle));
-    session.idx   = 0;
-  }
-
-  // UI Header
-  sessionScenePill.textContent = (typeof displaySceneName === 'function')
-    ? displaySceneName(scene)
-    : (scene.name || scene.id || 'Szene');
-  sessionRolePill.textContent  = role || '—';
-  heartsBox.innerHTML          = heartsSvg(session.hearts);
-
-  // UI Bereiche toggeln
-  revealText.classList.add('hidden');
-  typeArea.classList.toggle('hidden', session.mode !== 'type');
-  revealArea.classList.toggle('hidden', session.mode === 'type');
-
-  // Seite zeigen & ersten Schritt rendern
-  show('textSess');
-  renderStep();
-}
-
-
-function filterLinesForSession(lines, role, includeAlle, hideCuts, includeOpt){
-  return (lines||[]).filter(l=>{
-    if(hideCuts && l.status==='cut') return false;
-    if(!includeOpt && l.status==='optional') return false;
-    const isMine = (l.speaker===role) || (includeAlle && l.speaker==='ALLE');
-    const inContextMode = state.prefs.mode==='context';
-    return inContextMode ? true : isMine; // in Kontextmodus zeigen wir alle, fragen aber nächste Zeile
-  });
-}
-
-function renderStep(){
-  // 0) Leere- / Endzustände
-  if(session.mode === 'context'){
-    const totalMy = (session.askIdxs || []).length;
-    if(!totalMy){
-      promptSpeaker.textContent = '—';
-      promptHint.textContent = 'Für diese Rolle gibt es in dieser Szene keine abzufragenden Zeilen.';
-      stepInfo.textContent = '0/0';
-      contextBox.innerHTML = '';
-      revealText.classList.add('hidden');
-      revealLine.textContent = '';
-      // Eingabebereiche neutral
-      typeArea.classList.add('hidden');
-      revealArea.classList.remove('hidden');
-      return;
+  <script>
+    const q = new URLSearchParams(location.search);
+    const jsonSrc = q.get('src') || 'script.json'; // default neighbor file
+    const norm = (s) => (s||'').trim().toUpperCase();
+    function treatSpeaker(sp) {
+      const s = norm(sp);
+      if (s === 'DIE ANDEREN') return 'ALLE';
+      if (s === 'BARAPAPAPA' || s === 'BARAPAPAPABA') return '__IGNORE__';
+      return s;
     }
-    if(session.askPtr >= totalMy) session.askPtr = totalMy - 1;
-  } else {
-    const n = (session.lines || []).length;
-    if(!n){
-      promptSpeaker.textContent = '—';
-      promptHint.textContent = 'Keine Zeilen nach Filter.';
-      stepInfo.textContent = '0/0';
-      contextBox.innerHTML = '';
-      revealText.classList.add('hidden');
-      revealLine.textContent = '';
-      typeArea.classList.add('hidden');
-      revealArea.classList.remove('hidden');
-      return;
+    function isIncludedForRole(sp, chosen) {
+      const s = treatSpeaker(sp), ch = norm(chosen);
+      if (!s || s === '__IGNORE__') return false;
+      if (s === 'ALLE') return true;
+      return s === ch;
     }
-    if(session.idx >= n) session.idx = n - 1;
-  }
-
-  // 1) Zielzeile + Kontextquelle bestimmen
-  let l, ctxSource, baseIndex;
-  if(session.mode === 'context'){
-    const targetIndex = session.askIdxs[session.askPtr] ?? 0;
-    l         = (session.linesFull || [])[targetIndex] || {};
-    ctxSource = session.linesFull || [];
-    baseIndex = targetIndex;
-  } else {
-    l         = (session.lines || [])[session.idx] || {};
-    ctxSource = session.lines || [];
-    baseIndex = session.idx;
-  }
-
-  // 2) Kopfzeile / Hinweise (Regie kursiv, Song mit Icon)
-  const isStage = l.type === 'stage';
-  const isSong  = l.type === 'song';
-
-  if(isStage){
-    promptSpeaker.textContent = 'Regie';
-    promptHint.textContent    = (session.mode==='type' ? 'Info (Tippen deaktiviert)' : 'Info');
-  } else if(isSong){
-    promptSpeaker.textContent = `🎵 ${l.speaker || 'ENSEMBLE'}`;
-    promptHint.textContent    = (session.mode==='type' ? 'Tippe die Zeile' : 'Songzeile');
-  } else {
-    promptSpeaker.textContent = l.speaker || '—';
-    promptHint.textContent    = (session.mode==='type' ? 'Tippe deine Zeile' : (session.mode==='context' ? 'Erinnere deine Zeile' : 'Deine Zeile'));
-  }
-
-  // 3) Sichtbarkeit der Antwortbereiche (Stage niemals tippen)
-  const typeAllowed = (session.mode === 'type') && !isStage;
-  typeArea.classList.toggle('hidden', !typeAllowed);
-  revealArea.classList.toggle('hidden', typeAllowed);
-  if(typeAllowed){
-    typeInput.value = '';
-    feedback.textContent = '';
-  }
-
-  // 4) Kontext (max 2 vorherige Einträge aus dem vollen Fluss für context,
-  //    bzw. aus den gefilterten Zeilen für flash/type)
-  const ctxN = 2;
-  contextBox.innerHTML = '';
-  for(let i=Math.max(0, baseIndex - ctxN); i<baseIndex; i++){
-    const c = ctxSource[i] || {};
-    const cIsStage = c.type === 'stage';
-    const cIsSong  = c.type === 'song';
-    const speaker  = cIsStage ? 'Regie'
-                    : (cIsSong ? `🎵 ${c.speaker || 'ENSEMBLE'}` : (c.speaker || '—'));
-    const textHtml = cIsStage ? `<em>${escapeHtml(c.text || '')}</em>` : escapeHtml(c.text || '');
-    contextBox.innerHTML += `<div class="cue"><div class="spk">${speaker}</div><div class="line">${textHtml}</div></div>`;
-  }
-
-  // 5) Fortschritt + Reveal zurücksetzen
-  if(session.mode === 'context'){
-    const totalMy = (session.askIdxs || []).length;
-    stepInfo.textContent = `${Math.min(session.askPtr+1, totalMy)} / ${totalMy}`;
-  } else {
-    const n = (session.lines || []).length;
-    stepInfo.textContent = `${session.idx+1} / ${n}`;
-  }
-  revealText.classList.add('hidden');
-  revealLine.textContent = '';
-}
-
-
-/* ---------- Hilfsfunktion: aktuelle Zielzeile holen ---------- */
-function currentTargetLine(){
-  if(session.mode === 'context'){
-    const idx = (session.askIdxs || [])[session.askPtr];
-    return (session.linesFull || [])[idx] || {};
-  }
-  return (session.lines || [])[session.idx] || {};
-}
-
-/* ---------- Reveal ---------- */
-revealBtn.addEventListener('click', ()=>{
-  const l = currentTargetLine();
-  if(l.type === 'stage'){
-    revealLine.innerHTML = `<em>${escapeHtml(l.text || '')}</em>`;
-  } else {
-    revealLine.textContent = l.text || '';
-  }
-  revealText.classList.remove('hidden');
-});
-
-/* ---------- Wrong ---------- */
-wrongBtn.addEventListener('click', ()=>{
-  session.hearts = Math.max(0, session.hearts - 1);
-  heartsBox.innerHTML = heartsSvg(session.hearts);
-  if(session.hearts === 0){
-    alert('💔 Keine Herzen mehr – Runde vorbei.');
-    show('textSetup');
-    return;
-  }
-  nextStep();
-});
-
-/* ---------- Right (kein XP bei Regie) ---------- */
-rightBtn.addEventListener('click', ()=>{
-  const l = currentTargetLine();
-  if(l.type !== 'stage'){
-    state.meta.xp += 8;
-    saveSilently();
-  }
-  nextStep();
-});
-
-/* ---------- Check (Type-Modus) ---------- */
-checkBtn.addEventListener('click', ()=>{
-  const l = currentTargetLine();
-
-  // Regiezeilen werden im Type-Modus nicht abgefragt -> einfach weiter
-  if(l.type === 'stage'){
-    nextStep();
-    return;
-  }
-
-  const ok = similarEnough(typeInput.value, l.text || '');
-  feedback.textContent = ok ? '✅ Richtig!' : '❌ Nicht ganz.';
-  if(ok){
-    state.meta.xp += 10;
-    saveSilently();
-    setTimeout(nextStep, 300);
-  } else {
-    session.hearts = Math.max(0, session.hearts - 1);
-    heartsBox.innerHTML = heartsSvg(session.hearts);
-    if(session.hearts === 0){
-      alert('💔 Keine Herzen mehr – Runde vorbei.');
-      show('textSetup');
-    }
-  }
-});
-
-/* ---------- Hint ---------- */
-hintBtn.addEventListener('click', ()=>{
-  const l = currentTargetLine();
-  feedback.textContent = 'Hinweis: ' + firstNCharsHint(l.text || '', typeInput.value || '');
-});
-
-skipBtn.addEventListener('click', nextStep);
-prevBtn.addEventListener('click', prevStep);
-nextBtn.addEventListener('click', nextStep);
-
-function prevStep(){
-  if(session.mode==='context'){
-    session.askPtr = Math.max(0, session.askPtr-1);
-  } else {
-    session.idx = Math.max(0, session.idx-1);
-  }
-  renderStep();
-}
-function nextStep(){
-  if(session.mode==='context'){
-    session.askPtr = Math.min((session.askIdxs.length||1)-1, session.askPtr+1);
-  } else {
-    session.idx = Math.min((session.lines.length||1)-1, session.idx+1);
-  }
-  renderStep();
-}
-
-
-/* ---------------------- Song Session -------------------------- */
-const songTitlePill = document.getElementById('songTitlePill');
-const songRolePill  = document.getElementById('songRolePill');
-const songLinesBox  = document.getElementById('songLines');
-const songRevealAll = document.getElementById('songRevealAll');
-const songHideAll   = document.getElementById('songHideAll');
-
-function showSong(){
-  const role = state.prefs.songRole;
-  const song = state.data.songs.find(s=>s.id===state.prefs.songId);
-  if(!song){ alert('Kein Song gefunden.'); return; }
-  songTitlePill.textContent = song.title || song.name || song.id;
-  songRolePill.textContent = role;
-  songLinesBox.innerHTML = '';
-  (song.lines||[]).forEach((l,i)=>{
-    const hide = (l.status==='cut'); // geschnittene default aus
-    const row = document.createElement('div');
-    row.className = 'item';
-    row.innerHTML = `<div class="small">${l.speaker||'ENSEMBLE'}</div>
-      <div class="line ${hide?'hidden':''}" data-i="${i}">${escapeHtml(l.text)}</div>`;
-    row.addEventListener('click', ()=>{
-      const el = row.querySelector('.line');
-      el.classList.toggle('hidden');
-    });
-    songLinesBox.appendChild(row);
-  });
-  show('songSess');
-}
-songRevealAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.remove('hidden')); });
-songHideAll.addEventListener('click', ()=>{ songLinesBox.querySelectorAll('.line').forEach(e=>e.classList.add('hidden')); });
-
-/* ---------------------- Editor ------------------------------- */
-const edView = document.getElementById('edView');
-const edSceneWrap = document.getElementById('edSceneWrap');
-const edSongWrap  = document.getElementById('edSongWrap');
-const edSceneSel  = document.getElementById('edSceneSel');
-const edSongSel   = document.getElementById('edSongSel');
-const edList      = document.getElementById('edList');
-const edTitle     = document.getElementById('edTitle');
-const edSelectAll = document.getElementById('edSelectAll');
-const edClearSel  = document.getElementById('edClearSel');
-const edSetKeep   = document.getElementById('edSetKeep');
-const edSetOptional = document.getElementById('edSetOptional');
-const edSetCut    = document.getElementById('edSetCut');
-const edExportJson= document.getElementById('edExportJson');
-const edSaveLocal = document.getElementById('edSaveLocal');
-const edReload    = document.getElementById('edReload');
-
-let edSelection = new Set(); // indices of selected lines in current view
-
-function buildEditor(){
-  // populate selectors
-  edSceneSel.innerHTML = state.data.scenes.map(s=>`<option value="${s.id}" ${s.id===state.prefs.sceneId?'selected':''}>${s.name}</option>`).join('');
-  edSongSel.innerHTML  = state.data.songs.map(s=>`<option value="${s.id}" ${s.id===state.prefs.songId?'selected':''}>${s.title||s.name||s.id}</option>`).join('');
-  // view
-  edView.value = (state.ui.editorView || 'dialogue');
-  edSceneWrap.classList.toggle('hidden', edView.value!=='dialogue');
-  edSongWrap.classList.toggle('hidden', edView.value!=='songs');
-  renderEdList();
-}
-
-function currentEdLines(){
-  if(edView.value==='songs'){
-    const s = state.data.songs.find(x=>x.id===edSongSel.value);
-    return {kind:'song', obj:s, lines:(s?.lines||[])};
-  }else{
-    const s = state.data.scenes.find(x=>x.id===edSceneSel.value);
-    return {kind:'scene', obj:s, lines:(s?.lines||[])};
-  }
-}
-
-function renderEdList(){
-  edSelection.clear();
-  const {kind, obj, lines} = currentEdLines();
-  edTitle.textContent = (kind==='song' ? `🎵 ${obj?.title||obj?.name||obj?.id}` : (obj?.name||'Szene'));
-  edList.innerHTML = '';
-  lines.forEach((l,idx)=>{
-    const item = document.createElement('div');
-    item.className = 'item';
-    item.dataset.idx = String(idx);
-    item.innerHTML = `
-      <div class="row" style="justify-content:space-between;gap:8px">
-        <div><b>${l.speaker||'—'}</b> <span class="small">[${l.status||'keep'}]</span></div>
-        <div class="row" style="gap:6px">
-          <select class="edStatus">
-            <option value="keep" ${l.status==='keep'?'selected':''}>keep</option>
-            <option value="optional" ${l.status==='optional'?'selected':''}>optional</option>
-            <option value="cut" ${l.status==='cut'?'selected':''}>cut</option>
-          </select>
-          <button class="btn ghost edSelBtn">Markieren</button>
-        </div>
-      </div>
-      <div class="line" style="margin-top:6px">${escapeHtml(l.text||'')}</div>
-    `;
-    // events
-    item.querySelector('.edSelBtn').addEventListener('click', ()=>{
-      if(edSelection.has(idx)){ edSelection.delete(idx); item.style.outline=''; }
-      else { edSelection.add(idx); item.style.outline='2px solid var(--brand)'; }
-    });
-    item.querySelector('.edStatus').addEventListener('change', (e)=>{
-      l.status = e.target.value;
-      saveSilently();
-      item.querySelector('.small').textContent = `[${l.status}]`;
-    });
-    edList.appendChild(item);
-  });
-}
-
-edView.addEventListener('change', ()=>{
-  state.ui.editorView = edView.value; saveSilently();
-  edSceneWrap.classList.toggle('hidden', edView.value!=='dialogue');
-  edSongWrap.classList.toggle('hidden', edView.value!=='songs');
-  renderEdList();
-});
-edSceneSel.addEventListener('change', ()=>{ state.prefs.sceneId = edSceneSel.value; saveSilently(); renderEdList(); });
-edSongSel.addEventListener('change', ()=>{ state.prefs.songId = edSongSel.value; saveSilently(); renderEdList(); });
-
-edSelectAll.addEventListener('click', ()=>{
-  edSelection = new Set([...Array(currentEdLines().lines.length).keys()]);
-  edList.querySelectorAll('.item').forEach(el=> el.style.outline='2px solid var(--brand)');
-});
-edClearSel.addEventListener('click', ()=>{
-  edSelection.clear();
-  edList.querySelectorAll('.item').forEach(el=> el.style.outline='');
-});
-
-function bulkSetStatus(status){
-  const {lines} = currentEdLines();
-  edSelection.forEach(idx=>{
-    if(lines[idx]) lines[idx].status = status;
-  });
-  saveSilently();
-  renderEdList();
-}
-edSetKeep.addEventListener('click', ()=> bulkSetStatus('keep'));
-edSetOptional.addEventListener('click', ()=> bulkSetStatus('optional'));
-edSetCut.addEventListener('click', ()=> bulkSetStatus('cut'));
-
-edExportJson.addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify({title:state.data.title||'Horrorladen', roles:state.data.roles, scenes:state.data.scenes, songs:state.data.songs}, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'horrorladen_script_edited.json'; a.click();
-  URL.revokeObjectURL(url);
-});
-edSaveLocal.addEventListener('click', ()=>{ save(); });
-edReload.addEventListener('click', ()=>{ location.reload(); });
-
-
-/* ---------------------- Gesten (Swipe) ------------------------ */
-let touchStartX=null,touchStartY=null;
-function onTouchStart(e){ const t=e.changedTouches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
-function onTouchEnd(e){
-  if(touchStartX==null) return;
-  const t=e.changedTouches[0]; const dx=t.clientX - touchStartX; const dy=t.clientY - touchStartY;
-  if(Math.abs(dx)>60 && Math.abs(dy)<50){
-    if(dx<0){ // left
-      if(state.ui.page==='textSess') nextStep();
-    }else{ // right
-      if(state.ui.page==='textSess') prevStep();
-    }
-  }
-  touchStartX=touchStartY=null;
-}
-document.addEventListener('touchstart', onTouchStart, {passive:true});
-document.addEventListener('touchend', onTouchEnd, {passive:true});
-document.addEventListener('keydown', (e)=>{
-  if(state.ui.page==='textSess'){
-    if(e.key==='ArrowRight') nextStep();
-    if(e.key==='ArrowLeft') prevStep();
-    if(e.key===' ') { e.preventDefault(); const b=(state.prefs.mode==='type'?checkBtn:revealBtn); b?.click(); }
-  }
-});
-
-/* ---------- Canon-Rollen + Varianten-Mapping ---------- */
-const CANON_ROLES = [
-  "SEYMOUR","AUDREY","MR. MUSHNIK","ORIN","PFLANZE","STIMME",
-  "CRYSTAL","RONETTE","CHIFFON","SOULGIRLS",
-  "PENNER 1","PENNER 2","KUNDE","PATIENT",
-  "MRS. LUCE","MRS. BERNSTEIN","MR. MARTIN","ALLE"
-];
-
-// Schreibweisen-/Synonym-Varianten -> Canon
-const ROLE_VARIANTS = new Map([
-  ["SEYMOUR","SEYMOUR"],
-  ["AUDREY","AUDREY"],
-  ["MR. MUSHNIK","MR. MUSHNIK"],["MR MUSHNIK","MR. MUSHNIK"],["MUSHNIK","MR. MUSHNIK"],
-  ["ORIN","ORIN"],
-  ["DIE PFLANZE","PFLANZE"],["PFLANZE","PFLANZE"],["AUDREY II","PFLANZE"],["AUDREY 2","PFLANZE"],
-  ["STIMME","STIMME"],["STIMME DER PFLANZE","STIMME"],
-  ["CRYSTAL","CRYSTAL"],["RONETTE","RONETTE"],["CHIFFON","CHIFFON"],
-  ["SOULGIRLS","SOULGIRLS"],["GIRLS","SOULGIRLS"],["DREAMGIRLS","SOULGIRLS"],
-  ["PENNER 1","PENNER 1"],["PENNER1","PENNER 1"],["PENNER","PENNER 1"],
-  ["PENNER 2","PENNER 2"],["PENNER2","PENNER 2"],
-  ["KUNDE","KUNDE"],["PATIENT","PATIENT"],
-  ["MRS. LUCE","MRS. LUCE"],["MRS LUCE","MRS. LUCE"],
-  ["MRS. BERNSTEIN","MRS. BERNSTEIN"],["MRS BERNSTEIN","MRS. BERNSTEIN"],
-  ["MR. MARTIN","MR. MARTIN"],["MR MARTIN","MR. MARTIN"],
-  ["ALLE","ALLE"],["ENSEMBLE","ALLE"]
-]);
-
-function normRoleName(raw){
-  const k = String(raw||"").replace(/\./g,'').replace(/\s+/g,' ').trim().toUpperCase();
-  // Versuch exakte Variantenzuordnung
-  for(const [v,canon] of ROLE_VARIANTS){
-    const vv = v.replace(/\./g,'').toUpperCase();
-    if(k===vv) return canon;
-  }
-  // sonst, wenn es exakt im Kanon steht (z. B. "MR. MUSHNIK"):
-  if (CANON_ROLES.includes(String(raw||"").toUpperCase())) return String(raw||"").toUpperCase();
-  return String(raw||"").toUpperCase();
-}
-
-function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-
-// Prüft, ob Text mit einem Rollenlabel startet und gibt {speaker,text} zurück
-function extractPrefixedSpeaker(text){
-  const t = String(text||'').trim();
-  if(!t) return null;
-  // längere Varianten zuerst (MR. MUSHNIK vor MUSHNIK)
-  const variants = Array.from(ROLE_VARIANTS.keys()).sort((a,b)=> b.length - a.length);
-  for(const v of variants){
-    const re = new RegExp('^'+escapeReg(v)+'\\b\\s*(?:[:\\-–—])?\\s*(.*)$','i');
-    const m = t.match(re);
-    if(m){
-      const canon = ROLE_VARIANTS.get(v) || normRoleName(v);
-      const rest  = (m[1]||'').trim();
-      return {speaker: canon, text: rest, labelOnly: rest.length===0};
-    }
-  }
-  return null;
-}
-
-// Repariert Sprecher in einem Lines-Array
-function fixLines(lines){
-  const out = [];
-  let carrySpeaker = null; // letzter „echter“ Sprecher
-
-  for(const L of (lines||[])){
-    let sp   = String(L.speaker||'').trim();
-    let text = String(L.text||'').trim();
-    const status = L.status || 'keep';
-
-    // Text beginnt mit Rollenlabel? (z.B. "MUSHNIK: ...")
-    const ex = extractPrefixedSpeaker(text);
-    if(ex){
-      if(ex.labelOnly){
-        // nur ein Sprecher-Label in dieser Zeile -> merken und weiter
-        carrySpeaker = ex.speaker;
-        continue;
-      }else{
-        sp   = ex.speaker;
-        text = ex.text;
+    function buildExchanges(items, chosenRole) {
+      const dialogues = items.filter(it => it.type === 'dialogue')
+        .map(it => ({...it, speaker: treatSpeaker(it.speaker)}))
+        .filter(it => it.speaker !== '__IGNORE__');
+      const exchanges = [];
+      let i = 0, lastSelectedIndex = -1;
+      while (i < dialogues.length) {
+        const it = dialogues[i];
+        if (isIncludedForRole(it.speaker, chosenRole)) {
+          const context = [];
+          for (let j = lastSelectedIndex + 1; j < i; j++) {
+            const pj = dialogues[j];
+            if (!isIncludedForRole(pj.speaker, chosenRole)) context.push(pj);
+          }
+          const yours = [];
+          let k = i;
+          while (k < dialogues.length && isIncludedForRole(dialogues[k].speaker, chosenRole)) {
+            yours.push(dialogues[k]); k++;
+          }
+          exchanges.push({ idx: exchanges.length, context, yours });
+          lastSelectedIndex = k - 1;
+          i = k;
+        } else i++;
       }
+      return exchanges;
+    }
+    function el(tag, attrs = {}, ...children) {
+      const n = document.createElement(tag);
+      for (const [k,v] of Object.entries(attrs)) {
+        if (k === 'class') n.className = v;
+        else if (k === 'html') n.innerHTML = v;
+        else n.setAttribute(k, v);
+      }
+      for (const c of children) {
+        if (c == null) continue;
+        if (typeof c === 'string') n.appendChild(document.createTextNode(c));
+        else n.appendChild(c);
+      }
+      return n;
+    }
+    function escapeHtml(s) {
+      return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+    function renderLine(line, isYou) {
+      const wrap = el('div', {class: 'line' + (isYou ? ' you' : '')});
+      const spk = el('div', {class: 'speaker'});
+      spk.innerHTML = `<u>${escapeHtml(line.speaker || '')}</u>`;
+      const txt = el('div');
+      txt.innerHTML = escapeHtml(line.text).replace(/\n/g, '<br/>');
+      wrap.appendChild(spk); wrap.appendChild(txt);
+      return wrap;
     }
 
-    // Speaker aus vorheriger Label-Zeile übernehmen
-    if(!sp || sp.toUpperCase()==='ALLE'){
-      sp = carrySpeaker || 'ALLE';
+    const root = document.getElementById('root');
+    const roleSel = document.getElementById('roleSel');
+    const sessionSize = document.getElementById('sessionSize');
+    const toggleStage = document.getElementById('toggleStage');
+    const startBtn = document.getElementById('startBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const statsPill = document.getElementById('statsPill');
+
+    function updateQuery() {
+      const p = new URLSearchParams(location.search);
+      p.set('role', roleSel.value);
+      p.set('n', sessionSize.value);
+      p.set('stage', toggleStage.value);
+      history.replaceState(null, '', `?${p.toString()}`);
     }
 
-    // normalisieren
-    sp = normRoleName(sp);
-
-    // Carry aktualisieren (nur für echte Sprecher)
-    if(sp && sp.toUpperCase()!=='ALLE') carrySpeaker = sp;
-
-    // komplett leere Platzhalter vermeiden
-    if(!text && sp==='ALLE') continue;
-
-    out.push({ speaker: sp || 'ALLE', text, status });
-  }
-
-  // Sicherheitsnetz: falls alles gefiltert wurde, Original minimal übernehmen
-  return out.length ? out : (lines||[]).map(l=>({
-    speaker: normRoleName(l.speaker || 'ALLE'),
-    text: String(l.text||''),
-    status: l.status || 'keep'
-  }));
-}
-
-
-/* ---------------------- Utils (bereinigt) ---------------------- */
-function heartsSvg(n){
-  let html=''; for(let i=0;i<3;i++){
-    const c = i<n ? '#ff6b6b' : '#3a4057';
-    html += `<svg class="heart" viewBox="0 0 24 24"><path fill="${c}" d="M12 21s-6.716-4.727-9.428-7.44C.86 11.85.86 8.65 2.572 6.94c1.714-1.714 4.486-1.714 6.2 0L12 10.17l3.228-3.23c1.714-1.714 4.486-1.714 6.2 0 1.714 1.71 1.714 4.91 0 6.62C18.716 16.273 12 21 12 21z"/></svg>`;
-  }
-  return html;
-}
-function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-
-const toast = document.getElementById('toast'); let toastTimer=null;
-function showToast(txt){ toast.textContent=txt; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'), 850); }
-function toastOK(t){ showToast(t||'Geladen'); }
-function showLoadError(msg){
-  const box = document.getElementById('edList') || document.body;
-  const div = document.createElement('div');
-  div.style.cssText='padding:12px;border:1px solid #f55;border-radius:10px;background:#2a1010;color:#ffdede;margin:8px 0;white-space:pre-wrap';
-  div.textContent = msg;
-  box.prepend(div);
-  alert(msg);
-}
-
-/* ---- Szene-IDs / Anzeige ---- */
-function parseSceneId(id){
-  // akzeptiert "1.1", "2.10", "2", auch "01.02"
-  const m = String(id||'').trim().match(/^(\d+)(?:\.(\d+))?$/);
-  if(!m) return {act: 9999, num: 9999};
-  return {act: Number(m[1]||0), num: Number(m[2]||0)};
-}
-function sortScenes(list){
-  return (list||[]).slice().sort((a,b)=>{
-    if(typeof a.order==='number' && typeof b.order==='number') return a.order-b.order;
-    if(typeof a.order==='number') return -1;
-    if(typeof b.order==='number') return 1;
-    const A=parseSceneId(a.id), B=parseSceneId(b.id);
-    if(A.act!==B.act) return A.act - B.act;
-    if(A.num!==B.num) return A.num - B.num;
-    return String(a.name||'').localeCompare(String(b.name||''), 'de', {numeric:true, sensitivity:'base'});
-  });
-}
-function parseSceneIdParts(idOrName){
-  const s = String(idOrName||'').toUpperCase();
-  let m = s.match(/^(\d+)\.(\d+)$/);
-  if(m) return {act:Number(m[1]), num:Number(m[2])};
-  m = s.match(/^(\d+)\s*[\.\-]?\s*SZENE/);
-  if(m) return {act:1, num:Number(m[1])};
-  m = s.match(/(ERSTER|ZWEITER)\s+AKT.*?(\d+)\s*[\.\-]?\s*SZENE/);
-  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:Number(m[2])};
-  m = s.match(/(ERSTER|ZWEITER)\s+AKT/);
-  if(m) return {act:(m[1]==='ZWEITER'?2:1), num:0};
-  return {act:9999, num:9999};
-}
-function aktLabel(act){ return act===2 ? 'ZWEITER AKT' : 'ERSTER AKT'; }
-function detailTitle(name){
-  return String(name||'')
-    .replace(/^\s*(ERSTER|ZWEITER)\s+AKT\s*[\-–—]?\s*/i,'')
-    .replace(/^\s*\d+\s*[\.\-]?\s*SZENE\s*[\-–—:]?\s*/i,'')
-    .replace(/^\s*\d+(?:\.\d+)?\s*[\-–—:]?\s*/,'')
-    .trim();
-}
-function displaySceneName(scene){
-  const idHint = scene.id || scene.name || '';
-  const {act,num} = parseSceneIdParts(idHint || scene.name);
-  const head = `${aktLabel(act)}${num?` – ${num}. SZENE`:''}`;
-  const detail = detailTitle(scene.name||'');
-  return detail ? `${head} — ${detail}` : head;
-}
-
-/* ---- Text-Ähnlichkeit ---- */
-function normalize(s){ return (s||'').toLowerCase().replace(/[\s\n]+/g,' ').replace(/[.,!?:;…"'()\[\]«»„“‚’]/g,'').trim(); }
-function levenshtein(a,b){ const m=a.length,n=b.length; if(!m)return n;if(!n)return m; const dp=new Array(n+1); for(let j=0;j<=n;j++) dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=Math.min(dp[j]+1, dp[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev=tmp; } } return dp[n]; }
-function similarEnough(a,b){ const A=normalize(a), B=normalize(b); if(!A) return false; if(A===B) return true; const d=levenshtein(A,B); const maxLen=Math.max(A.length,B.length); return (1 - d/Math.max(1,maxLen)) >= .88; }
-function firstNCharsHint(target, typed){ const T=normalize(target), U=normalize(typed); let i=0; while(i<Math.min(T.length,U.length)&&T[i]===U[i]) i++; return target.slice(0, Math.max(1,i+1)) + '…'; }
-
-/* ---- Rollen-/Szenen-Helfer ---- */
-function sceneHasRole(scene, role, includeAlle){
-  if(!role) return true;
-  return (scene?.lines||[]).some(l => l.speaker===role || (includeAlle && l.speaker==='ALLE'));
-}
-function isMyLine(line, role, includeAlle){
-  if(!line) return false;
-  return (line.speaker===role) || (includeAlle && line.speaker==='ALLE');
-}
-function filterByStatus(lines, hideCuts, includeOpt){
-  return (lines||[]).filter(l=>{
-    if(hideCuts && l.status==='cut') return false;
-    if(!includeOpt && l.status==='optional') return false;
-    return true;
-  });
-}
-
-/* ---- Song-Erkennung / Normalisierung ---- */
-const KNOWN_SONGS = [
-  "KLEINER HORRORLADEN","VORSTADT","DA – DOO","WACHS FÜR MICH",
-  "WUNDER GIBT ES DOCH","IM GRÜNEN IRGENDWO","WIR MÜSSEN RENOVIEREN",
-  "ZAHNARZT","MUSHNIK UND SOHN","SCHICKSAL, WELCH EINE WENDUNG",
-  "GIB’S MIR","JETZT","JETZT HAST DU SEYMOUR",
-  "ESSENSZEIT","DIE LETZTEN WERDEN DIE ERSTEN SEIN","FINALE"
-];
-const _canon = s => String(s||'')
-  .toUpperCase()
-  .replace(/[„“"']/g,'')
-  .replace(/\s+/g,' ')
-  .replace(/\bNR\.\s*\d+[A-Z]?\)?\s*/g,'')
-  .replace(/\bREPRISE:?/g,'')
-  .replace(/\bLIED:?/g,'')
-  .replace(/^\s*[:–—-]\s*/,'')
-  .trim();
-const KNOWN_SONGS_CANON = KNOWN_SONGS.map(_canon);
-function isKnownSongTitle(name){
-  const n = _canon(name);
-  return KNOWN_SONGS_CANON.some(k => n.includes(k));
-}
-
-/* ---- Script-Normalisierung (Songs vs. Dialog) ---- */
-function normalizeScript(j){
-  const roles = Array.isArray(j.roles) ? j.roles.slice() : [];
-  const scenesRaw = Array.isArray(j.scenes) ? j.scenes.filter(s => Array.isArray(s.lines)) : [];
-  const songsRaw  = Array.isArray(j.songs)  ? j.songs.filter(s => Array.isArray(s.lines))  : [];
-
-  const isSongByType = s => String(s.type||'').toLowerCase()==='song';
-  const isSongByName = s => /^(\d+\.\s*)?lied\b/i.test(String(s.name||''));
-  const cleanTitle = name => String(name||'')
-    .replace(/^(\d+\.\s*)?/,'')
-    .replace(/^lied[: ]*/i,'')
-    .replace(/^["„]|["“]$/g,'')
-    .trim();
-
-  const dialogScenes = [];
-  const detectedSongs = [];
-
-  for(const s of scenesRaw){
-    if(isSongByType(s) || isSongByName(s) || isKnownSongTitle(s.name||'')){
-      detectedSongs.push({
-        id: s.id || ('song-' + (s.name||'').replace(/\s+/g,'-')),
-        title: s.title || cleanTitle(s.name),
-        status: s.status || 'keep',
-        lines: s.lines
+    function groupRoles(data) {
+      const seen = new Set(); const roles = [];
+      if (data.roles_meta && Array.isArray(data.roles_meta.roles)) {
+        for (const r of data.roles_meta.roles) {
+          const name = norm(r.name);
+          if (name && !seen.has(name)) { seen.add(name); roles.push(name); }
+          if (Array.isArray(r.aliases)) for (const a of r.aliases) {
+            const an = norm(a); if (an && !seen.has(an)) { seen.add(an); roles.push(an); }
+          };
+        }
+      } else {
+        for (const it of data.items||[]) if (it.type==='dialogue' && it.speaker) {
+          const s = norm(it.speaker); if (s && !seen.has(s)) { seen.add(s); roles.push(s); }
+        };
+      }
+      if (!seen.has('ALLE')) roles.push('ALLE');
+      roles.sort((a,b) => {
+        const pr = ['SEYMOUR','AUDREY','MR. MUSHNIK','ORIN','DIE PFLANZE'];
+        const ia = pr.indexOf(a), ib = pr.indexOf(b);
+        if (ia !== -1 || ib !== -1) return (ia===-1?999:ia)-(ib===-1?999:ib);
+        return a.localeCompare(b);
       });
-    } else {
-      dialogScenes.push({ ...s, type:'dialogue' });
-    }
-  }
-
-  const byTitle = new Map();
-  const addSong = sg => {
-    const key = (sg.title || sg.name || sg.id || '').toLowerCase();
-    if(!key) return;
-    if(!byTitle.has(key)) byTitle.set(key, { id: sg.id || ('song-'+key), title: sg.title || sg.name || sg.id, status: sg.status || 'keep', lines: [] });
-    byTitle.get(key).lines.push(...(sg.lines||[]));
-  };
-  songsRaw.forEach(addSong);
-  detectedSongs.forEach(addSong);
-
-  return { roles, scenes: dialogScenes, songs: Array.from(byTitle.values()) };
-}
-
-/* ---- ABAB-Blockbildung ---- */
-// Fasst aufeinanderfolgende Zeilen mit gleichem Sprecher zu EINEM Block zusammen.
-// Regie (type:'stage') bleibt als eigener Block.
-// Status wird „streng“ gemerged: cut > optional > keep.
-function groupConsecutiveBySpeaker(lines){
-  const out = [];
-  const rank = s => (s==='cut'?2 : s==='optional'?1 : 0);
-  let cur = null; // {speaker, text, status, type}
-
-  for(const L of (lines||[])){
-    const type = L.type || 'dialogue'; // 'dialogue' | 'stage' | 'song'
-    const speaker = (L.speaker || (type==='stage' ? 'REGIE' : '—')).toString();
-
-    if(type === 'stage'){
-      if(cur) { out.push(cur); cur=null; }
-      out.push({ speaker:'REGIE', text:String(L.text||''), status:L.status||'keep', type:'stage' });
-      continue;
+      return roles.filter(r => r !== 'ALLE');
     }
 
-    if(cur && cur.type!=='stage' && cur.speaker === speaker){
-      const add = String(L.text||'').trim();
-      cur.text = add ? (cur.text ? (cur.text + '\n' + add) : add) : cur.text;
-      const worst = rank(L.status||'keep') > rank(cur.status||'keep') ? (L.status||'keep') : cur.status;
-      cur.status = worst;
-      if((L.type||'dialogue')==='song') cur.type = 'song';
-    }else{
-      if(cur) out.push(cur);
-      cur = {
-        speaker,
-        text: String(L.text||'').trim(),
-        status: L.status || 'keep',
-        type: (L.type || 'dialogue')
+    function attachControls(data) {
+      // roles
+      const roles = groupRoles(data);
+      roleSel.innerHTML = roles.map(r => `<option value="${r}">${r}</option>`).join('');
+      const roleQ = q.get('role'); if (roleQ && roles.includes(norm(roleQ))) roleSel.value = norm(roleQ);
+      else roleSel.value = roles[0] || 'SEYMOUR';
+      // N
+      const nQ = parseInt(q.get('n')||'5', 10); sessionSize.value = String(isNaN(nQ) ? 5 : Math.min(25, Math.max(1, nQ)));
+      // stage
+      const stageQ = q.get('stage'); toggleStage.value = stageQ === 'on' ? 'on' : 'off';
+
+      roleSel.onchange = updateQuery;
+      sessionSize.onchange = updateQuery;
+      toggleStage.onchange = render;
+
+      shareBtn.onclick = async () => {
+        updateQuery();
+        try { await navigator.clipboard.writeText(location.href); shareBtn.textContent='Link kopiert!'; setTimeout(()=>shareBtn.textContent='Link teilen',1200); }
+        catch { alert('Link: ' + location.href); }
       };
+      loadBtn.onclick = () => fileInput.click();
+      fileInput.onchange = async (ev) => {
+        const f = ev.target.files[0]; if (!f) return;
+        try {
+          const txt = await f.text(); const j = JSON.parse(txt);
+          window.__SCRIPT = j; render();
+        } catch(e) { alert('Ungültiges JSON: ' + e.message); }
+      };
+      startBtn.onclick = () => { const p = new URLSearchParams(location.search); p.set('page','0'); history.replaceState(null,'',`?${p.toString()}`); render(); };
     }
-  }
-  if(cur) out.push(cur);
-  return out;
-}
 
+    function render() {
+      const chosen = roleSel.value;
+      const items = (window.__SCRIPT && window.__SCRIPT.items) ? window.__SCRIPT.items : [];
+      const ex = buildExchanges(items, chosen);
+      const N = parseInt(sessionSize.value||'5', 10);
+      const total = ex.length;
+      statsPill.textContent = `${total} Blöcke (Rolle: ${chosen})`;
 
+      // page calc
+      let page = parseInt(q.get('page')||'0', 10);
+      if (isNaN(page) || page < 0) page = 0;
+      const pages = Math.max(1, Math.ceil(total / N));
+      if (page >= pages) page = pages - 1;
 
-/* ---------------------- Data URL UI --------------------------- */
-document.getElementById('setDataUrl').addEventListener('click', ()=>{
-  const current = new URLSearchParams(location.search).get('data') || '';
-  const u = prompt('Daten-URL eingeben (z.B. https://USERNAME.github.io/REPO/horrorladen_script.json)', current);
-  if(u){ const url = new URL(location.href); url.searchParams.set('data', u.trim()); location.href = url.toString(); }
-});
-document.getElementById('reloadData').addEventListener('click', ()=> initLoad());
+      const start = page * N;
+      const slice = ex.slice(start, start + N);
 
-/* ---------------------- Start -------------------------------- */
-document.getElementById('goTextSetup').addEventListener('click', ()=> show('textSetup'));
-show(state.ui.page||'home');
-initLoad();
-</script>
+      root.innerHTML = '';
+
+      const navTop = el('div', {class:'toolbar'},
+        el('button', {class:'secondary', id:'prevBtn'}, '← Zurück'),
+        el('span', {class:'pill'}, `Seite ${page+1} / ${pages}`),
+        el('button', {class:'secondary', id:'nextBtn'}, 'Weiter →')
+      );
+      root.appendChild(navTop);
+
+      // content
+      for (const block of slice) {
+        const box = el('div', {class:'exchange'});
+
+        if (block.context.length) {
+          const ctx = el('div', {class:'ctx'});
+          for (const line of block.context) ctx.appendChild(renderLine(line, false));
+          box.appendChild(ctx);
+        }
+        if (block.yours.length) {
+          const you = el('div', {class:'you'});
+          for (const line of block.yours) you.appendChild(renderLine(line, true));
+          box.appendChild(you);
+        }
+        root.appendChild(box);
+      }
+
+      const navBottom = navTop.cloneNode(true);
+      root.appendChild(navBottom);
+
+      function setPage(p) {
+        const P = new URLSearchParams(location.search);
+        P.set('page', String(p));
+        history.replaceState(null, '', `?${P.toString()}`);
+        location.reload(); // ensure q updates in this simple setup
+      }
+      root.querySelectorAll('#prevBtn').forEach(b => b.addEventListener('click', () => setPage(Math.max(0, page-1))));
+      root.querySelectorAll('#nextBtn').forEach(b => b.addEventListener('click', () => setPage(Math.min(pages-1, page+1))));
+    }
+
+    // Load external JSON (default script.json or ?src=...)
+    (async () => {
+      try {
+        const res = await fetch(jsonSrc, { cache: 'no-store' });
+        const j = await res.json();
+        window.__SCRIPT = j;
+        attachControls(j);
+        render();
+      } catch (e) {
+        root.innerHTML = '<div class="exchange">Fehler beim Laden der JSON: '+ String(e.message || e) +'</div>';
+        attachControls({ items: [] });
+      }
+    })();
+  </script>
 </body>
 </html>
