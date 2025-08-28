@@ -297,19 +297,16 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 
 <script>
 /* ---------------- BaseDir & Path Normalisierung ---------------- */
-// Ermittelt den Ordner, in dem index.html liegt (mit abschließendem /), z.B. /horrorladen-app/
 const CURRENT_DIR = (()=>{
   const p = location.pathname;
   return p.endsWith('/') ? p : p.replace(/[^/]+$/, '');
 })();
-
-// scripts.json + Skriptdateien relativ zu CURRENT_DIR laden
 function normalizeScriptPath(p){
   if(!p) return p;
-  if(/^https?:\/\//i.test(p)) return p;           // absolute URL bleibt
-  if(p.startsWith('./') || p.startsWith('../')) return p; // explizit relativ
-  if(p.startsWith('/')) return CURRENT_DIR.replace(/\/$/,'') + p; // "/x.json" -> unterhalb des App-Ordners behandeln
-  return CURRENT_DIR + p;                          // Dateiname -> im aktuellen Ordner
+  if(/^https?:\/\//i.test(p)) return p;
+  if(p.startsWith('./') || p.startsWith('../')) return p;
+  if(p.startsWith('/')) return CURRENT_DIR.replace(/\/$/,'') + p;
+  return CURRENT_DIR + p;
 }
 async function fetchJson(paths){
   for(const raw of paths){
@@ -325,9 +322,6 @@ async function fetchJson(paths){
 /* ---------------- Prefs/State ---------------- */
 const LS={name:'hl_player_name',src:'hl_json_src',sfx:'hl_sfx_on',motion:'hl_reduce_motion'};
 let jsonSrc = normalizeScriptPath(localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json');
-console.log('[PATH] location.pathname =', location.pathname);
-console.log('[PATH] CURRENT_DIR =', CURRENT_DIR);
-console.log('[PATH] initialSrc(raw) =', initialSrc, ' → jsonSrc(norm) =', jsonSrc);
 let sfxOn = true;
 
 const state={items:[],roles:[],actsList:[],scenesByAct:{},songsSet:new Set(),
@@ -407,14 +401,13 @@ const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote=document.getElementById('scriptsNote');
 async function loadScriptsIndex(){
   try{
-    const idx=await fetchJson(['scripts.json','./scripts.json']); // im selben Ordner wie index.html
+    const idx=await fetchJson(['scripts.json','./scripts.json']);
     const list=parseScriptsJson(idx);
     if(list.length){
       state.indexFromScriptsJson=list.map(o=>({label:o.label||o.value, value:o.value}));
       const options=state.indexFromScriptsJson.map(o=>({label:o.label, value: normalizeScriptPath(o.value)}));
       scriptSelect.innerHTML=options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
       scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
-      // Preselect falls passend
       const found=options.find(o=>o.value===jsonSrc || normalizeScriptPath(o.value)===jsonSrc);
       if(found) scriptSelect.value=found.value;
       return true;
@@ -433,11 +426,9 @@ async function loadScriptsIndex(){
 /* ---------------- Content JSON laden ---------------- */
 const jsonLabel = document.getElementById('jsonSrcLabel');
 async function loadJSON(){
-  // Pfad relativ zur index.html auflösen (z. B. "/horrorladen-app/...")
   jsonSrc = normalizeScriptPath(jsonSrc);
   if (jsonLabel) jsonLabel.textContent = jsonSrc;
 
-  // Falls du die Fallbacks behalten willst, lassen wir sie drin:
   const tryPaths = [jsonSrc, '/'+jsonSrc.replace(/^\//,''), './'+jsonSrc.replace(/^\//,'')];
 
   let data;
@@ -448,7 +439,6 @@ async function loadJSON(){
     return;
   }
 
-  // Falls versehentlich eine Index-Datei (scripts.json) gewählt wurde -> erstes Skript daraus laden
   const maybeIndex = parseScriptsJson(data);
   if (maybeIndex.length && !isFullScript(data)){
     jsonSrc = normalizeScriptPath(maybeIndex[0].value);
@@ -581,7 +571,6 @@ function renderLearnPage(reset=false){
     const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
     const card=el('div',{class:'card'});
     if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
-    // simple Cloze
     const html=(line.text||'').replace(/\b(\w{3,})\b/g,'<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">&nbsp;&nbsp;&nbsp;</span>');
     card.appendChild(el('div',{class:'big',html:`${line.speaker}: ${html}`}));
     if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
@@ -665,9 +654,7 @@ loadScriptBtn.onclick=()=>{ const raw = manualToggle.checked ? (scriptInput.valu
 
 /* ---------------- Mobile: Zoom strikt verbieten ---------------- */
 (function(){
-  // Pinch-Zoom blocken
   ['gesturestart','gesturechange','gestureend'].forEach(evt=>document.addEventListener(evt,e=>e.preventDefault(),{passive:false}));
-  // Doppeltap-Zoom blocken
   let lt=0; document.addEventListener('touchend',e=>{const n=Date.now(); if(n-lt<=300) e.preventDefault(); lt=n;},{passive:false});
 })();
 
@@ -677,8 +664,8 @@ document.querySelector('[data-nav="home"]').onclick=switchHome;
 
 async function boot(){
   switchViewImmediate('home');
-  await loadScriptsIndex();   // füllt Dropdown aus scripts.json (im selben Ordner wie index.html)
-  await loadJSON();           // lädt das gewählte oder Default-Script
+  await loadScriptsIndex();
+  await loadJSON();
   renderBoardAuto();
 }
 document.readyState==='loading' ? document.addEventListener('DOMContentLoaded',boot) : boot();
