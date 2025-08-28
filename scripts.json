@@ -2,5 +2,6 @@
   "scripts": [
     { "title": "Horrorladen (fertig)", "src": "/horrorladen_final_with_acts.json" },
     { "title": "Anderes Stück", "src": "/anderes_stueck.json" },
+    "noch_eins.json"
   ]
 }
