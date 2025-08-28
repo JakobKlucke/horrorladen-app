@@ -44,7 +44,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 @media (min-width:760px){.controls{grid-template-columns:1fr 1fr auto}}
 .controls .cta{display:flex;justify-content:flex-end}
 
-/* === BUTTONS (Uiverse-Style, vereinheitlicht) === */
+/* Buttons – Duolingo/Uiverse */
 .btn{
   position:relative; appearance:button; background-color: var(--green); border: solid transparent;
   border-radius: 16px; border-width: 0 0 4px; color:#0b1220; cursor:pointer; display:inline-block;
@@ -61,13 +61,12 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .btn:active:after{ border-width:0 }
 .btn:active{ padding-bottom:10px; transform:translateY(2px) }
 .btn:disabled{opacity:.5; cursor:default}
-.btn.primary{ /* identisch, semantisch */ }
 .btn.secondary{ background:#fff; color:var(--ink); border:2px solid #00000014; text-transform:none; letter-spacing:.2px }
 .btn.secondary:after{display:none}
 .btn.blue{ background:var(--blue-dark); color:#fff }
 .btn.blue:after{ background:var(--blue) }
 
-/* Checkbox (Uiverse, fix Label sichtbar) */
+/* Checkbox */
 .checkbox-container{display:inline-flex;align-items:center;gap:.6rem;position:relative;padding-left:35px;cursor:pointer;user-select:none;color:var(--ink)}
 .custom-checkbox{position:absolute;opacity:0;height:0;width:0}
 .checkmark{position:absolute;top:0;left:0;height:25px;width:25px;background:#eee;border-radius:6px;transition:background-color .25s;box-shadow:0 2px 5px rgba(0,0,0,.2)}
@@ -77,8 +76,8 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .checkbox-container .label{color:var(--ink);font-weight:600}
 @keyframes checkAnim{0%{height:0}100%{height:10px}}
 
-/* Cards & Learn lines */
-.card{--border-radius:22px;--primary-color:#58CC02;--secondary-color:#3c3852;width:min(100%,42rem);padding:1.1rem;border-radius:var(--border-radius);background:#fff;border:2px solid #00000010;box-shadow:var(--shadow);margin:1rem auto;position:relative;color:var(--ink)}
+/* Cards & Lines */
+.card{--border-radius:22px;width:min(100%,42rem);padding:1.1rem;border-radius:var(--border-radius);background:#fff;border:2px solid #00000010;box-shadow:var(--shadow);margin:1rem auto;position:relative;color:var(--ink)}
 .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid #00000010;color:var(--ink)}
 .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25);color:var(--ink)}
 .faded{opacity:.9;color:var(--muted);font-size:.96rem}
@@ -100,7 +99,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .pager .info{font-size:.92rem;color:var(--muted)}
 .pager .group{display:flex;gap:.5rem}
 
-/* Home tiles + Bottom nav (Emoji) */
+/* Home & Bottom Nav */
 .home-menu{display:grid;gap:.8rem}
 @media (min-width:640px){.home-menu{grid-template-columns:1fr 1fr}}
 @media (min-width:900px){.home-menu{grid-template-columns:repeat(4,1fr)}}
@@ -109,7 +108,6 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;max-width:64rem;margin:0 auto}
 .navbtn{display:grid;place-items:center;height:56px;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:20px;color:var(--ink)}
 
-/* Visibility helpers */
 [data-view]{display:none}[data-view].active{display:block}
 @keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
@@ -255,6 +253,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
         <div><label for="playerName">Spielername</label><input id="playerName" type="text" placeholder="z.B. Alex"></div>
         <div class="cta"><button class="btn primary" id="saveSettings" data-sfx>Speichern</button></div>
       </div>
+
       <div style="display:grid;gap:.6rem">
         <label for="scriptSelect">JSON-Quelle</label>
         <select id="scriptSelect"></select>
@@ -269,6 +268,17 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
         <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
         <div class="faded" id="discHint"></div>
       </div>
+
+      <!-- Index-Picker für scripts.json -->
+      <div id="indexPicker" class="panel" style="display:none; margin-top:.4rem">
+        <div class="title" style="font-size:1rem;margin-bottom:.4rem">Skript aus Index wählen</div>
+        <div class="controls" style="grid-template-columns:1fr auto">
+          <div><label for="indexScriptSel">Skripte in dieser Datei</label><select id="indexScriptSel"></select></div>
+          <div class="cta"><button class="btn primary" id="loadFromIndexBtn" data-sfx>Dieses Skript laden</button></div>
+        </div>
+        <div class="faded" id="indexSourceNote">Hinweis: Die aktuell geladene Datei ist ein Index (scripts.json).</div>
+      </div>
+
       <div class="controls" style="grid-template-columns:repeat(2,1fr)">
         <label class="checkbox-container" style="padding-left:35px">
           <input id="toggleSound" class="custom-checkbox" type="checkbox" checked>
@@ -302,7 +312,9 @@ let reduceMotion=JSON.parse(localStorage.getItem(LS.motion)??'false');
 
 const state={items:[],roles:[],actsList:[],scenesByAct:{},songsSet:new Set(),
   pageIndex:0,pageSizeClassic:8,pageSizeSingle:1,lastFiltered:[],
-  viewerIndex:0,viewerPageSize:20,viewerLast:[],viewerHighlightRole:''};
+  viewerIndex:0,viewerPageSize:20,viewerLast:[],viewerHighlightRole:'',
+  indexList:[]
+};
 
 const norm=s=>(s||'').trim().toUpperCase();
 const treatSpeaker=sp=>{const s=norm(sp); if(s==='DIE ANDEREN')return'ALLE'; if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__'; return s;};
@@ -328,10 +340,45 @@ const sfxGood =()=>tone([0,7,12,19],.07,'sine',720);
 const sfxBad  =()=>tone([0,-3,-5],.09,'sawtooth',200);
 document.addEventListener('click',e=>{ if(e.target.closest('[data-sfx]')) sfxClick(); },{capture:true});
 
-/* ---------- JSON Flatten ---------- */
+/* ---------- JSON/Index ---------- */
 const scanTitleLike=o=>{if(!o||typeof o!=='object')return null;for(const k of ['title','name','label','id'])if(typeof o[k]==='string'&&o[k].trim())return o[k].trim();return null;}
 const normalizeTitle=v=> typeof v==='string'?v: (typeof v==='number'?String(v): (v&&typeof v==='object'? (scanTitleLike(v)||'') : '') );
 
+function isFullScript(data){
+  if(!data) return false;
+  if(Array.isArray(data)) return data.some(n=>typeof n==='object' && (n.type||'')==='speaker_block') || data.some(n=>n&&n.acts) || data.some(n=>n.children||n.segments||n.items);
+  if(typeof data==='object') return !!(data.acts || data.segments || data.children || data.items);
+  return false;
+}
+function parseIndexList(data){
+  const out=[];
+  if(!data) return out;
+  if(Array.isArray(data)){
+    data.forEach((it,i)=>{
+      if(typeof it==='string') out.push({label:it, value:it});
+      else if(it && typeof it==='object'){
+        const value = it.src || it.file || it.path || it.url || '';
+        const label = it.title || it.name || it.label || value || `Skript ${i+1}`;
+        if(value) out.push({label,value});
+      }
+    });
+  } else if (typeof data==='object'){
+    if(Array.isArray(data.scripts)) return parseIndexList(data.scripts);
+    if(typeof data.scripts==='object'){
+      Object.entries(data.scripts).forEach(([k,v])=>{
+        if(typeof v==='string') out.push({label:k||v, value:v});
+        else if(v && typeof v==='object'){
+          const value=v.src||v.file||v.path||'';
+          const label=v.title||v.name||k||value;
+          if(value) out.push({label,value});
+        }
+      });
+    }
+  }
+  return out;
+}
+
+/* ---------- Flatten ---------- */
 function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   if(!node||typeof node!=='object')return;
   const t=(node.type||'').toLowerCase();
@@ -353,8 +400,32 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
 }
 
+/* ---------- Loader ---------- */
+const jsonLabel=document.getElementById('jsonSrcLabel');
+const indexPicker=document.getElementById('indexPicker');
+const indexScriptSel=document.getElementById('indexScriptSel');
+const loadFromIndexBtn=document.getElementById('loadFromIndexBtn');
+
 async function loadJSON(){
-  const res=await fetch(jsonSrc,{cache:'no-store'}); const data=await res.json();
+  jsonLabel.textContent=jsonSrc;
+  indexPicker.style.display='none';
+  const res=await fetch(jsonSrc,{cache:'no-store'});
+  const data=await res.json();
+
+  // Ist es ein Index (wie dein Beispiel)?
+  const indexList = parseIndexList(data);
+  if(indexList.length>0 && !isFullScript(data)){
+    state.indexList=indexList;
+    indexScriptSel.innerHTML=indexList.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+    indexPicker.style.display='';
+    // Default: erstes Skript im Index vorauswählen
+    if(indexList[0]) indexScriptSel.value=indexList[0].value;
+    // Ins Settings-View wechseln, damit es sofort sichtbar ist
+    switchViewImmediate('settings');
+    return;
+  }
+
+  // Vollständiges Skript laden/flatten
   const out=[]; const meta={roles:new Set(),songs:new Set()};
   Array.isArray(data)?flattenAny({segments:data},{},out,meta):flattenAny(data,{},out,meta);
   state.items=out; state.roles=[...meta.roles];
@@ -369,6 +440,15 @@ async function loadJSON(){
   }
   populateFilters();
 }
+
+loadFromIndexBtn.onclick=()=>{
+  const file=indexScriptSel.value;
+  if(!file) return;
+  localStorage.setItem(LS.src,file);
+  jsonSrc=file;
+  sfxOpen();
+  loadJSON();
+};
 
 /* ---------- Navigation ---------- */
 let currentView='home';
@@ -525,11 +605,12 @@ function renderBoard(list){ list.sort((a,b)=>b.score-a.score); boardDiv.innerHTM
 
 /* ---------- Settings ---------- */
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
-const scriptSelect=document.getElementById('scriptSelect'), manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn'), discHint=document.getElementById('discHint'), jsonLabel=document.getElementById('jsonSrcLabel');
-playerName.value=localStorage.getItem(LS.name)||''; jsonLabel.textContent=jsonSrc;
+const scriptSelect=document.getElementById('scriptSelect'), manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn'), discHint=document.getElementById('discHint');
+playerName.value=localStorage.getItem(LS.name)||''; document.getElementById('jsonSrcLabel').textContent=jsonSrc;
 saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); sfxGood(); };
 manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'none'; };
-loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; jsonLabel.textContent=jsonSrc; sfxOpen(); loadJSON(); };
+loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; sfxOpen(); loadJSON(); };
+
 async function discoverJsonFiles(){
   discHint.textContent='Suche JSONs…';
   const found=new Set([jsonSrc,'horrorladen_final_with_acts.json','data.json','script.json','scripts.json']);
