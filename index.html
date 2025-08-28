@@ -2,74 +2,178 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Horrorladen – Lernapp</title>
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Horrorladen – Lernapp (Duolingo-Style)</title>
+  <meta name="theme-color" content="#58CC02" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --c-lapis:#22577a; --c-verdigris:#38a3a5; --c-emerald:#57cc99; --c-light:#80ed99; --c-tea:#c7f9cc;
-      --bg:#0f172a; --panel:#0b1220; --text:#e5f7ef; --muted:#bfe7d3;
-      --ios:cubic-bezier(.22,.61,.36,1); --shadow:0 12px 40px rgba(0,0,0,.35);
+      /* Farbpalette */
+      --green:#58CC02;
+      --green-strong:#8EE000;
+      --green-dark:#1FAF38;
+      --yellow:#FFC715;
+      --blue:#1CB0F6;
+      --purple:#A560E8;
+      --red:#FF4B4B;
+      --ink:#2F2F2F;
+      --paper:#FFFFFF;
+      --bg:#F6F7FB;
+      --muted:#6F6F6F;
+      --ring: rgba(88,204,2,.35);
+      --shadow:0 12px 30px rgba(0,0,0,.10);
+      --radius:20px;
+      /* Motion tokens (nahe Mobile-App) */
+      --duo-ease-out: cubic-bezier(.17,.67,.16,1);
+      --duo-ease-in: cubic-bezier(.5,0,1,.5);
+      --duo-spring: cubic-bezier(.2,.8,.2,1);
+      --t-fast: 120ms; --t-reg: 200ms; --t-slow: 320ms;
     }
-    html{font-size:16px}
-    body{margin:0;min-height:100dvh;background:linear-gradient(180deg,var(--bg),#0a192f);color:var(--text);
-         font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    header{position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top);
-           backdrop-filter:blur(10px);background:color-mix(in srgb,#0b1220 70%,transparent);
-           border-bottom:1px solid rgba(199,249,204,.15)}
-    .wrap{max-width:60rem;margin:0 auto;padding:12px}
-    .hero{display:flex;align-items:center;gap:.9rem;padding:.9rem .25rem}
-    .hero .logo{width:2.8rem;height:2.8rem;border-radius:1rem;background:linear-gradient(135deg,var(--c-light),var(--c-emerald));
-      display:flex;align-items:center;justify-content:center;color:#0b1220;font-weight:900;box-shadow:var(--shadow)}
-    .hero .title{font-weight:900;font-size:1.35rem}
-    .badge{font-size:.78rem;padding:.2rem .5rem;border-radius:999px;background:rgba(87,204,153,.15);color:var(--c-light);}
-    .compact .hero{padding:.4rem .25rem; gap:.6rem}
-    .compact .hero .logo{width:2rem;height:2rem;border-radius:.6rem}
-    .compact .hero .title{font-size:1rem}
-    nav.menu{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0}
+
+    html{font-size:16px;height:100dvh;overscroll-behavior:none;background:var(--bg);-webkit-text-size-adjust:100%;}
+    *{-webkit-tap-highlight-color:transparent;}
+    body{
+      margin:0;height:100dvh;display:flex;flex-direction:column;
+      background:var(--bg);color:var(--ink);
+      font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden; /* verhindert Bounce */
+      touch-action: manipulation; /* verhindert Double-Tap-Zoom */
+    }
+
+    /* Header */
+    header{position:sticky;top:0;z-index:30;padding-top:env(safe-area-inset-top);
+      backdrop-filter:saturate(120%) blur(10px);
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.75));
+      border-bottom:1px solid rgba(0,0,0,.06)
+    }
+    .wrap{max-width:64rem;margin:0 auto;padding:12px}
+    main.wrap{flex:1 1 auto; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;}
+
+    .hero{display:flex;align-items:center;gap:12px;padding:.8rem .25rem}
+    .logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--green-strong));
+      display:grid;place-items:center;box-shadow:var(--shadow);position:relative;overflow:hidden;
+      transition:transform var(--t-reg) var(--duo-ease-out);
+    }
+    .logo:active{transform:scale(.94);}
+    .logo svg{width:36px;height:36px;display:block}
+
+    .title{font-family:Nunito, Inter, sans-serif;font-weight:900;font-size:1.35rem;letter-spacing:.2px}
+    .badge{font-size:.8rem;padding:.25rem .6rem;border-radius:999px;background:rgba(88,204,2,.15);color:#0D6A00;font-weight:700}
+
+    .compact .hero{padding:.45rem .25rem;gap:.55rem}
+    .compact .logo{width:36px;height:36px;border-radius:10px}
+    .compact .title{font-size:1.05rem}
+
+    /* Bottom Nav (mobile-first) */
+    .bottom-nav{position:sticky;bottom:0;z-index:25}
+    .bottom-nav .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
+
     nav.menu button{
       display:flex;gap:.6rem;align-items:center;justify-content:center;
-      padding:1rem;border-radius:16px;border:1px solid rgba(199,249,204,.18);
-      background:linear-gradient(180deg,rgba(34,87,122,.12),rgba(56,163,165,.08));
-      text-decoration:none;color:var(--text);font-weight:800; transition: transform .15s var(--ios);
-      min-height:64px;
+      padding:.85rem;border-radius:18px;border:2px solid rgba(0,0,0,.06);
+      background:linear-gradient(180deg,#fff,#F5FFF0);
+      color:var(--ink);font-weight:800;letter-spacing:.2px;
+      min-height:56px; box-shadow:var(--shadow);
+      will-change: transform;
+      transition: transform var(--t-fast) var(--duo-spring), box-shadow var(--t-reg) var(--duo-ease-out), border-color var(--t-reg) var(--duo-ease-out);
     }
-    nav.menu button:hover{ transform: translateY(-1px); }
+    nav.menu button:hover{ transform: translateY(-1px) scale(1.02);}
+    nav.menu button:active{ transform: translateY(0) scale(.98); box-shadow:0 4px 12px rgba(0,0,0,.10)}
+
+    /* Panels & Inputs */
     .panel{
-      background:linear-gradient(180deg,rgba(34,87,122,.12),rgba(56,163,165,.08));
-      border:1px solid rgba(199,249,204,.18);
-      border-radius:16px;padding:.85rem;box-shadow:var(--shadow)
+      background:linear-gradient(180deg,#fff,#F8FFF4);
+      border:2px solid rgba(0,0,0,.06);
+      border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+      animation: slideUp var(--t-slow) var(--duo-ease-out);
     }
-    label{font-size:.9rem;color:var(--muted);display:block;margin-bottom:.25rem}
-    select,input[type=number],button{
-      width:100%;padding:.8rem 1rem;border-radius:14px;border:1px solid rgba(199,249,204,.28);
-      background:rgba(11,18,32,.6);color:var(--text);min-height:48px;outline:none;
-      transition:transform .18s var(--ios)}
-    button{font-weight:800;letter-spacing:.01em}
-    button.primary{background:linear-gradient(180deg,var(--c-emerald),var(--c-verdigris));color:#0b1220}
-    button.secondary{background:rgba(199,249,204,.1)}
-    .controls{display:grid;gap:.6rem}
+    label{font-size:.95rem;color:var(--muted);display:block;margin-bottom:.35rem}
+
+    select,input[type=number],input[type=text],button{
+      width:100%;padding:.85rem 1rem;border-radius:16px;border:2px solid rgba(0,0,0,.08);
+      background:#fff;color:var(--ink);min-height:48px;outline:none;
+      transition: transform var(--t-fast) var(--duo-spring), border-color var(--t-reg) var(--duo-ease-out), box-shadow var(--t-reg) var(--duo-ease-out)
+    }
+    select:focus,input:focus{border-color:var(--green); box-shadow:0 0 0 6px var(--ring); transform: translateY(-1px)}
+    button{font-weight:800;letter-spacing:.02em;cursor:pointer}
+    button.primary{background:linear-gradient(180deg,var(--green-strong),var(--green));color:#0b1220;border-color:transparent}
+    button.secondary{background:#fff}
+
+    .controls{display:grid;gap:.75rem}
     @media (min-width:760px){ .controls{grid-template-columns:repeat(4,1fr)} }
     @media (max-width:759px){ .controls{grid-template-columns:repeat(2,1fr)} }
-    .exchange{margin:1rem 0;padding:1rem;border-radius:16px;background:rgba(34,87,122,.14);border:1px solid rgba(199,249,204,.2)}
-    .line{padding:.8rem .9rem;border-radius:14px;background:rgba(11,18,32,.55);border:1px solid rgba(199,249,204,.2)}
-    .line.you{background:rgba(128,237,153,.14);border-color:rgba(128,237,153,.45)}
-    .speaker{font-size:.9rem;letter-spacing:.04em;color:var(--c-light)}
-    .card{margin:1rem 0;padding:1.2rem;border-radius:18px;background:rgba(11,18,32,.55);border:1px solid rgba(199,249,204,.25);
-      text-align:center;display:flex;flex-direction:column;gap:.5rem}
+
+    .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid rgba(0,0,0,.06)}
+    .line{padding:.85rem 1rem;border-radius:14px;background:#F7FAFF;border:2px solid rgba(0,0,0,.06)}
+    .line.you{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25)}
+
+    .card{margin:1rem 0;padding:1.1rem;border-radius:22px;background:#fff;border:2px solid rgba(0,0,0,.06);
+      text-align:center;display:flex;flex-direction:column;gap:.6rem;box-shadow:var(--shadow);
+      animation: slideUp var(--t-slow) var(--duo-ease-out);
+    }
     .choices{display:grid;gap:.6rem;margin-top:.6rem}
-    .big{font-size:1.05rem;line-height:1.5}
-    .faded{opacity:.7;color:var(--muted);font-size:.9rem}
-    .cloze-gap{border-bottom:2px dotted var(--c-light); padding:0 .25rem}
+
+    .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .65rem;border-radius:999px;background:#fff;border:2px solid rgba(0,0,0,.06); font-weight:800}
+    .pill.heart{color:var(--red)}
+
+    .cloze-gap{border-bottom:3px dotted var(--green-dark); padding:0 .25rem}
+
     [data-view]{display:none}
     [data-view].active{display:block}
+
+    /* Filter-Bar (Acts/Scenes/Songs/Lyrics) */
+    .filters{display:grid;gap:.6rem;margin:.6rem 0}
+    @media (min-width:760px){ .filters{grid-template-columns:repeat(4,1fr)} }
+    .chipbar{display:flex;gap:.5rem;overflow:auto;padding:.2rem .1rem}
+    .chip{flex:0 0 auto; padding:.45rem .8rem;border-radius:999px;border:2px solid rgba(0,0,0,.06); background:#fff;font-weight:800}
+    .chip.active{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25)}
+
+    /* Micro-Animationen */
+    @keyframes slideUp{0%{opacity:0; transform:translateY(10px)}100%{opacity:1; transform:translateY(0)}}
+    .enter{animation: slideUp var(--t-slow) var(--duo-ease-out);}
+
+    .pop{animation:pop .36s var(--duo-spring)}
+    @keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+    .shake{animation:shake .36s cubic-bezier(.36,.07,.19,.97)}
+    @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+
+    .flash{animation:flash .7s ease}
+    @keyframes flash{0%{background:#fff}30%{background:#E5FFD6}100%{background:#fff}}
+
+    /* Level-Up Overlay / View-Transition */
+    #levelup{position:fixed;inset:0;pointer-events:none;display:grid;place-items:center;z-index:60}
+    .ripple{position:absolute;inset:auto; width:120px;height:120px;border-radius:50%; background:radial-gradient(circle at center, var(--green-strong), var(--green)); transform:scale(0); opacity:.9;}
+    .ripple.run{animation:rippleGrow 420ms var(--duo-spring) forwards}
+    @keyframes rippleGrow{to{transform:scale(20); opacity:0}}
+    .levelup-card{position:relative;background:#fff;border:2px solid rgba(0,0,0,.06);box-shadow:var(--shadow);border-radius:22px;padding:16px 20px;display:flex;align-items:center;gap:10px;transform:translateY(8px);opacity:0}
+    .levelup-card.show{animation:cardIn 360ms var(--duo-ease-out) forwards}
+    @keyframes cardIn{to{transform:translateY(0);opacity:1}}
   </style>
 </head>
 <body>
 <header id="hdr">
   <div class="wrap">
     <div class="hero">
-      <div class="logo">🌱</div>
+      <div class="logo" aria-hidden="true">
+        <!-- Simple Owl-ish mark -->
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="r"><rect rx="16" width="64" height="64"/></clipPath>
+          </defs>
+          <g clip-path="url(#r)">
+            <rect width="64" height="64" fill="#8EE000"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/>
+            <circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/>
+            <circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <path d="M10 44 C 20 52, 44 52, 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </g>
+        </svg>
+      </div>
       <div>
         <div class="title">Horrorladen – Lernapp</div>
         <div class="badge" id="subtitle">Willkommen</div>
@@ -81,7 +185,7 @@
 <main class="wrap">
   <!-- HOME -->
   <section data-view="home" class="active">
-    <div class="panel">
+    <div class="panel pop">
       <nav class="menu">
         <button data-nav="learn">📖 Lernen</button>
         <button data-nav="survival">🎮 Survival</button>
@@ -93,26 +197,54 @@
 
   <!-- LEARN -->
   <section data-view="learn">
-    <div class="panel controls">
-      <div>
-        <label for="roleSel">Rolle</label>
-        <select id="roleSel"></select>
+    <div class="panel pop">
+      <!-- Filter-Bar -->
+      <div class="filters">
+        <div>
+          <label for="actFilter">Akt</label>
+          <select id="actFilter"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="sceneFilter">Szene</label>
+          <select id="sceneFilter"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="songFilter">Song</label>
+          <select id="songFilter"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="lyricsOnly">Lyrics-only</label>
+          <label style="display:flex;gap:.5rem;align-items:center">
+            <input id="lyricsOnly" type="checkbox" /> <span>nur Gesang</span>
+          </label>
+        </div>
       </div>
-      <div id="blockWrap">
-        <label for="sessionSize">Blockgröße</label>
-        <input id="sessionSize" type="number" min="1" max="25" value="5"/>
-      </div>
-      <div>
-        <label for="modeSel">Modus</label>
-        <select id="modeSel">
-          <option value="classic">Classic</option>
-          <option value="flash">Flashcards</option>
-          <option value="cloze">Cloze</option>
-        </select>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button class="primary" id="startLearn">Start</button>
+
+      <!-- Schnellwahl Akte -->
+      <div id="actChips" class="chipbar" aria-label="Akte"></div>
+
+      <!-- Lern-Controls -->
+      <div class="controls" style="margin-top:.6rem">
+        <div>
+          <label for="roleSel">Rolle</label>
+          <select id="roleSel"></select>
+        </div>
+        <div id="blockWrap">
+          <label for="sessionSize">Blockgröße</label>
+          <input id="sessionSize" type="number" min="1" max="25" value="5"/>
+        </div>
+        <div>
+          <label for="modeSel">Modus</label>
+          <select id="modeSel">
+            <option value="classic">Classic</option>
+            <option value="flash">Flashcards</option>
+            <option value="cloze">Cloze</option>
+          </select>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button class="primary" id="startLearn">Start</button>
+        </div>
       </div>
     </div>
     <div id="learnRoot"></div>
@@ -120,24 +252,33 @@
 
   <!-- SURVIVAL -->
   <section data-view="survival">
-    <div class="panel controls">
+    <div class="panel controls pop">
       <div>
         <label for="roleSurv">Rolle</label>
         <select id="roleSurv"></select>
       </div>
-      <div><label>Herzen</label><div id="heartPill" class="faded">❤️❤️❤️</div></div>
-      <div><label>Score</label><div id="scorePill" class="faded">0</div></div>
-      <div><label>&nbsp;</label><button class="primary" id="startSurv">Neu starten</button></div>
+      <div>
+        <label>Herzen</label>
+        <div id="heartPill" class="pill heart" aria-live="polite">❤️❤️❤️</div>
+      </div>
+      <div>
+        <label>Score</label>
+        <div id="scorePill" class="pill" aria-live="polite">0</div>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="primary" id="startSurv">Neu starten</button>
+      </div>
     </div>
     <div id="survRoot"></div>
   </section>
 
   <!-- SCORES -->
   <section data-view="scores">
-    <div class="panel controls">
+    <div class="panel controls pop">
       <div>
         <label for="nameField">Dein Name</label>
-        <input id="nameField" placeholder="z.B. Alex"/>
+        <input id="nameField" type="text" placeholder="z.B. Alex"/>
       </div>
       <div>
         <label for="boardRole">Rolle</label>
@@ -148,82 +289,173 @@
         <select id="boardLimit"><option>10</option><option selected>25</option><option>50</option></select>
       </div>
       <div>
-        <label>&nbsp;</label><button class="primary" id="refreshBoard">Aktualisieren</button></div>
+        <label>&nbsp;</label>
+        <button class="primary" id="refreshBoard">Aktualisieren</button>
+      </div>
     </div>
     <div id="board" class="list"></div>
   </section>
 
   <!-- SETTINGS -->
   <section data-view="settings">
-    <div class="panel">
-      <div class="list">
-        <div class="row"><span>JSON-Quelle</span><span><code id="jsonSrcLabel">script.json</code></span></div>
-        <div class="row"><span>Gesten-Navigation</span><span>aktiv</span></div>
+    <div class="panel pop">
+      <div class="list" style="display:grid;gap:.8rem">
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+          <span>JSON-Quelle</span><span><code id="jsonSrcLabel">horrorladen_final_with_acts.json</code></span>
+        </div>
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Gesten-Navigation</span><span>aktiv</span>
+        </div>
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Soundeffekte</span>
+          <label style="display:inline-flex;gap:.5rem;align-items:center">
+            <input id="toggleSound" type="checkbox" checked /> <span>an</span>
+          </label>
+        </div>
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Sound-Pack</span>
+          <select id="soundPackSel">
+            <option value="synth" selected>Synth (leicht)</option>
+            <option value="chime">Chime (gläsern)</option>
+          </select>
+        </div>
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Bewegung reduzieren</span>
+          <label style="display:inline-flex;gap:.5rem;align-items:center">
+            <input id="toggleMotion" type="checkbox" /> <span>aktiv</span>
+          </label>
+        </div>
       </div>
     </div>
   </section>
 </main>
 
-<div class="wrap">
+<div id="levelup" aria-hidden="true"></div>
+
+<div class="wrap bottom-nav">
   <nav class="menu">
-    <button data-nav="home">🏠</button>
-    <button data-nav="learn">📖</button>
-    <button data-nav="survival">🎮</button>
-    <button data-nav="scores">🏆</button>
+    <button data-nav="home" aria-label="Home">🏠</button>
+    <button data-nav="learn" aria-label="Lernen">📖</button>
+    <button data-nav="survival" aria-label="Survival">🎮</button>
+    <button data-nav="scores" aria-label="Highscores">🏆</button>
   </nav>
 </div>
 
+<!-- Delight libs -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
 
 <script>
+/* =========================
+   JSON-Loader (acts/scenes/songs + speaker_blocks) – robust & rekursiv
+   ========================= */
 const q=new URLSearchParams(location.search);
-const jsonSrc=q.get('src')||'script.json';
-document.getElementById("jsonSrcLabel").textContent=jsonSrc;
+const jsonSrc=q.get('src')||'horrorladen_final_with_acts.json';
+const jsonLabel = document.getElementById('jsonSrcLabel'); if(jsonLabel) jsonLabel.textContent=jsonSrc;
 
-// === Hilfsfunktionen ===
-const norm=s=>(s||'').trim().toUpperCase();
-const treatSpeaker=sp=>{
-  const s=norm(sp);
-  if(s==='DIE ANDEREN')return'ALLE';
-  if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__';
+let soundOn=true, reduceMotion=false, soundPack='synth', currentView='home';
+
+const state = {
+  items: [],           // {type:'dialogue', speaker, text, kind:'line'|'lyric', meta:{act,scene,song}}
+  acts: [], scenes: [], songs: [],
+  roles: []
+};
+
+const norm = s => (s||'').trim().toUpperCase();
+const treatSpeaker = sp => {
+  const s = norm(sp);
+  if (s==='DIE ANDEREN') return 'ALLE';
+  if (s==='BARAPAPAPA' || s==='BARAPAPAPABA') return '__IGNORE__';
   return s;
 };
-const isIncludedForRole=(sp,chosen)=>{
-  const s=treatSpeaker(sp),ch=norm(chosen);
-  if(!s||s==='__IGNORE__')return false;
-  if(s==='ALLE')return true;
-  return s===ch;
-};
 
-function buildExchanges(items,chosen){
-  const d=(items||[]).filter(it=>it.type==='dialogue').map(it=>({...it,speaker:treatSpeaker(it.speaker)})).filter(it=>it.speaker!=='__IGNORE__');
-  const ex=[];
-  let i=0,last=-1;
-  while(i<d.length){
-    const it=d[i];
-    if(isIncludedForRole(it.speaker,chosen)){
-      const ctx=[];
-      for(let j=last+1;j<i;j++){
-        const pj=d[j];
-        if(!isIncludedForRole(pj.speaker,chosen))ctx.push(pj);
-      }
-      const yours=[];
-      let k=i;
-      while(k<d.length&&isIncludedForRole(d[k].speaker,chosen)){yours.push(d[k]);k++;}
-      ex.push({context:ctx,yours});
-      last=k-1;
-      i=k;
-    } else i++;
-  }
-  return ex;
+function scanTitleLike(node, keys=['title','name','label','id']) {
+  for (const k of keys) if (node && typeof node[k]==='string' && node[k].trim()) return node[k].trim();
+  return null;
 }
+
+function flattenAny(node, ctx={act:null,scene:null,song:null}, out=[], metaSets){
+  if (!node || typeof node!=='object') return;
+
+  // Node-level context
+  const t = (node.type||'').toLowerCase();
+
+  if (t==='act' || 'act' in node) {
+    const actName = scanTitleLike(node) || node.act || ctx.act;
+    if (actName) ctx={...ctx, act: String(actName)};
+  }
+  if (t==='scene' || 'scene' in node) {
+    const sceneName = scanTitleLike(node) || node.scene || ctx.scene;
+    if (sceneName) ctx={...ctx, scene: String(sceneName)};
+  }
+  if (t==='song' || 'song' in node) {
+    const songName = scanTitleLike(node) || node.song || ctx.song;
+    if (songName) ctx={...ctx, song: String(songName)};
+  }
+
+  // speaker_block
+  if (t==='speaker_block' && node.speaker) {
+    const speaker = node.speaker;
+    const content = Array.isArray(node.content) ? node.content : [];
+    content.forEach(c=>{
+      if (!c || !c.type) return;
+      const ty = String(c.type).toLowerCase();
+      if (ty==='line' || ty==='lyric') {
+        const text = (c.text||'').trim();
+        if (text) {
+          out.push({type:'dialogue', speaker, text, kind: ty, meta:{...ctx}});
+          metaSets.acts.add(ctx.act||''); metaSets.scenes.add(ctx.scene||''); metaSets.songs.add(ctx.song||'');
+          metaSets.roles.add(norm(speaker));
+        }
+      }
+    });
+  }
+
+  // Recurse into known children arrays
+  const kids = []
+    .concat(node.segments||[])
+    .concat(node.children||[])
+    .concat(node.parts||[])
+    .concat(node.items||[])
+    .concat(Array.isArray(node) ? node : []);
+  kids.forEach(child => flattenAny(child, ctx, out, metaSets));
+}
+
+async function loadJSON(){
+  const res = await fetch(jsonSrc, {cache:'no-store'});
+  const data = await res.json();
+
+  const out=[]; const metaSets={acts:new Set(),scenes:new Set(),songs:new Set(),roles:new Set()};
+  if (Array.isArray(data)) flattenAny({segments:data}, {}, out, metaSets);
+  else flattenAny(data, {}, out, metaSets);
+
+  // roles vom Feld roles übernehmen, sonst aus Sprecher sammeln
+  let roles=[];
+  if (data && Array.isArray(data.roles) && data.roles.length){
+    roles = data.roles.map(r => typeof r==='string' ? norm(r) : norm(r.name||''));
+  } else roles = [...metaSets.roles].filter(Boolean);
+
+  state.items = out;
+  state.acts = [...metaSets.acts].filter(Boolean);
+  state.scenes = [...metaSets.scenes].filter(Boolean);
+  state.songs = [...metaSets.songs].filter(Boolean);
+  state.roles = roles;
+
+  populateFiltersAndRoles();
+  document.dispatchEvent(new CustomEvent('script-ready', {detail:{src:jsonSrc, count:state.items.length}}));
+}
+
+/* =========================
+   UI Helpers & Rendering
+   ========================= */
 function el(tag,attrs={},...children){
   const n=document.createElement(tag);
-  for(const[k,v]of Object.entries(attrs)){
-    if(k==='class')n.className=v;else if(k==='html')n.innerHTML=v;else n.setAttribute(k,v);
+  for (const[k,v]of Object.entries(attrs)){
+    if(k==='class') n.className=v;
+    else if(k==='html') n.innerHTML=v;
+    else n.setAttribute(k,v);
   }
-  for(const c of children){if(c==null)continue;n.appendChild(typeof c==='string'?document.createTextNode(c):c);}
+  for(const c of children){ if(c==null) continue; n.appendChild(typeof c==='string'?document.createTextNode(c):c); }
   return n;
 }
 function escapeHtml(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -240,118 +472,236 @@ function makeCloze(text,ratio=.35){
   return{html:out,gaps};
 }
 
-// === Views Navigation ===
-const views=document.querySelectorAll("[data-view]");
-function showView(name){
-  views.forEach(v=>v.classList.toggle("active",v.dataset.view===name));
-  document.getElementById("hdr").classList.toggle("compact",name!=="home");
-  document.getElementById("subtitle").textContent=name==="home"?"Willkommen":name[0].toUpperCase()+name.slice(1);
+/* Motion & Haptik */
+const Motion = {
+  haptic(type='soft'){ try{ if(!('vibrate' in navigator)) return;
+    if(type==='success') navigator.vibrate(12);
+    else if(type==='error') navigator.vibrate([20,40,20]);
+    else navigator.vibrate(8);
+  }catch{} },
+  stagger(nodes, step=60){ nodes.forEach((n,i)=>{ n.style.animationDelay=(i*step)+'ms'; n.classList.add('enter');
+    n.addEventListener('animationend',()=>{n.style.animationDelay=''; n.classList.remove('enter');},{once:true}); }); }
+};
+
+/* Sounds */
+function playTone(steps=[0], duration=0.18, type='sine', base=440){
+  if(!soundOn||typeof window.AudioContext==='undefined') return;
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const osc=ctx.createOscillator(); const gain=ctx.createGain();
+  osc.type=type; osc.connect(gain); gain.connect(ctx.destination);
+  const now=ctx.currentTime; let t=now; gain.gain.setValueAtTime(.0001, now);
+  gain.gain.linearRampToValueAtTime(.22, now+.01);
+  steps.forEach(semi=>{ const f=base*Math.pow(2, semi/12); osc.frequency.setValueAtTime(f, t); t+=duration; });
+  gain.gain.exponentialRampToValueAtTime(.0001, t+.05);
+  osc.start(now); osc.stop(t+.06);
 }
-document.querySelectorAll("[data-nav]").forEach(btn=>btn.onclick=()=>showView(btn.dataset.nav));
+function sfxCorrect(){ if(soundPack==='chime') playTone([0,7,12,19], .08, 'triangle', 720); else playTone([0,4,7,12], .07, 'triangle', 660); Motion.haptic('success'); }
+function sfxWrong(){   if(soundPack==='chime') playTone([0,-2,-5], .09, 'sine', 200);    else playTone([0,-3,-5], .08, 'sawtooth', 180); Motion.haptic('error'); }
+function sfxOpen(){    if(soundPack==='chime') playTone([0,2,5,9,12], .06, 'sine', 560); else playTone([0,2,5,9,12], .06, 'square', 520); Motion.haptic('soft'); }
 
-// === Lernen ===
-const root=document.getElementById('learnRoot'),
-  roleSel=document.getElementById('roleSel'),
-  sessionSize=document.getElementById('sessionSize'),
-  modeSel=document.getElementById('modeSel'),
-  blockWrap=document.getElementById('blockWrap');
+/* Gems/Coins */
+function gemBurst(origin={x:window.innerWidth/2, y:window.innerHeight*0.6}){
+  const colors=['#FFD700','#FFF2A6','#8EE000','#58CC02','#1CB0F6'];
+  confetti({particleCount:36, spread:60, origin:{x:origin.x/window.innerWidth, y:origin.y/window.innerHeight}, scalar:1.1, colors});
+  setTimeout(()=>confetti({particleCount:22, spread:80, origin:{x:origin.x/window.innerWidth, y:(origin.y-40)/window.innerHeight}, scalar:.9, colors}),120);
+}
 
-function renderClassic(ex,N){
-  root.innerHTML='';
-  ex.slice(0,N).forEach(b=>{
-    const box=el('div',{class:'exchange'});
-    if(b.context.length){
-      const ctx=el('div',{class:'faded'},`${b.context[b.context.length-1].speaker}: ${b.context[b.context.length-1].text}`);
-      box.appendChild(ctx);
-    }
-    b.yours.forEach(l=>{
-      box.appendChild(el('div',{class:'line you'},`${l.speaker}: ${l.text}`));
-    });
-    root.appendChild(box);
+/* View Transition / LevelUp */
+const levelupEl=document.getElementById('levelup');
+function runViewTransition(targetName){
+  const r=el('div',{class:'ripple'}); r.style.left='50%'; r.style.bottom='16%'; r.style.transform='translate(-50%,0) scale(0)';
+  levelupEl.innerHTML=''; levelupEl.appendChild(r);
+  requestAnimationFrame(()=>{ r.classList.add('run'); });
+  setTimeout(()=>{ switchViewImmediate(targetName); }, 220);
+}
+function levelUpToast(text='Level Up!'){
+  const card=el('div',{class:'levelup-card'} , el('div',{html:'✨'}), el('div',{}, text));
+  levelupEl.appendChild(card); requestAnimationFrame(()=>card.classList.add('show'));
+  setTimeout(()=>{ levelupEl.innerHTML=''; }, 1200);
+}
+
+/* Filters & Roles UI */
+const actSel   = document.getElementById('actFilter');
+const sceneSel = document.getElementById('sceneFilter');
+const songSel  = document.getElementById('songFilter');
+const lyricsOnly = document.getElementById('lyricsOnly');
+const actChips = document.getElementById('actChips');
+
+const roleSel = document.getElementById('roleSel');
+const roleSurv = document.getElementById('roleSurv');
+const boardRole = document.getElementById('boardRole');
+
+function populateFiltersAndRoles(){
+  // Roles
+  roleSel.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
+  roleSurv.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
+  boardRole.innerHTML = '<option value="">Alle</option>' + state.roles.map(r=>`<option>${r}</option>`).join('');
+
+  // Filters
+  const fillSel = (sel, arr) => sel.innerHTML = '<option value="">Alle</option>' + arr.map(v=>`<option>${v}</option>`).join('');
+  fillSel(actSel, state.acts); fillSel(sceneSel, state.scenes); fillSel(songSel, state.songs);
+
+  // Chips for acts
+  actChips.innerHTML = '';
+  state.acts.forEach(a=>{
+    const chip=el('button',{class:'chip', type:'button'}, a);
+    chip.onclick=()=>{ actSel.value=a; renderLearn(); highlightChips(); };
+    actChips.appendChild(chip);
+  });
+  highlightChips();
+}
+
+function highlightChips(){
+  [...actChips.querySelectorAll('.chip')].forEach(ch=>{
+    ch.classList.toggle('active', ch.textContent===actSel.value && actSel.value!=='');
   });
 }
-function renderFlash(ex){
-  const pool=[];
-  ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});
-  let i=0,revealed=false;
-  root.innerHTML='';
-  const card=el('div',{class:'card'});
-  root.appendChild(card);
-  function show(){
-    const it=pool[i];
-    card.innerHTML='';
-    if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));
-    card.appendChild(el('div',{class:'big'},revealed?`${it.line.speaker}: ${it.line.text}`:`${it.line.speaker}: (verborgen)`));
-    if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));
+
+function applyFilters(items){
+  const role = roleSel.value;
+  const act = actSel.value, scene = sceneSel.value, song = songSel.value;
+  const lyrOnly = !!lyricsOnly.checked;
+
+  return items
+    .filter(it=>{
+      const sp = treatSpeaker(it.speaker);
+      if (!sp || sp==='__IGNORE__') return false;
+      if (sp!=='ALLE' && sp!==norm(role)) return false;
+      return true;
+    })
+    .filter(it=>{
+      if (act && (it.meta?.act||'') !== act) return false;
+      if (scene && (it.meta?.scene||'') !== scene) return false;
+      if (song && (it.meta?.song||'') !== song) return false;
+      if (lyrOnly && it.kind!=='lyric') return false;
+      return true;
+    });
+}
+
+/* Views Navigation */
+const views=document.querySelectorAll('[data-view]');
+function switchViewImmediate(name){
+  views.forEach(v=>{
+    const active = v.dataset.view===name;
+    v.classList.toggle('active',active);
+    if(active){ const cards = v.querySelectorAll('.panel,.card,.row'); Motion.stagger([...cards]); }
+  });
+  document.getElementById('hdr').classList.toggle('compact',name!=='home');
+  document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
+  currentView=name;
+}
+function showView(name){ if(name===currentView){return;} runViewTransition(name); }
+Array.from(document.querySelectorAll('[data-nav]')).forEach(btn=>btn.onclick=()=>showView(btn.dataset.nav));
+
+/* Lernen Render */
+const learnRoot=document.getElementById('learnRoot');
+const sessionSize=document.getElementById('sessionSize');
+const modeSel=document.getElementById('modeSel');
+const blockWrap=document.getElementById('blockWrap');
+
+function renderLearn(){
+  const items = applyFilters(state.items);
+  if (modeSel.value==='classic') renderClassic(items, parseInt(sessionSize.value)||5);
+  else if (modeSel.value==='flash') renderFlash(items);
+  else renderCloze(items);
+  blockWrap.style.display = (modeSel.value==='classic') ? 'block' : 'none';
+  sfxOpen();
+}
+
+function renderClassic(filtered, N){
+  learnRoot.innerHTML='';
+  const chunks = []; // baue Exchanges (einfach: je 1 Kontextzeile vor deiner Zeile)
+  for (let i=0;i<filtered.length;i++){
+    const line = filtered[i];
+    const prev = filtered[i-1] || null;
+    chunks.push({context: prev && treatSpeaker(prev.speaker)!==norm(roleSel.value) ? prev : null, yours: line});
   }
-  card.addEventListener('click',()=>{revealed=!revealed;show();});
+  chunks.slice(0,N).forEach(b=>{
+    const box=el('div',{class:'exchange'});
+    if(b.context){
+      const ctxDiv=el('div',{class:'faded row'},`${b.context.speaker}: ${b.context.text}`);
+      box.appendChild(ctxDiv);
+    }
+    const you=el('div',{class:'line you row'},`${b.yours.speaker}: ${b.yours.text}`);
+    box.appendChild(you);
+    learnRoot.appendChild(box);
+  });
+  Motion.stagger([...learnRoot.querySelectorAll('.row')], 40);
+}
+
+function renderFlash(filtered){
+  const pool = filtered.map((line,i)=>({line, prev: filtered[i-1]||null, next: filtered[i+1]||null}));
+  let idx=0, revealed=false;
+  learnRoot.innerHTML='';
+  const card=el('div',{class:'card'}); learnRoot.appendChild(card);
+
+  function show(){
+    const it=pool[idx]; if(!it) return;
+    card.innerHTML='';
+    if(it.prev) card.appendChild(el('div',{class:'faded row'},`${it.prev.speaker}: ${it.prev.text}`));
+    card.appendChild(el('div',{class:'big row'}, revealed ? `${it.line.speaker}: ${it.line.text}` : `${it.line.speaker}: (verborgen)`));
+    if(it.next) card.appendChild(el('div',{class:'faded row'},`${it.next.speaker}: ${it.next.text}`));
+    Motion.stagger([...card.querySelectorAll('.row')], 70);
+  }
+  card.addEventListener('click',()=>{ revealed=!revealed; if(revealed) sfxOpen(); show(); });
   show();
 }
-function renderCloze(ex){
-  const pool=[];
-  ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});
-  let i=0;
-  root.innerHTML='';
-  const card=el('div',{class:'card'});
-  root.appendChild(card);
-  function show(){
-    const it=pool[i];
+
+function renderCloze(filtered){
+  const pool = filtered.map((line,i)=>({line, prev: filtered[i-1]||null, next: filtered[i+1]||null}));
+  learnRoot.innerHTML='';
+  const card=el('div',{class:'card'}); learnRoot.appendChild(card);
+
+  function show(i=0){
+    const it=pool[i]; if(!it) return;
     card.innerHTML='';
-    if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));
+    if(it.prev) card.appendChild(el('div',{class:'faded row'},`${it.prev.speaker}: ${it.prev.text}`));
     const {html}=makeCloze(it.line.text,.35);
-    card.appendChild(el('div',{class:'big'},`${it.line.speaker}: ${html}`));
-    if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));
+    card.appendChild(el('div',{class:'big row', html:`${it.line.speaker}: ${html}`}));
+    if(it.next) card.appendChild(el('div',{class:'faded row'},`${it.next.speaker}: ${it.next.text}`));
+    Motion.stagger([...card.querySelectorAll('.row')], 70);
   }
-  show();
+  show(0);
 }
 
-document.getElementById('startLearn').onclick=()=>{
-  const data=window.__SCRIPT||{items:[]};
-  const role=roleSel.value;
-  const ex=buildExchanges(data.items||[],role);
-  if(modeSel.value==='classic'){renderClassic(ex,parseInt(sessionSize.value)||5);}
-  else if(modeSel.value==='flash'){renderFlash(ex);}
-  else{renderCloze(ex);}
-  blockWrap.style.display=(modeSel.value==='classic')?'block':'none';
-};
-modeSel.onchange=()=>{blockWrap.style.display=(modeSel.value==='classic')?'block':'none';};
+/* Start-Button + Filter-Events */
+document.getElementById('startLearn').onclick=renderLearn;
+modeSel.onchange=()=>{blockWrap.style.display=(modeSel.value==='classic')?'block':'none'; renderLearn();};
+sessionSize.oninput=()=>{ if(modeSel.value==='classic') renderLearn(); };
+[actSel, sceneSel, songSel, lyricsOnly, roleSel].forEach(elm=>elm.addEventListener('change', ()=>{ renderLearn(); highlightChips(); }));
 
-// === Survival ===
-const survRoot=document.getElementById("survRoot");
-let survLives=3,survScore=0,survPool=[];
+/* Survival */
+const survRoot=document.getElementById('survRoot');
+let survLives=3,survScore=0;
+function renderHearts(){ document.getElementById('heartPill').textContent='❤️'.repeat(Math.max(0,survLives)); }
+function renderScore(){ const pill=document.getElementById('scorePill'); pill.textContent=survScore; }
+
 function startSurv(){
-  const data=window.__SCRIPT||{items:[]};
-  const role=document.getElementById("roleSurv").value;
-  const ex=buildExchanges(data.items||[],role);
-  survPool=[];
-  ex.forEach(b=>b.yours.forEach(line=>survPool.push(line)));
-  survLives=3;survScore=0;
-  document.getElementById("heartPill").textContent="❤️❤️❤️";
-  document.getElementById("scorePill").textContent="0";
-  nextSurv();
+  const pool = applyFilters(state.items); // nutzt aktuelle Filter & Rolle
+  if(!pool.length){ survRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; return; }
+
+  survLives=3; survScore=0; renderHearts(); renderScore(); nextSurv(pool); sfxOpen();
 }
-function nextSurv(){
+function nextSurv(pool){
   if(survLives<=0){gameOver();return;}
   survRoot.innerHTML='';
-  const card=el('div',{class:'card'});
-  survRoot.appendChild(card);
-  const line=survPool[Math.floor(Math.random()*survPool.length)];
+  const card=el('div',{class:'card'}); survRoot.appendChild(card);
+  const line=pool[Math.floor(Math.random()*pool.length)];
   const correct=line.text;
-  const wrongs=survPool.filter(l=>l!==line).sort(()=>.5-Math.random()).slice(0,2).map(l=>l.text);
+  const wrongs=pool.filter(l=>l!==line).sort(()=>.5-Math.random()).slice(0,2).map(l=>l.text);
   const opts=[correct,...wrongs].sort(()=>.5-Math.random());
   card.appendChild(el('div',{class:'big'},`${line.speaker}: …`));
   const choices=el('div',{class:'choices'});
   opts.forEach(opt=>{
     const btn=el('button',{class:'secondary'},opt);
-    btn.onclick=()=>{
+    btn.onclick=(ev)=>{
       if(opt===correct){
-        survScore++;
-        document.getElementById("scorePill").textContent=survScore;
-        confetti({particleCount:40,spread:60,origin:{y:.6}});
+        survScore++; renderScore(); sfxCorrect();
+        gemBurst({x:(ev.clientX||window.innerWidth/2), y:(ev.clientY||window.innerHeight*0.6)});
       }else{
-        survLives--;document.getElementById("heartPill").textContent="❤️".repeat(survLives);
+        survLives--; renderHearts(); sfxWrong(); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
       }
-      nextSurv();
+      nextSurv(pool);
     };
     choices.appendChild(btn);
   });
@@ -359,63 +709,58 @@ function nextSurv(){
 }
 function gameOver(){
   survRoot.innerHTML='';
-  survRoot.appendChild(el('div',{class:'card big'},`Game Over! Score: ${survScore}`));
-  saveScore(survScore);
+  const over=el('div',{class:'card big'},`Game Over! Score: ${survScore}`);
+  survRoot.appendChild(over); saveScore(survScore); levelUpToast('Neuer Highscore? Prüfe die Liste!');
 }
-document.getElementById("startSurv").onclick=startSurv;
+document.getElementById('startSurv').onclick=startSurv;
 
-// === Highscores (GUN.js) ===
+/* Highscores (GUN.js) */
 const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);
 const board=gun.get('horrorladen-scores');
 function saveScore(score){
-  const name=document.getElementById("nameField").value||"Anon";
-  const role=document.getElementById("roleSurv").value;
+  const name=document.getElementById('nameField').value||'Anon';
+  const role=roleSurv.value;
   board.set({name,role,score,time:Date.now()});
 }
-document.getElementById("refreshBoard").onclick=async()=>{
-  const list=[];
-  board.map().once((data)=>{
-    if(data)list.push(data);
-    renderBoard(list);
-  });
+document.getElementById('refreshBoard').onclick=async()=>{
+  const list=[]; board.map().once((data)=>{ if(data)list.push(data); renderBoard(list); });
 };
 function renderBoard(list){
-  const limit=parseInt(document.getElementById("boardLimit").value)||25;
-  const roleFilter=document.getElementById("boardRole").value;
+  const limit=parseInt(document.getElementById('boardLimit').value)||25;
+  const roleFilter=boardRole.value;
   list.sort((a,b)=>b.score-a.score);
   const filtered=list.filter(x=>!roleFilter||x.role===roleFilter).slice(0,limit);
-  const div=document.getElementById("board");
-  div.innerHTML='';
+  const div=document.getElementById('board'); div.innerHTML='';
   filtered.forEach(r=>{
-    div.appendChild(el('div',{class:'row'},`${r.name} (${r.role||''})`,el('span',{},r.score)));
+    div.appendChild(el('div',{class:'row',style:'display:flex;justify-content:space-between;padding:.7rem 1rem;background:#fff;border:2px solid rgba(0,0,0,.06);border-radius:14px;margin:.35rem 0'},
+      `${r.name} ${r.role?`(${r.role})`:''}`, el('span',{}, r.score)));
   });
 }
 
-// === Gesten-Navigation (Zurück-Swipe) ===
+/* Gesten-Navigation (Zurück-Swipe) */
 let touchStartX=0;
-document.body.addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;});
-document.body.addEventListener("touchend",e=>{
-  const dx=e.changedTouches[0].screenX-touchStartX;
-  if(dx>80)showView("home");
-});
+addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;});
+addEventListener('touchend',e=>{ const dx=e.changedTouches[0].screenX-touchStartX; if(dx>80)showView('home'); });
 
-// === Initialisierung ===
-(async()=>{
-  try{
-    const res=await fetch(jsonSrc,{cache:'no-store'});
-    const j=await res.json();
-    window.__SCRIPT=j;
-    const roles=new Set();
-    (j.items||[]).forEach(it=>{
-      if(it.type==='dialogue'&&it.speaker)roles.add(norm(it.speaker));
-    });
-    roleSel.innerHTML=[...roles].map(r=>`<option>${r}</option>`).join('');
-    document.getElementById("roleSurv").innerHTML=[...roles].map(r=>`<option>${r}</option>`).join('');
-    document.getElementById("boardRole").innerHTML='<option value="">Alle</option>'+[...roles].map(r=>`<option>${r}</option>`).join('');
-  }catch{
-    root.textContent='Fehler beim Laden';
-  }
+/* Mobile: Zoom strikt unterbinden */
+(function(){
+  ['gesturestart','gesturechange','gestureend'].forEach(evt=>document.addEventListener(evt, e=>e.preventDefault(), {passive:false}));
+  document.addEventListener('touchmove', function(e){ if(typeof e.scale==='number' && e.scale!==1){ e.preventDefault(); } }, {passive:false});
+  let lastTouchEnd=0;
+  document.addEventListener('touchend', function(e){ const now=Date.now(); if(now - lastTouchEnd <= 300){ e.preventDefault(); } lastTouchEnd=now; }, {passive:false});
 })();
+
+/* Init */
+const toggleSound = document.getElementById('toggleSound');
+const toggleMotion = document.getElementById('toggleMotion');
+const soundPackSel = document.getElementById('soundPackSel');
+
+if(toggleSound){ soundOn = toggleSound.checked; toggleSound.onchange=()=>{soundOn=toggleSound.checked;}; }
+if(toggleMotion){ toggleMotion.onchange=()=>{reduceMotion=toggleMotion.checked; document.documentElement.style.setProperty('scroll-behavior', reduceMotion?'auto':'smooth'); }; }
+if(soundPackSel){ soundPackSel.onchange=()=>{ soundPack=soundPackSel.value; levelUpToast('Sound-Pack: '+(soundPack==='chime'?'Chime':'Synth')); sfxOpen(); }; }
+
+function switchViewImmediateSetup(){ switchViewImmediate('home'); }
+document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', ()=>loadJSON().then(switchViewImmediateSetup)) : (loadJSON().then(switchViewImmediateSetup));
 </script>
 </body>
 </html>
