@@ -25,12 +25,20 @@ body{margin:0;height:100dvh;display:flex;flex-direction:column;font-family:Inter
 header{position:sticky;top:0;z-index:40;padding-top:env(safe-area-inset-top);backdrop-filter:saturate(120%) blur(10px);background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.78));border-bottom:1px solid #00000010}
 .wrap{max-width:64rem;margin:0 auto;padding:12px}
 main.wrap{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:12px}
-.hero{display:flex;gap:12px;align-items:center;padding:.8rem .25rem}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:.8rem .25rem}
+.brand{display:flex;align-items:center;gap:12px}
 .logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--green2));display:grid;place-items:center;box-shadow:var(--shadow);transition:transform .2s var(--ease)}
 .logo:active{transform:scale(.94)}
 .title{font-family:Nunito,Inter,sans-serif;font-weight:900;font-size:clamp(1.1rem,2.4vw,1.35rem);color:var(--ink)}
 .badge{font-size:.82rem;padding:.25rem .65rem;border-radius:999px;background:#8ee00029;color:#0D6A00;font-weight:800}
-.compact .hero{padding:.45rem .25rem}.compact .logo{width:36px;height:36px;border-radius:10px}.compact .title{font-size:1.05rem}
+.top-actions{display:flex;gap:.5rem}
+.iconbtn{min-width:44px;min-height:44px;border-radius:14px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:18px;display:grid;place-items:center;cursor:pointer;transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
+.iconbtn:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)}
+.iconbtn:active{transform:translateY(0) scale(.98)}
+
+.compact .logo{width:36px;height:36px;border-radius:10px}
+.compact .title{font-size:1.05rem}
 
 /* Panels / Inputs */
 .panel{background:linear-gradient(180deg,#fff,#F8FFF4);border:2px solid #00000010;border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);animation:enter .32s var(--ease)}
@@ -63,6 +71,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .btn:disabled{opacity:.5; cursor:default}
 .btn.secondary{ background:#fff; color:var(--ink); border:2px solid #00000014; text-transform:none; letter-spacing:.2px }
 .btn.secondary:after{display:none}
+.btn.secondary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1)} /* sanfter Hover */
 .btn.blue{ background:var(--blue-dark); color:#fff }
 .btn.blue:after{ background:var(--blue) }
 
@@ -78,7 +87,8 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 
 /* Cards & Lines */
 .card{--border-radius:22px;width:min(100%,42rem);padding:1.1rem;border-radius:var(--border-radius);background:#fff;border:2px solid #00000010;box-shadow:var(--shadow);margin:1rem auto;position:relative;color:var(--ink)}
-.exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid #00000010;color:var(--ink)}
+.exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid #00000010;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
+.exchange:hover{transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.08)} /* helle Card Hover */
 .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25);color:var(--ink)}
 .faded{opacity:.9;color:var(--muted);font-size:.96rem}
 .big{font-size:clamp(1.05rem,2.7vw,1.25rem);line-height:1.6;word-break:break-word;overflow-wrap:anywhere;color:var(--ink)}
@@ -103,10 +113,13 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .home-menu{display:grid;gap:.8rem}
 @media (min-width:640px){.home-menu{grid-template-columns:1fr 1fr}}
 @media (min-width:900px){.home-menu{grid-template-columns:repeat(4,1fr)}}
-.tile{display:flex;align-items:center;justify-content:center;gap:.6rem;min-height:64px;padding:.9rem;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-weight:900;color:var(--ink)}
+.tile{display:flex;align-items:center;justify-content:center;gap:.6rem;min-height:64px;padding:.9rem;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-weight:900;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
+.tile:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)} /* sanfter Hover für helle Kacheln */
+
 .bottom{position:sticky;bottom:0;z-index:35;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.85))}
-.bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;max-width:64rem;margin:0 auto}
-.navbtn{display:grid;place-items:center;height:56px;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:20px;color:var(--ink)}
+.bottom-nav{display:grid;grid-template-columns:repeat(1,1fr);gap:.6rem;max-width:20rem;margin:0 auto}
+.navbtn{display:grid;place-items:center;height:56px;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:20px;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
+.navbtn:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)}
 
 [data-view]{display:none}[data-view].active{display:block}
 @keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -115,18 +128,23 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 <body>
 <header id="hdr">
   <div class="wrap">
-    <div class="hero">
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" rx="16" fill="#8EE000"/>
-          <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
-          <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
-          <path d="M10 44C20 52 44 52 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
-        </svg>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#8EE000"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <path d="M10 44C20 52 44 52 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="title">Horrorladen – Lernapp</div>
+          <div class="badge" id="subtitle">Willkommen</div>
+        </div>
       </div>
-      <div>
-        <div class="title">Horrorladen – Lernapp</div>
-        <div class="badge" id="subtitle">Willkommen</div>
+      <div class="top-actions">
+        <button class="iconbtn" id="goSettings" title="Einstellungen" aria-label="Einstellungen" data-sfx>⚙️</button>
       </div>
     </div>
   </div>
@@ -141,7 +159,6 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
         <button class="tile" data-nav="viewer"  data-sfx>📜 Textviewer</button>
         <button class="tile" data-nav="survival"data-sfx>🎮 Survival</button>
         <button class="tile" data-nav="scores"  data-sfx>🏆 Highscores</button>
-        <button class="tile" data-nav="settings"data-sfx>⚙️ Einstellungen</button>
       </div>
     </div>
   </section>
@@ -278,17 +295,6 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
         </div>
         <div class="faded" id="indexSourceNote">Hinweis: Die aktuell geladene Datei ist ein Index (scripts.json).</div>
       </div>
-
-      <div class="controls" style="grid-template-columns:repeat(2,1fr)">
-        <label class="checkbox-container" style="padding-left:35px">
-          <input id="toggleSound" class="custom-checkbox" type="checkbox" checked>
-          <span class="checkmark"></span><span class="label">Soundeffekte</span>
-        </label>
-        <label class="checkbox-container" style="padding-left:35px">
-          <input id="toggleMotion" class="custom-checkbox" type="checkbox">
-          <span class="checkmark"></span><span class="label">Bewegung reduzieren</span>
-        </label>
-      </div>
     </div>
   </section>
 </main>
@@ -296,10 +302,6 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 <div class="bottom">
   <div class="bottom-nav">
     <button class="navbtn" data-nav="home"    data-sfx>🏠</button>
-    <button class="navbtn" data-nav="learn"   data-sfx>📖</button>
-    <button class="navbtn" data-nav="viewer"  data-sfx>📜</button>
-    <button class="navbtn" data-nav="survival"data-sfx>🎮</button>
-    <button class="navbtn" data-nav="scores"  data-sfx>🏆</button>
   </div>
 </div>
 
@@ -400,32 +402,44 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
 }
 
-/* ---------- Loader ---------- */
+/* ---------- Robust Loader ---------- */
 const jsonLabel=document.getElementById('jsonSrcLabel');
 const indexPicker=document.getElementById('indexPicker');
 const indexScriptSel=document.getElementById('indexScriptSel');
 const loadFromIndexBtn=document.getElementById('loadFromIndexBtn');
 
+async function fetchFirstOk(paths){
+  for(const p of paths){
+    try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok){ return await r.json(); } }catch{}
+  }
+  throw new Error('Keine der JSON-Pfade konnte geladen werden: '+paths.join(', '));
+}
+
 async function loadJSON(){
   jsonLabel.textContent=jsonSrc;
   indexPicker.style.display='none';
-  const res=await fetch(jsonSrc,{cache:'no-store'});
-  const data=await res.json();
 
-  // Ist es ein Index (wie dein Beispiel)?
+  const tryPaths=[jsonSrc, './'+jsonSrc, '/'+jsonSrc];
+  let data;
+  try{
+    data=await fetchFirstOk(tryPaths);
+  }catch(err){
+    showError('JSON konnte nicht geladen werden', err.message);
+    return;
+  }
+
+  // Index?
   const indexList = parseIndexList(data);
   if(indexList.length>0 && !isFullScript(data)){
     state.indexList=indexList;
     indexScriptSel.innerHTML=indexList.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
     indexPicker.style.display='';
-    // Default: erstes Skript im Index vorauswählen
     if(indexList[0]) indexScriptSel.value=indexList[0].value;
-    // Ins Settings-View wechseln, damit es sofort sichtbar ist
     switchViewImmediate('settings');
     return;
   }
 
-  // Vollständiges Skript laden/flatten
+  // Vollständiges Skript
   const out=[]; const meta={roles:new Set(),songs:new Set()};
   Array.isArray(data)?flattenAny({segments:data},{},out,meta):flattenAny(data,{},out,meta);
   state.items=out; state.roles=[...meta.roles];
@@ -441,14 +455,15 @@ async function loadJSON(){
   populateFilters();
 }
 
-loadFromIndexBtn.onclick=()=>{
-  const file=indexScriptSel.value;
-  if(!file) return;
-  localStorage.setItem(LS.src,file);
-  jsonSrc=file;
-  sfxOpen();
-  loadJSON();
-};
+function showError(title,msg){
+  const root=document.querySelector('[data-view].active')||document.body;
+  const box=el('div',{class:'card'},
+    el('div',{class:'big'},`❗ ${title}`),
+    el('div',{class:'faded'},String(msg||'')),
+    el('div',{class:'faded'},`Gesucht: ${jsonSrc}`)
+  );
+  root.appendChild(box);
+}
 
 /* ---------- Navigation ---------- */
 let currentView='home';
@@ -459,6 +474,7 @@ function switchViewImmediate(name){
   currentView=name;
 }
 document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{switchViewImmediate(b.dataset.nav); sfxOpen();});
+document.getElementById('goSettings').onclick=()=>{switchViewImmediate('settings'); sfxOpen();};
 
 /* ---------- Controls & Filters ---------- */
 const actSel=document.getElementById('actFilter'), sceneSel=document.getElementById('sceneFilter'), songSel=document.getElementById('songFilter'), lyricsOnly=document.getElementById('lyricsOnly'), roleSel=document.getElementById('roleSel');
@@ -612,18 +628,19 @@ manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'n
 loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; sfxOpen(); loadJSON(); };
 
 async function discoverJsonFiles(){
-  discHint.textContent='Suche JSONs…';
-  const found=new Set([jsonSrc,'horrorladen_final_with_acts.json','data.json','script.json','scripts.json']);
+  // Leichte Heuristik – listet ein paar sinnvolle Defaults + vorhandene Fundstücke
+  const candidates=new Set([jsonSrc,'horrorladen_final_with_acts.json','data.json','script.json','scripts.json']);
+  // Falls du im privaten Repo bist, ist die GitHub API ggf. geblockt – daher optional:
   try{
     const host=location.hostname, user=host.split('.')[0]; const repo=location.pathname.split('/')[1] || (user+'.github.io');
     const base=`https://api.github.com/repos/${user}/${repo}/contents`;
     for(const p of ['','/data','/scripts']){
       const r=await fetch(base+p,{headers:{Accept:'application/vnd.github.v3+json'}});
-      if(!r.ok) continue; const arr=await r.json(); (arr||[]).forEach(e=>{ if(e && /\.json$/i.test(e.name)) found.add((p?p+'/':'')+e.name); });
+      if(!r.ok) continue; const arr=await r.json(); (arr||[]).forEach(e=>{ if(e && /\.json$/i.test(e.name)) candidates.add((p?p+'/':'')+e.name); });
     }
     discHint.textContent='Gefundene JSON-Dateien im Repo.';
   }catch{ discHint.textContent='Privates Repo? Dann manuell eingeben.' }
-  const list=[...found].sort((a,b)=>a.localeCompare(b));
+  const list=[...candidates].sort((a,b)=>a.localeCompare(b));
   scriptSelect.innerHTML=list.map(v=>`<option value="${v}">${v}</option>`).join('');
   if(list.includes(jsonSrc)) scriptSelect.value=jsonSrc;
 }
@@ -636,10 +653,10 @@ async function discoverJsonFiles(){
 })();
 
 /* ---------- Init ---------- */
-document.getElementById('toggleSound').checked=sfxOn;
-document.getElementById('toggleSound').onchange=()=>{sfxOn=document.getElementById('toggleSound').checked; localStorage.setItem(LS.sfx,JSON.stringify(sfxOn));};
-document.getElementById('toggleMotion').checked=reduceMotion;
-document.getElementById('toggleMotion').onchange=()=>{reduceMotion=document.getElementById('toggleMotion').checked; localStorage.setItem(LS.motion,JSON.stringify(reduceMotion));};
+document.getElementById('toggleSound')?.addEventListener('change',e=>{sfxOn=e.target.checked; localStorage.setItem(LS.sfx,JSON.stringify(sfxOn));});
+document.getElementById('toggleMotion')?.addEventListener('change',e=>{reduceMotion=e.target.checked; localStorage.setItem(LS.motion,JSON.stringify(reduceMotion));});
+document.getElementById('toggleSound')&&(document.getElementById('toggleSound').checked=sfxOn);
+document.getElementById('toggleMotion')&&(document.getElementById('toggleMotion').checked=reduceMotion);
 
 function boot(){ switchViewImmediate('home'); loadJSON(); renderBoardAuto(); discoverJsonFiles(); }
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
