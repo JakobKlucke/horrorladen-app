@@ -1,7 +1,5 @@
 {
   "scripts": [
-    "horrorladen_final_with_acts.json",
-    "anderes_stueck.json",
-    { "title": "Noch eins (alternativer Pfad)", "src": "unterordner/noch_eins.json" }
+    "horrorladen_final_with_acts.json"
   ]
 }
