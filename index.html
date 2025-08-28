@@ -52,7 +52,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 @media (min-width:760px){.controls{grid-template-columns:1fr 1fr auto}}
 .controls .cta{display:flex;justify-content:flex-end}
 
-/* Duo-like Buttons */
+/* Duolingo-like Buttons */
 .btn{
   position:relative; appearance:button; background-color: var(--green); border: solid transparent;
   border-radius: 16px; border-width: 0 0 4px; color:#0b1220; cursor:pointer; display:inline-block;
@@ -187,7 +187,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
             <option value="cloze">Cloze</option>
           </select>
         </div>
-        <div class="cta"><button class="btn primary" id="startLearn" data-sfx>Start</button></div>
+        <div class="cta"><button class="btn" id="startLearn" data-sfx>Start</button></div>
       </div>
     </div>
 
@@ -202,7 +202,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
       <div class="info" id="pagerInfo">Seite 1/1</div>
       <div class="group">
         <button id="prevPage" class="btn secondary" data-sfx>← Zurück</button>
-        <button id="nextPage" class="btn primary"   data-sfx>Weiter →</button>
+        <button id="nextPage" class="btn"   data-sfx>Weiter →</button>
       </div>
     </div>
   </section>
@@ -238,7 +238,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
       <div class="info" id="viewerPagerInfo">Seite 1/1</div>
       <div class="group">
         <button id="viewerPrev" class="btn secondary" data-sfx>← Zurück</button>
-        <button id="viewerNext" class="btn primary"   data-sfx>Weiter →</button>
+        <button id="viewerNext" class="btn"   data-sfx>Weiter →</button>
       </div>
     </div>
   </section>
@@ -249,7 +249,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
       <div><label for="roleSurv">Rolle</label><select id="roleSurv"></select></div>
       <div><label>Herzen</label><div id="heartPill" class="tile" style="min-height:auto;padding:.4rem .8rem">❤️❤️❤️</div></div>
       <div><label>Score</label><div id="scorePill" class="tile" style="min-height:auto;padding:.4rem .8rem">0</div></div>
-      <div class="cta"><button class="btn primary" id="startSurv" data-sfx>Neu starten</button></div>
+      <div class="cta"><button class="btn" id="startSurv" data-sfx>Neu starten</button></div>
     </div>
     <div id="survRoot"></div>
   </section>
@@ -268,7 +268,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
     <div class="panel" style="display:grid;gap:1rem">
       <div class="controls" style="grid-template-columns:1fr auto">
         <div><label for="playerName">Spielername</label><input id="playerName" type="text" placeholder="z.B. Alex"></div>
-        <div class="cta"><button class="btn primary" id="saveSettings" data-sfx>Speichern</button></div>
+        <div class="cta"><button class="btn" id="saveSettings" data-sfx>Speichern</button></div>
       </div>
 
       <div style="display:grid;gap:.6rem">
@@ -280,10 +280,10 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
             <span class="checkmark"></span><span class="label">Manuell eingeben</span>
           </label>
           <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
-          <button class="btn primary" id="loadScriptBtn" data-sfx>Neu laden</button>
+          <button class="btn" id="loadScriptBtn" data-sfx>Neu laden</button>
         </div>
         <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
-        <div class="faded" id="scriptsNote">Suche nach /scripts.json …</div>
+        <div class="faded" id="scriptsNote">Suche nach scripts.json …</div>
       </div>
     </div>
   </section>
@@ -296,11 +296,32 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 </div>
 
 <script>
+/* ---------- Base path & helpers (fix for subfolder like /horrorladen-app/) ---------- */
+const basePath = (()=>{
+  // Directory of current page, e.g. /horrorladen-app/ or /user/repo/
+  const p = location.pathname;
+  if (p.endsWith('/')) return p;
+  return p.replace(/[^/]+$/, '');
+})();
+const withBase = (p) => {
+  if (!p) return p;
+  if (/^https?:\/\//i.test(p)) return p;                 // absolute URL
+  if (p.startsWith('./') || p.startsWith('../')) return p;// explicit relative
+  if (p.startsWith('/')) return basePath.replace(/\/$/,'') + p; // treat "/x.json" as app-root relative
+  return basePath + p; // plain filename -> current folder
+};
+async function fetchJsonAny(paths){
+  for(const raw of paths){
+    const p = withBase(raw);
+    try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok){ return await r.json(); } }catch(e){}
+  }
+  throw new Error('Konnte keine Datei laden aus: '+paths.map(withBase).join(', '));
+}
+
 /* ---------- Prefs/State ---------- */
 const LS={name:'hl_player_name',src:'hl_json_src',sfx:'hl_sfx_on',motion:'hl_reduce_motion'};
-let jsonSrc=localStorage.getItem(LS.src)||'/horrorladen_final_with_acts.json';
-let sfxOn=JSON.parse(localStorage.getItem(LS.sfx)??'true');
-let reduceMotion=JSON.parse(localStorage.getItem(LS.motion)??'false');
+let jsonSrc=localStorage.getItem(LS.src)||'horrorladen_final_with_acts.json'; // jetzt relativ zum Ordner
+let sfxOn=true;
 
 const state={items:[],roles:[],actsList:[],scenesByAct:{},songsSet:new Set(),
   pageIndex:0,pageSizeClassic:8,pageSizeSingle:1,lastFiltered:[],
@@ -312,30 +333,20 @@ const norm=s=>(s||'').trim().toUpperCase();
 const treatSpeaker=sp=>{const s=norm(sp); if(s==='DIE ANDEREN')return'ALLE'; if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__'; return s;};
 const el=(t,a={},...c)=>{const n=document.createElement(t);for(const[k,v]of Object.entries(a)){k==='class'?n.className=v:k==='html'?n.innerHTML=v:n.setAttribute(k,v)} c.forEach(x=>{if(x!=null)n.appendChild(typeof x==='string'?document.createTextNode(x):x)});return n};
 const escapeHtml=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const wordsOf=t=>(t||'').split(/(\s+|[.,;:!?]+)/).filter(x=>x&&!/[.,;:!?]+/.test(x));
-function makeCloze(text,ratio=.35){const ws=wordsOf(text); if(ws.length<4)return{html:escapeHtml(text)}; const hide=Math.max(1,Math.floor(ws.length*ratio));
-  const idx=new Set(ws.map((w,i)=>({i,w})).sort((a,b)=>b.w.length-a.w.length).slice(0,hide).map(o=>o.i));
-  return{html:ws.map((w,i)=>idx.has(i)?`<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">${' '.repeat(Math.min(12,w.length))}</span>`:escapeHtml(w)).join('')};
-}
 
-/* ---------- Sounds ---------- */
+/* ---------- Sounds (click) ---------- */
 const AudioC=window.AudioContext||window.webkitAudioContext; let ac;
-function tone(seq=[0],dur=.16,type='triangle',base=600){ if(!sfxOn||!AudioC)return; ac=ac||new AudioC();
+function tone(seq=[0],dur=.12,type='triangle',base=640){ if(!sfxOn||!AudioC)return; ac=ac||new AudioC();
   const o=ac.createOscillator(), g=ac.createGain(); o.type=type; o.connect(g).connect(ac.destination);
   const now=ac.currentTime; let t=now; g.gain.setValueAtTime(.0001,now); g.gain.linearRampToValueAtTime(.22,now+.01);
   seq.forEach(semi=>{o.frequency.setValueAtTime(base*Math.pow(2,semi/12),t); t+=dur;});
   g.gain.exponentialRampToValueAtTime(.0001,t+.04); o.start(now); o.stop(t+.05);
 }
-const sfxClick=()=>tone([0],.07,'triangle',700);
-const sfxOpen =()=>tone([0,4,7,12],.06,'square',520);
-const sfxGood =()=>tone([0,7,12,19],.07,'sine',720);
-const sfxBad  =()=>tone([0,-3,-5],.09,'sawtooth',200);
-document.addEventListener('click',e=>{ if(e.target.closest('[data-sfx]')) sfxClick(); },{capture:true});
+document.addEventListener('click',e=>{ if(e.target.closest('[data-sfx]')) tone([0],.07); },{capture:true});
 
 /* ---------- Parse helpers ---------- */
 const scanTitleLike=o=>{if(!o||typeof o!=='object')return null;for(const k of ['title','name','label','id'])if(typeof o[k]==='string'&&o[k].trim())return o[k].trim();return null;}
 const normalizeTitle=v=> typeof v==='string'?v: (typeof v==='number'?String(v): (v&&typeof v==='object'? (scanTitleLike(v)||'') : '') );
-
 function isFullScript(data){
   if(!data) return false;
   if(Array.isArray(data)) return data.some(n=>typeof n==='object' && (n.type||'')==='speaker_block') || data.some(n=>n&&n.acts) || data.some(n=>n.children||n.segments||n.items);
@@ -343,12 +354,7 @@ function isFullScript(data){
   return false;
 }
 function parseScriptsJson(data){
-  // Accepts:
-  // { "scripts": ["a.json","b.json"] }
-  // { "scripts": [{ "title":"X","src":"x.json"}, "y.json", {"name":"Z","file":"z.json"}] }
-  // [ "a.json", {"title":"B","src":"b.json"} ]
-  const out=[];
-  const push=(label,value)=>{ if(value) out.push({label:label||value, value}); };
+  const out=[]; const push=(label,value)=>{ if(value) out.push({label:label||value, value}); };
   const parseEntry=(it,i)=>{
     if(typeof it==='string'){ push(it,it); }
     else if(it && typeof it==='object'){
@@ -396,46 +402,35 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
 }
 
-/* ---------- Fetch helpers ---------- */
-const jsonLabel=document.getElementById('jsonSrcLabel');
-async function fetchJsonAny(paths){
-  for(const p of paths){
-    try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok){ return await r.json(); } }catch{}
-  }
-  throw new Error('Konnte keine Datei laden aus: '+paths.join(', '));
-}
-
 /* ---------- scripts.json -> dropdown ---------- */
 const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote=document.getElementById('scriptsNote');
-
 async function loadScriptsIndex(){
-  const candidates=['/scripts.json','scripts.json','./scripts.json','/data/scripts.json','data/scripts.json'];
+  // Try current folder first
+  const candidates=['scripts.json','./scripts.json', '/scripts.json']; // '/scripts.json' nur falls die Seite direkt im Root liegt
   try{
     const idx=await fetchJsonAny(candidates);
     const list=parseScriptsJson(idx);
     if(list.length){
       state.indexFromScriptsJson=list;
       scriptSelect.innerHTML=list.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
-      // Preselect current jsonSrc if present in list
-      const plain=jsonSrc.replace(/^\//,'');
-      const found=list.find(o=>o.value===jsonSrc || o.value===plain || '/'+o.value===jsonSrc);
+      // Preselect current jsonSrc if present
+      const found=list.find(o=>o.value===jsonSrc || ('/'+o.value)===jsonSrc);
       if(found) scriptSelect.value=found.value;
-      scriptsNote.textContent='Quelle: scripts.json';
+      scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
       return true;
     }
     scriptsNote.textContent='scripts.json gefunden, aber leer.';
     return false;
   }catch{
-    scriptsNote.textContent='Keine scripts.json gefunden – du kannst einen Pfad manuell eingeben.';
-    // Fallback: show current src as a single option
+    scriptsNote.textContent='Keine scripts.json im Ordner gefunden – Pfad kann manuell gesetzt werden.';
     scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
     return false;
   }
 }
 
 /* ---------- Loader for content JSON ---------- */
-const indexPicker=document.getElementById('indexPicker'); // (not used now; we rely on scripts.json)
+const jsonLabel=document.getElementById('jsonSrcLabel');
 async function loadJSON(){
   jsonLabel.textContent=jsonSrc;
   const tryPaths=[jsonSrc, '/'+jsonSrc.replace(/^\//,''), './'+jsonSrc.replace(/^\//,'')];
@@ -443,16 +438,14 @@ async function loadJSON(){
   try{ data=await fetchJsonAny(tryPaths); }
   catch(err){ showError('JSON konnte nicht geladen werden', err.message); return; }
 
-  // If someone accidentally points to an index-like file here, try to resolve via parseScriptsJson:
+  // If index-like file accidentally selected, resolve first entry
   const maybeIndex=parseScriptsJson(data);
   if(maybeIndex.length && !isFullScript(data)){
-    // choose first as fallback
     jsonSrc=maybeIndex[0].value;
     localStorage.setItem(LS.src,jsonSrc);
     return loadJSON();
   }
 
-  // Full script → flatten
   const out=[]; const meta={roles:new Set(),songs:new Set()};
   Array.isArray(data)?flattenAny({segments:data},{},out,meta):flattenAny(data,{},out,meta);
   state.items=out; state.roles=[...meta.roles];
@@ -474,7 +467,7 @@ function showError(title,msg){
   const box=el('div',{class:'card'},
     el('div',{class:'big'},`❗ ${title}`),
     el('div',{class:'faded'},String(msg||'')),
-    el('div',{class:'faded'},`Quelle: ${jsonSrc}`)
+    el('div',{class:'faded'},`Quelle: ${withBase(jsonSrc)}`)
   );
   root.appendChild(box);
 }
@@ -487,8 +480,8 @@ function switchViewImmediate(name){
   document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
   currentView=name;
 }
-document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{switchViewImmediate(b.dataset.nav); sfxOpen();});
-document.getElementById('goSettings').onclick=()=>{switchViewImmediate('settings'); sfxOpen();};
+document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{switchViewImmediate(b.dataset.nav); tone([0,4],.05);});
+document.getElementById('goSettings').onclick=()=>{switchViewImmediate('settings'); tone([0,4],.05);};
 
 /* ---------- Controls & Filters ---------- */
 const actSel=document.getElementById('actFilter'), sceneSel=document.getElementById('sceneFilter'), songSel=document.getElementById('songFilter'), lyricsOnly=document.getElementById('lyricsOnly'), roleSel=document.getElementById('roleSel');
@@ -526,12 +519,12 @@ function getContextForLine(line,fullSeq,myRoleUC,onlySameSong){
 /* ---------- Learn ---------- */
 const learnRoot=document.getElementById('learnRoot'); const modeSel=document.getElementById('modeSel'); const startLearnBtn=document.getElementById('startLearn');
 const pager=document.getElementById('learnPager'); const pagerInfo=document.getElementById('pagerInfo'); const prevPage=document.getElementById('prevPage'); const nextPage=document.getElementById('nextPage'); const learnProg=document.getElementById('learnProg'); const learnCount=document.getElementById('learnCount');
-function setProg(p,instant=false){ if(instant){const t=learnProg.style.transition; learnProg.style.transition='none'; learnProg.style.width=p; learnProg.getBoundingClientRect(); learnProg.style.transition=t||'width .25s var(--ease)'; } else learnProg.style.width=p; }
-function renderLearn(){ state.lastFiltered=applyFilters(state.items,{byRole:true}); state.pageIndex=0; renderLearnPage(true); sfxOpen(); }
+function setProg(p){ learnProg.style.width=p; }
+function renderLearn(){ state.lastFiltered=applyFilters(state.items,{byRole:true}); state.pageIndex=0; renderLearnPage(true); }
 function renderLearnPage(reset=false){
   const mode=modeSel.value; const pageSize=(mode==='classic')?state.pageSizeClassic:state.pageSizeSingle;
   const items=state.lastFiltered; const total=items.length;
-  if(!items.length){ learnRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; pager.hidden=true; learnCount.textContent=`0/${state.items.length}`; setProg('0%',true); return; }
+  if(!items.length){ learnRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; pager.hidden=true; learnCount.textContent=`0/${state.items.length}`; setProg('0%'); return; }
   const pages=Math.max(1,Math.ceil(total/pageSize)); state.pageIndex=Math.min(Math.max(0,state.pageIndex),pages-1);
   const slice=items.slice(state.pageIndex*pageSize,state.pageIndex*pageSize+pageSize);
 
@@ -556,13 +549,13 @@ function renderLearnPage(reset=false){
     );
     card.appendChild(inner);
     if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
-    card.addEventListener('click',()=>{ card.classList.add('flipped'); sfxGood(); },{once:true});
+    card.addEventListener('click',()=>{ card.classList.add('flipped'); },{once:true});
     learnRoot.appendChild(card);
   } else { // cloze
     const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
     const card=el('div',{class:'card'});
     if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
-    const {html}=makeCloze(line.text,.35);
+    const html=(line.text||'').replace(/\b(\w{3,})\b/g,(m)=>'<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">&nbsp;&nbsp;&nbsp;</span>');
     card.appendChild(el('div',{class:'big',html:`${line.speaker}: ${html}`}));
     if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
     learnRoot.appendChild(card);
@@ -572,7 +565,7 @@ function renderLearnPage(reset=false){
   pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
   prevPage.disabled=state.pageIndex===0; nextPage.disabled=state.pageIndex>=pages-1;
   learnCount.textContent=`${total}/${state.items.length}`;
-  setProg(`${((state.pageIndex+1)/pages)*100}%`, !!reset);
+  setProg(`${((state.pageIndex+1)/pages)*100}%`);
 }
 startLearnBtn.onclick=renderLearn;
 [sceneSel,songSel,lyricsOnly,roleSel,modeSel].forEach(e=>e.addEventListener('change',()=>{state.pageIndex=0; renderLearn();}));
@@ -580,7 +573,7 @@ prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();}; nextPage.onclick=(
 
 /* ---------- Viewer ---------- */
 const viewerRoot=document.getElementById('viewerRoot'); const viewerPager=document.getElementById('viewerPager'); const viewerPagerInfo=document.getElementById('viewerPagerInfo'); const viewerPrev=document.getElementById('viewerPrev'); const viewerNext=document.getElementById('viewerNext'); const viewerProg=document.getElementById('viewerProg'); const viewerCount=document.getElementById('viewerCount');
-function renderViewer(){ state.viewerLast=applyFilters(state.items,{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage(); }
+function renderViewer(){ state.viewerLast=applyFilters(state.items',{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage(); }
 function renderViewerPage(){
   const items=state.viewerLast,total=items.length;
   if(!items.length){ viewerRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; viewerPager.hidden=true; viewerCount.textContent=`0/${state.items.length}`; viewerProg.style.width='0%'; return; }
@@ -600,7 +593,7 @@ const survRoot=document.getElementById('survRoot'); let survLives=3,survScore=0;
 const hearts =()=>{document.getElementById('heartPill').textContent='❤️'.repeat(Math.max(0,survLives));}
 const score  =()=>{document.getElementById('scorePill').textContent=survScore;}
 function startSurv(){ const pool=applyFilters(state.items,{byRole:true,roleOverride:roleSurv.value}); if(!pool.length){survRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';return;}
-  survLives=3;survScore=0;hearts();score(); sfxOpen(); nextQ(pool); }
+  survLives=3;survScore=0;hearts();score(); nextQ(pool); }
 function nextQ(pool){
   if(survLives<=0){ over(); return; }
   survRoot.innerHTML=''; const card=el('div',{class:'card'});
@@ -611,9 +604,9 @@ function nextQ(pool){
   const grid=el('div',{class:'home-menu'});
   opts.forEach(o=>{
     const b=el('button',{class:'btn secondary','data-sfx':''},o);
-    b.onclick=(ev)=>{ if(o===correct){survScore++;score(); sfxGood();
+    b.onclick=(ev)=>{ if(o===correct){survScore++;score();
         confetti({particleCount:24,spread:60,origin:{x:(ev.clientX||innerWidth/2)/innerWidth,y:(ev.clientY||innerHeight*.6)/innerHeight}});
-      } else {survLives--;hearts(); sfxBad();}
+      } else {survLives--;hearts();}
       nextQ(pool);
     };
     grid.appendChild(b);
@@ -637,9 +630,9 @@ function renderBoard(list){ list.sort((a,b)=>b.score-a.score); boardDiv.innerHTM
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
 const manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn');
 playerName.value=localStorage.getItem(LS.name)||''; document.getElementById('jsonSrcLabel').textContent=jsonSrc;
-saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); sfxGood(); };
+saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); tone([0,7],.06); };
 manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'none'; };
-loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; sfxOpen(); loadJSON(); };
+loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; loadJSON(); };
 
 /* ---------- Mobile: prevent zoom/bounce ---------- */
 (function(){
@@ -654,9 +647,9 @@ document.querySelector('[data-nav="home"]').onclick=switchHome;
 
 async function boot(){
   switchViewImmediate('home');
-  await loadScriptsIndex();          // Fill dropdown from scripts.json if available
-  await loadJSON();                  // Load the selected or default script
-  renderBoardAuto();                 // Start scores listener
+  await loadScriptsIndex();          // fills dropdown from scripts.json in current folder
+  await loadJSON();                  // loads selected or default script (folder-relative)
+  renderBoardAuto();
 }
 document.readyState==='loading' ? document.addEventListener('DOMContentLoaded',boot) : boot();
 </script>
