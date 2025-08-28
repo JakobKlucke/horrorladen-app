@@ -627,7 +627,7 @@ function renderBoard(list){ list.sort((a,b)=>b.score-a.score); boardDiv.innerHTM
 
 /* ---------------- Settings ---------------- */
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
-const manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn'), scriptSelect=document.getElementById('scriptSelect');
+const manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn');
 playerName.value=localStorage.getItem(LS.name)||''; document.getElementById('jsonSrcLabel').textContent=jsonSrc;
 saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); tone([0,7],.06); };
 manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'none'; };
