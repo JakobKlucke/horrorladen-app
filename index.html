@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Horrorladen – Lernapp (Hub v2)</title>
+  <title>Horrorladen – Lernapp</title>
   <meta name="theme-color" content="#0f172a" />
   <style>
     :root{
@@ -11,6 +11,7 @@
       --bg:#0f172a; --panel:#0b1220; --text:#e5f7ef; --muted:#bfe7d3;
       --ios:cubic-bezier(.22,.61,.36,1); --shadow:0 12px 40px rgba(0,0,0,.35);
     }
+    html{font-size:16px}
     body{margin:0;min-height:100dvh;background:linear-gradient(180deg,var(--bg),#0a192f);color:var(--text);
          font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Arial,sans-serif}
     header{position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top);
@@ -21,79 +22,400 @@
     .hero .logo{width:2.8rem;height:2.8rem;border-radius:1rem;background:linear-gradient(135deg,var(--c-light),var(--c-emerald));
       display:flex;align-items:center;justify-content:center;color:#0b1220;font-weight:900;box-shadow:var(--shadow)}
     .hero .title{font-weight:900;font-size:1.35rem}
-    .panel{background:linear-gradient(180deg,rgba(34,87,122,.12),rgba(56,163,165,.08));border:1px solid rgba(199,249,204,.18);
-           border-radius:16px;padding:.85rem;box-shadow:var(--shadow)}
+    .badge{font-size:.78rem;padding:.2rem .5rem;border-radius:999px;background:rgba(87,204,153,.15);color:var(--c-light);}
+    .compact .hero{padding:.4rem .25rem; gap:.6rem}
+    .compact .hero .logo{width:2rem;height:2rem;border-radius:.6rem}
+    .compact .hero .title{font-size:1rem}
+    nav.menu{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0}
+    nav.menu button{
+      display:flex;gap:.6rem;align-items:center;justify-content:center;
+      padding:1rem;border-radius:16px;border:1px solid rgba(199,249,204,.18);
+      background:linear-gradient(180deg,rgba(34,87,122,.12),rgba(56,163,165,.08));
+      text-decoration:none;color:var(--text);font-weight:800; transition: transform .15s var(--ios);
+      min-height:64px;
+    }
+    nav.menu button:hover{ transform: translateY(-1px); }
+    .panel{
+      background:linear-gradient(180deg,rgba(34,87,122,.12),rgba(56,163,165,.08));
+      border:1px solid rgba(199,249,204,.18);
+      border-radius:16px;padding:.85rem;box-shadow:var(--shadow)
+    }
     label{font-size:.9rem;color:var(--muted);display:block;margin-bottom:.25rem}
-    select,input[type=number],button{width:100%;padding:.8rem 1rem;border-radius:14px;border:1px solid rgba(199,249,204,.28);
-           background:rgba(11,18,32,.6);color:var(--text);min-height:48px;outline:none}
-    button{font-weight:800;letter-spacing:.01em;transition:background .2s}
+    select,input[type=number],button{
+      width:100%;padding:.8rem 1rem;border-radius:14px;border:1px solid rgba(199,249,204,.28);
+      background:rgba(11,18,32,.6);color:var(--text);min-height:48px;outline:none;
+      transition:transform .18s var(--ios)}
+    button{font-weight:800;letter-spacing:.01em}
     button.primary{background:linear-gradient(180deg,var(--c-emerald),var(--c-verdigris));color:#0b1220}
     button.secondary{background:rgba(199,249,204,.1)}
     .controls{display:grid;gap:.6rem}
-    @media (min-width:720px){ .controls{grid-template-columns:repeat(4,1fr)} }
-    @media (max-width:719px){ .controls{grid-template-columns:repeat(2,1fr)} }
-    .exchange,.card{margin:1rem 0;padding:1rem;border-radius:16px;background:rgba(34,87,122,.14);border:1px solid rgba(199,249,204,.2)}
+    @media (min-width:760px){ .controls{grid-template-columns:repeat(4,1fr)} }
+    @media (max-width:759px){ .controls{grid-template-columns:repeat(2,1fr)} }
+    .exchange{margin:1rem 0;padding:1rem;border-radius:16px;background:rgba(34,87,122,.14);border:1px solid rgba(199,249,204,.2)}
     .line{padding:.8rem .9rem;border-radius:14px;background:rgba(11,18,32,.55);border:1px solid rgba(199,249,204,.2)}
     .line.you{background:rgba(128,237,153,.14);border-color:rgba(128,237,153,.45)}
-    .speaker{font-size:.9rem;color:var(--c-light)}
-    .faded{opacity:.7;color:var(--muted);font-size:.9rem}
-    .big{font-size:1.05rem;line-height:1.5}
-    .cloze-gap{border-bottom:2px dotted var(--c-light);padding:0 .25rem}
+    .speaker{font-size:.9rem;letter-spacing:.04em;color:var(--c-light)}
+    .card{margin:1rem 0;padding:1.2rem;border-radius:18px;background:rgba(11,18,32,.55);border:1px solid rgba(199,249,204,.25);
+      text-align:center;display:flex;flex-direction:column;gap:.5rem}
     .choices{display:grid;gap:.6rem;margin-top:.6rem}
+    .big{font-size:1.05rem;line-height:1.5}
+    .faded{opacity:.7;color:var(--muted);font-size:.9rem}
+    .cloze-gap{border-bottom:2px dotted var(--c-light); padding:0 .25rem}
+    [data-view]{display:none}
+    [data-view].active{display:block}
   </style>
 </head>
 <body>
-<header><div class="wrap"><div class="hero"><div class="logo">🌱</div><div><div class="title">Horrorladen – Lernapp</div></div></div></div></header>
-<main class="wrap">
-  <div class="panel controls">
-    <div>
-      <label for="roleSel">Rolle</label>
-      <select id="roleSel"></select>
-    </div>
-    <div id="blockWrap">
-      <label for="sessionSize">Blockgröße</label>
-      <input id="sessionSize" type="number" min="1" max="25" value="5"/>
-    </div>
-    <div>
-      <label for="modeSel">Modus</label>
-      <select id="modeSel">
-        <option value="classic">Classic</option>
-        <option value="flash">Flashcards</option>
-        <option value="cloze">Cloze</option>
-      </select>
-    </div>
-    <div>
-      <label>&nbsp;</label>
-      <button class="primary" id="startLearn">Start</button>
+<header id="hdr">
+  <div class="wrap">
+    <div class="hero">
+      <div class="logo">🌱</div>
+      <div>
+        <div class="title">Horrorladen – Lernapp</div>
+        <div class="badge" id="subtitle">Willkommen</div>
+      </div>
     </div>
   </div>
-  <div id="learnRoot"></div>
+</header>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section data-view="home" class="active">
+    <div class="panel">
+      <nav class="menu">
+        <button data-nav="learn">📖 Lernen</button>
+        <button data-nav="survival">🎮 Survival</button>
+        <button data-nav="scores">🏆 Highscores</button>
+        <button data-nav="settings">⚙️ Einstellungen</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section data-view="learn">
+    <div class="panel controls">
+      <div>
+        <label for="roleSel">Rolle</label>
+        <select id="roleSel"></select>
+      </div>
+      <div id="blockWrap">
+        <label for="sessionSize">Blockgröße</label>
+        <input id="sessionSize" type="number" min="1" max="25" value="5"/>
+      </div>
+      <div>
+        <label for="modeSel">Modus</label>
+        <select id="modeSel">
+          <option value="classic">Classic</option>
+          <option value="flash">Flashcards</option>
+          <option value="cloze">Cloze</option>
+        </select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="primary" id="startLearn">Start</button>
+      </div>
+    </div>
+    <div id="learnRoot"></div>
+  </section>
+
+  <!-- SURVIVAL -->
+  <section data-view="survival">
+    <div class="panel controls">
+      <div>
+        <label for="roleSurv">Rolle</label>
+        <select id="roleSurv"></select>
+      </div>
+      <div><label>Herzen</label><div id="heartPill" class="faded">❤️❤️❤️</div></div>
+      <div><label>Score</label><div id="scorePill" class="faded">0</div></div>
+      <div><label>&nbsp;</label><button class="primary" id="startSurv">Neu starten</button></div>
+    </div>
+    <div id="survRoot"></div>
+  </section>
+
+  <!-- SCORES -->
+  <section data-view="scores">
+    <div class="panel controls">
+      <div>
+        <label for="nameField">Dein Name</label>
+        <input id="nameField" placeholder="z.B. Alex"/>
+      </div>
+      <div>
+        <label for="boardRole">Rolle</label>
+        <select id="boardRole"><option value="">Alle</option></select>
+      </div>
+      <div>
+        <label for="boardLimit">Anzahl</label>
+        <select id="boardLimit"><option>10</option><option selected>25</option><option>50</option></select>
+      </div>
+      <div>
+        <label>&nbsp;</label><button class="primary" id="refreshBoard">Aktualisieren</button></div>
+    </div>
+    <div id="board" class="list"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-view="settings">
+    <div class="panel">
+      <div class="list">
+        <div class="row"><span>JSON-Quelle</span><span><code id="jsonSrcLabel">script.json</code></span></div>
+        <div class="row"><span>Gesten-Navigation</span><span>aktiv</span></div>
+      </div>
+    </div>
+  </section>
 </main>
+
+<div class="wrap">
+  <nav class="menu">
+    <button data-nav="home">🏠</button>
+    <button data-nav="learn">📖</button>
+    <button data-nav="survival">🎮</button>
+    <button data-nav="scores">🏆</button>
+  </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
 
 <script>
 const q=new URLSearchParams(location.search);
 const jsonSrc=q.get('src')||'script.json';
+document.getElementById("jsonSrcLabel").textContent=jsonSrc;
+
+// === Hilfsfunktionen ===
 const norm=s=>(s||'').trim().toUpperCase();
-const treatSpeaker=sp=>{const s=norm(sp);if(s==='DIE ANDEREN')return'ALLE';if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__';return s;};
-const isIncludedForRole=(sp,chosen)=>{const s=treatSpeaker(sp),ch=norm(chosen);if(!s||s==='__IGNORE__')return false;if(s==='ALLE')return true;return s===ch;};
-function buildExchanges(items,chosen){const d=(items||[]).filter(it=>it.type==='dialogue').map(it=>({...it,speaker:treatSpeaker(it.speaker)})).filter(it=>it.speaker!=='__IGNORE__');const ex=[];let i=0,last=-1;while(i<d.length){const it=d[i];if(isIncludedForRole(it.speaker,chosen)){const ctx=[];for(let j=last+1;j<i;j++){const pj=d[j];if(!isIncludedForRole(pj.speaker,chosen))ctx.push(pj);}const yours=[];let k=i;while(k<d.length&&isIncludedForRole(d[k].speaker,chosen)){yours.push(d[k]);k++;}ex.push({context:ctx,yours});last=k-1;i=k;}else i++;}return ex;}
-function el(tag,attrs={},...children){const n=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==='class')n.className=v;else if(k==='html')n.innerHTML=v;else n.setAttribute(k,v);}for(const c of children){if(c==null)continue;n.appendChild(typeof c==='string'?document.createTextNode(c):c);}return n;}
+const treatSpeaker=sp=>{
+  const s=norm(sp);
+  if(s==='DIE ANDEREN')return'ALLE';
+  if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__';
+  return s;
+};
+const isIncludedForRole=(sp,chosen)=>{
+  const s=treatSpeaker(sp),ch=norm(chosen);
+  if(!s||s==='__IGNORE__')return false;
+  if(s==='ALLE')return true;
+  return s===ch;
+};
+
+function buildExchanges(items,chosen){
+  const d=(items||[]).filter(it=>it.type==='dialogue').map(it=>({...it,speaker:treatSpeaker(it.speaker)})).filter(it=>it.speaker!=='__IGNORE__');
+  const ex=[];
+  let i=0,last=-1;
+  while(i<d.length){
+    const it=d[i];
+    if(isIncludedForRole(it.speaker,chosen)){
+      const ctx=[];
+      for(let j=last+1;j<i;j++){
+        const pj=d[j];
+        if(!isIncludedForRole(pj.speaker,chosen))ctx.push(pj);
+      }
+      const yours=[];
+      let k=i;
+      while(k<d.length&&isIncludedForRole(d[k].speaker,chosen)){yours.push(d[k]);k++;}
+      ex.push({context:ctx,yours});
+      last=k-1;
+      i=k;
+    } else i++;
+  }
+  return ex;
+}
+function el(tag,attrs={},...children){
+  const n=document.createElement(tag);
+  for(const[k,v]of Object.entries(attrs)){
+    if(k==='class')n.className=v;else if(k==='html')n.innerHTML=v;else n.setAttribute(k,v);
+  }
+  for(const c of children){if(c==null)continue;n.appendChild(typeof c==='string'?document.createTextNode(c):c);}
+  return n;
+}
 function escapeHtml(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function wordsOf(t){return(t||'').split(/(\s+|[.,;:!?]+)/).filter(x=>x&&!/[.,;:!?]+/.test(x));}
-function makeCloze(text,ratio=.35){const ws=wordsOf(text);if(ws.length<4)return{html:escapeHtml(text),gaps:[]};const toHide=Math.max(1,Math.floor(ws.length*ratio));const idxs=new Set();const order=ws.map((w,i)=>({i,w})).sort((a,b)=>b.w.length-a.w.length).map(o=>o.i);for(let i=0;i<order.length&&idxs.size<toHide;i++){if(ws[order[i]].length>=3)idxs.add(order[i]);}const gaps=[];const out=ws.map((w,i)=>idxs.has(i)?(gaps.push(w),`<span class="cloze-gap">${' '.repeat(Math.min(12,w.length))}</span>`):escapeHtml(w));return{html:out.join(' '),gaps};}
+function makeCloze(text,ratio=.35){
+  const ws=wordsOf(text);
+  if(ws.length<4)return{html:escapeHtml(text),gaps:[]};
+  const toHide=Math.max(1,Math.floor(ws.length*ratio));
+  const idxs=new Set();
+  const order=ws.map((w,i)=>({i,w})).sort((a,b)=>b.w.length-a.w.length).map(o=>o.i);
+  for(let i=0;i<order.length&&idxs.size<toHide;i++){if(ws[order[i]].length>=3)idxs.add(order[i]);}
+  const gaps=[];
+  const out=ws.map((w,i)=>idxs.has(i)?(gaps.push(w),`<span class="cloze-gap">${' '.repeat(Math.min(12,w.length))}</span>`):escapeHtml(w)).join('');
+  return{html:out,gaps};
+}
 
-const root=document.getElementById('learnRoot'),roleSel=document.getElementById('roleSel'),sessionSize=document.getElementById('sessionSize'),modeSel=document.getElementById('modeSel'),blockWrap=document.getElementById('blockWrap');
+// === Views Navigation ===
+const views=document.querySelectorAll("[data-view]");
+function showView(name){
+  views.forEach(v=>v.classList.toggle("active",v.dataset.view===name));
+  document.getElementById("hdr").classList.toggle("compact",name!=="home");
+  document.getElementById("subtitle").textContent=name==="home"?"Willkommen":name[0].toUpperCase()+name.slice(1);
+}
+document.querySelectorAll("[data-nav]").forEach(btn=>btn.onclick=()=>showView(btn.dataset.nav));
 
-function renderClassic(ex,N){root.innerHTML='';ex.slice(0,N).forEach(b=>{const box=el('div',{class:'exchange'});if(b.context.length){const ctx=el('div',{class:'faded'},`${b.context[b.context.length-1].speaker}: ${b.context[b.context.length-1].text}`);box.appendChild(ctx);}b.yours.forEach(l=>{box.appendChild(el('div',{class:'line you'},`${l.speaker}: ${l.text}`));});root.appendChild(box);});}
-function renderFlash(ex){const pool=[];ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});let i=0,revealed=false;root.innerHTML='';const card=el('div',{class:'card'});root.appendChild(card);function show(){const it=pool[i];card.innerHTML='';if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));card.appendChild(el('div',{class:'big'},revealed?`${it.line.speaker}: ${it.line.text}`:`${it.line.speaker}: (verborgen)`));if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));}
-card.addEventListener('click',()=>{revealed=!revealed;show();});show();}
-function renderCloze(ex){const pool=[];ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});let i=0;root.innerHTML='';const card=el('div',{class:'card'});root.appendChild(card);function show(){const it=pool[i];card.innerHTML='';if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));const {html}=makeCloze(it.line.text,.35);card.appendChild(el('div',{class:'big'},`${it.line.speaker}: ${html}`));if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));}
-show();}
+// === Lernen ===
+const root=document.getElementById('learnRoot'),
+  roleSel=document.getElementById('roleSel'),
+  sessionSize=document.getElementById('sessionSize'),
+  modeSel=document.getElementById('modeSel'),
+  blockWrap=document.getElementById('blockWrap');
 
-document.getElementById('startLearn').onclick=()=>{const data=window.__SCRIPT||{items:[]};const role=roleSel.value;const ex=buildExchanges(data.items||[],role);if(modeSel.value==='classic'){renderClassic(ex,parseInt(sessionSize.value)||5);}else if(modeSel.value==='flash'){renderFlash(ex);}else{renderCloze(ex);}blockWrap.style.display=(modeSel.value==='classic')?'block':'none';};
+function renderClassic(ex,N){
+  root.innerHTML='';
+  ex.slice(0,N).forEach(b=>{
+    const box=el('div',{class:'exchange'});
+    if(b.context.length){
+      const ctx=el('div',{class:'faded'},`${b.context[b.context.length-1].speaker}: ${b.context[b.context.length-1].text}`);
+      box.appendChild(ctx);
+    }
+    b.yours.forEach(l=>{
+      box.appendChild(el('div',{class:'line you'},`${l.speaker}: ${l.text}`));
+    });
+    root.appendChild(box);
+  });
+}
+function renderFlash(ex){
+  const pool=[];
+  ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});
+  let i=0,revealed=false;
+  root.innerHTML='';
+  const card=el('div',{class:'card'});
+  root.appendChild(card);
+  function show(){
+    const it=pool[i];
+    card.innerHTML='';
+    if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));
+    card.appendChild(el('div',{class:'big'},revealed?`${it.line.speaker}: ${it.line.text}`:`${it.line.speaker}: (verborgen)`));
+    if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));
+  }
+  card.addEventListener('click',()=>{revealed=!revealed;show();});
+  show();
+}
+function renderCloze(ex){
+  const pool=[];
+  ex.forEach((b,bi)=>{b.yours.forEach(line=>pool.push({line,prev:b.context[b.context.length-1]||null,next:ex[bi+1]?ex[bi+1].context[0]:null}));});
+  let i=0;
+  root.innerHTML='';
+  const card=el('div',{class:'card'});
+  root.appendChild(card);
+  function show(){
+    const it=pool[i];
+    card.innerHTML='';
+    if(it.prev)card.appendChild(el('div',{class:'faded'},`${it.prev.speaker}: ${it.prev.text}`));
+    const {html}=makeCloze(it.line.text,.35);
+    card.appendChild(el('div',{class:'big'},`${it.line.speaker}: ${html}`));
+    if(it.next)card.appendChild(el('div',{class:'faded'},`${it.next.speaker}: ${it.next.text}`));
+  }
+  show();
+}
+
+document.getElementById('startLearn').onclick=()=>{
+  const data=window.__SCRIPT||{items:[]};
+  const role=roleSel.value;
+  const ex=buildExchanges(data.items||[],role);
+  if(modeSel.value==='classic'){renderClassic(ex,parseInt(sessionSize.value)||5);}
+  else if(modeSel.value==='flash'){renderFlash(ex);}
+  else{renderCloze(ex);}
+  blockWrap.style.display=(modeSel.value==='classic')?'block':'none';
+};
 modeSel.onchange=()=>{blockWrap.style.display=(modeSel.value==='classic')?'block':'none';};
 
-(async()=>{try{const res=await fetch(jsonSrc,{cache:'no-store'});const j=await res.json();window.__SCRIPT=j;const roles=new Set();(j.items||[]).forEach(it=>{if(it.type==='dialogue'&&it.speaker)roles.add(norm(it.speaker));});roleSel.innerHTML=[...roles].map(r=>`<option>${r}</option>`).join('');}catch{root.textContent='Fehler beim Laden';}})();
+// === Survival ===
+const survRoot=document.getElementById("survRoot");
+let survLives=3,survScore=0,survPool=[];
+function startSurv(){
+  const data=window.__SCRIPT||{items:[]};
+  const role=document.getElementById("roleSurv").value;
+  const ex=buildExchanges(data.items||[],role);
+  survPool=[];
+  ex.forEach(b=>b.yours.forEach(line=>survPool.push(line)));
+  survLives=3;survScore=0;
+  document.getElementById("heartPill").textContent="❤️❤️❤️";
+  document.getElementById("scorePill").textContent="0";
+  nextSurv();
+}
+function nextSurv(){
+  if(survLives<=0){gameOver();return;}
+  survRoot.innerHTML='';
+  const card=el('div',{class:'card'});
+  survRoot.appendChild(card);
+  const line=survPool[Math.floor(Math.random()*survPool.length)];
+  const correct=line.text;
+  const wrongs=survPool.filter(l=>l!==line).sort(()=>.5-Math.random()).slice(0,2).map(l=>l.text);
+  const opts=[correct,...wrongs].sort(()=>.5-Math.random());
+  card.appendChild(el('div',{class:'big'},`${line.speaker}: …`));
+  const choices=el('div',{class:'choices'});
+  opts.forEach(opt=>{
+    const btn=el('button',{class:'secondary'},opt);
+    btn.onclick=()=>{
+      if(opt===correct){
+        survScore++;
+        document.getElementById("scorePill").textContent=survScore;
+        confetti({particleCount:40,spread:60,origin:{y:.6}});
+      }else{
+        survLives--;document.getElementById("heartPill").textContent="❤️".repeat(survLives);
+      }
+      nextSurv();
+    };
+    choices.appendChild(btn);
+  });
+  card.appendChild(choices);
+}
+function gameOver(){
+  survRoot.innerHTML='';
+  survRoot.appendChild(el('div',{class:'card big'},`Game Over! Score: ${survScore}`));
+  saveScore(survScore);
+}
+document.getElementById("startSurv").onclick=startSurv;
+
+// === Highscores (GUN.js) ===
+const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);
+const board=gun.get('horrorladen-scores');
+function saveScore(score){
+  const name=document.getElementById("nameField").value||"Anon";
+  const role=document.getElementById("roleSurv").value;
+  board.set({name,role,score,time:Date.now()});
+}
+document.getElementById("refreshBoard").onclick=async()=>{
+  const list=[];
+  board.map().once((data)=>{
+    if(data)list.push(data);
+    renderBoard(list);
+  });
+};
+function renderBoard(list){
+  const limit=parseInt(document.getElementById("boardLimit").value)||25;
+  const roleFilter=document.getElementById("boardRole").value;
+  list.sort((a,b)=>b.score-a.score);
+  const filtered=list.filter(x=>!roleFilter||x.role===roleFilter).slice(0,limit);
+  const div=document.getElementById("board");
+  div.innerHTML='';
+  filtered.forEach(r=>{
+    div.appendChild(el('div',{class:'row'},`${r.name} (${r.role||''})`,el('span',{},r.score)));
+  });
+}
+
+// === Gesten-Navigation (Zurück-Swipe) ===
+let touchStartX=0;
+document.body.addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;});
+document.body.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].screenX-touchStartX;
+  if(dx>80)showView("home");
+});
+
+// === Initialisierung ===
+(async()=>{
+  try{
+    const res=await fetch(jsonSrc,{cache:'no-store'});
+    const j=await res.json();
+    window.__SCRIPT=j;
+    const roles=new Set();
+    (j.items||[]).forEach(it=>{
+      if(it.type==='dialogue'&&it.speaker)roles.add(norm(it.speaker));
+    });
+    roleSel.innerHTML=[...roles].map(r=>`<option>${r}</option>`).join('');
+    document.getElementById("roleSurv").innerHTML=[...roles].map(r=>`<option>${r}</option>`).join('');
+    document.getElementById("boardRole").innerHTML='<option value="">Alle</option>'+[...roles].map(r=>`<option>${r}</option>`).join('');
+  }catch{
+    root.textContent='Fehler beim Laden';
+  }
+})();
 </script>
 </body>
 </html>
