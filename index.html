@@ -33,7 +33,7 @@
     .menu{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin:.6rem 0}
     @media (max-width:820px){ .menu{grid-template-columns:repeat(3,1fr);} }
     @media (max-width:480px){ .menu{grid-template-columns:repeat(2,1fr);} }
-    @media (max-width:400px){ .menu{grid-template-columns:1fr;} } /* iPhone – untereinander */
+    @media (max-width:400px){ .menu{grid-template-columns:1fr;} }
 
     .menu button{
       display:flex;gap:.35rem;align-items:center;justify-content:center;
@@ -208,14 +208,10 @@
         </div>
       </div>
 
-      <!-- NEU: Hervorhebungs-Dropdown NUR für Anzeige -->
-      <div class="controls" style="grid-template-columns:1fr auto">
+      <div class="controls" style="grid-template-columns:1fr">
         <div>
           <label for="viewerRoleSel">Hervorhebung (nur Anzeige)</label>
           <select id="viewerRoleSel"></select>
-        </div>
-        <div class="cta" style="align-items:flex-end">
-          <span class="faded" id="viewerLegend">Hervorhebung aktiv</span>
         </div>
       </div>
     </div>
@@ -259,48 +255,41 @@
     <div id="survRoot"></div>
   </section>
 
-  <!-- SCORES -->
+  <!-- SCORES (nur Leaderboard) -->
   <section data-view="scores">
-    <div class="panel controls">
-      <div>
-        <label for="nameField">Dein Name</label>
-        <input id="nameField" type="text" placeholder="z.B. Alex"/>
-      </div>
-      <div>
-        <label for="boardRole">Rolle</label>
-        <select id="boardRole"><option value="">Alle</option></select>
-      </div>
-      <div>
-        <label for="boardLimit">Anzahl</label>
-        <select id="boardLimit"><option>10</option><option selected>25</option><option>50</option></select>
-      </div>
-      <div class="cta">
-        <button class="primary" id="refreshBoard">Aktualisieren</button>
-      </div>
+    <div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap">
+      <div class="title" style="font-size:1.05rem">Leaderboard</div>
+      <div class="faded" id="boardInfo">—</div>
     </div>
     <div id="board" class="list"></div>
   </section>
 
-  <!-- SETTINGS -->
+  <!-- SETTINGS (aufgeräumt + JSON-Dropdown) -->
   <section data-view="settings">
-    <div class="panel" style="display:grid;gap:.9rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
-        <div style="flex:1 1 260px">
+    <div class="panel" style="display:grid;gap:1rem">
+      <div class="controls" style="grid-template-columns:1fr auto">
+        <div>
           <label for="playerName">Spielername</label>
           <input id="playerName" type="text" placeholder="z.B. Alex"/>
         </div>
-        <div>
+        <div class="cta">
           <button class="primary" id="saveSettings">Speichern</button>
         </div>
       </div>
 
-      <div style="display:grid;gap:.4rem">
-        <label for="scriptInput">JSON-Quelle (Pfad/Datei)</label>
-        <input id="scriptInput" type="text" />
-        <div style="display:flex;gap:.5rem;align-items:center">
+      <div style="display:grid;gap:.6rem">
+        <label for="scriptSelect">JSON-Quelle</label>
+        <select id="scriptSelect"></select>
+
+        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+          <label style="display:flex;gap:.4rem;align-items:center">
+            <input id="manualToggle" type="checkbox"> <span>Manuell eingeben</span>
+          </label>
+          <input id="scriptInput" type="text" placeholder="Pfad/Datei.json" style="display:none;flex:1 1 260px"/>
           <button class="primary" id="loadScriptBtn">Neu laden</button>
-          <span class="faded">Aktuell: <code id="jsonSrcLabel">horrorladen_final_with_acts.json</code></span>
+          <span class="faded">Aktuell: <code id="jsonSrcLabel">—</code></span>
         </div>
+        <div class="faded" id="discHint"></div>
       </div>
     </div>
   </section>
@@ -333,7 +322,7 @@ const state={
   actsList:[], scenesByAct:{}, songsSet:new Set(),
   pageIndex:0, pageSizeClassic:8, pageSizeSingle:1, lastFiltered:[],
   viewerIndex:0, viewerPageSize:20, viewerLast:[],
-  viewerHighlightRole:'' // NEU: eigene Auswahl im Viewer
+  viewerHighlightRole:''
 };
 
 const norm = s => (s||'').trim().toUpperCase();
@@ -406,7 +395,6 @@ async function loadJSON(){
   state.items=out;
   state.roles=[...meta.roles].filter(Boolean);
 
-  // acts & scenes aus data.acts[]
   state.actsList=[];
   state.scenesByAct={};
   if(data && Array.isArray(data.acts)){
@@ -420,6 +408,7 @@ async function loadJSON(){
   state.songsSet = meta.songs;
 
   populateFilters();
+  renderBoardAuto(); // refresh leaderboard on load
   console.info('[JSON]', jsonSrc, 'Zeilen:', state.items.length);
 }
 
@@ -446,18 +435,14 @@ const songSelV  = document.getElementById('songFilterV');
 const lyricsOnlyV = document.getElementById('lyricsOnlyV');
 const viewerRoleSel = document.getElementById('viewerRoleSel');
 const roleSurv=document.getElementById('roleSurv');
-const boardRole=document.getElementById('boardRole');
-const nameField=document.getElementById('nameField');
 
-/* ====== Populate filters ====== */
 function populateFilters(){
   // Rollen
-  roleSel.innerHTML=state.roles.map(r=>`<option>${r}</option>`).join('');
-  roleSurv.innerHTML=state.roles.map(r=>`<option>${r}</option>`).join('');
-  viewerRoleSel.innerHTML=state.roles.map(r=>`<option>${r}</option>`).join('');
+  const roleOpts = state.roles.map(r=>`<option>${r}</option>`).join('');
+  roleSel.innerHTML=roleOpts;
+  roleSurv.innerHTML=roleOpts;
+  viewerRoleSel.innerHTML=roleOpts;
   state.viewerHighlightRole = viewerRoleSel.value || '';
-
-  boardRole.innerHTML='<option value="">Alle</option>'+state.roles.map(r=>`<option>${r}</option>`).join('');
 
   // Akte nur aus acts[]
   const fillActs=(sel)=> sel.innerHTML='<option value="">Alle</option>'+state.actsList.map(a=>`<option>${a}</option>`).join('');
@@ -472,13 +457,13 @@ function populateFilters(){
 
   // Songs
   const songs=[...state.songsSet];
-  songSel.innerHTML='<option value="">Alle</option>'+songs.map(s=>`<option>${s}</option>`).join('');
-  songSelV.innerHTML='<option value="">Alle</option>'+songs.map(s=>`<option>${s}</option>`).join('');
+  const songOpts = '<option value="">Alle</option>'+songs.map(s=>`<option>${s}</option>`).join('');
+  songSel.innerHTML=songOpts; songSelV.innerHTML=songOpts;
 
   renderLearn(); renderViewer();
 }
 
-/* Szenen neu füllen bei Aktwechsel */
+/* Aktwechsel -> Szenen aktualisieren */
 actSel.addEventListener('change', ()=>{ const a=actSel.value; const list= a?(state.scenesByAct[a]||[]):Object.values(state.scenesByAct).flat(); sceneSel.innerHTML='<option value="">Alle</option>'+list.map(s=>`<option>${s}</option>`).join(''); renderLearn(); });
 actSelV.addEventListener('change', ()=>{ const a=actSelV.value; const list= a?(state.scenesByAct[a]||[]):Object.values(state.scenesByAct).flat(); sceneSelV.innerHTML='<option value="">Alle</option>'+list.map(s=>`<option>${s}</option>`).join(''); renderViewer(); });
 
@@ -596,7 +581,7 @@ startLearnBtn.onclick=renderLearn;
 prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();};
 nextPage.onclick=()=>{state.pageIndex++; renderLearnPage();};
 
-/* ====== Viewer (mit eigener Hervorhebungsrolle) ====== */
+/* ====== Viewer ====== */
 const viewerRoot=document.getElementById('viewerRoot');
 const viewerPager=document.getElementById('viewerPager');
 const viewerPagerInfo=document.getElementById('viewerPagerInfo');
@@ -644,7 +629,6 @@ function nextSurv(pool){
   survRoot.innerHTML='';
   const card=el('div',{class:'card'});
   const line=pool[Math.floor(Math.random()*pool.length)];
-  // Kontext (nur davor, kein Spoiler)
   const fullSeq = applyFilters(state.items,{byRole:false});
   const {prev}=getContextForLine(line, fullSeq, norm(roleSurv.value||''));
   if(prev) card.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
@@ -666,40 +650,99 @@ document.getElementById('startSurv').onclick=startSurv;
 /* ====== Highscores (GUN.js Demo) ====== */
 const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);
 const board=gun.get('horrorladen-scores');
-function saveScore(score){ const name=(localStorage.getItem(LS.nameKey)||'Anon'); const role=roleSurv.value; board.set({name,role,score,time:Date.now()}); document.getElementById('refreshBoard').click(); }
-document.getElementById('refreshBoard').onclick=()=>{ const list=[]; board.map().once(d=>{ if(d) list.push(d); renderBoard(list); }); };
+const boardDiv=document.getElementById('board'); const boardInfo=document.getElementById('boardInfo');
+
+function saveScore(score){
+  const name=(localStorage.getItem(LS.nameKey)||'Anon');
+  const role=roleSurv.value;
+  board.set({name,role,score,time:Date.now()});
+  renderBoardAuto();
+}
+function renderBoardAuto(){ const list=[]; board.map().once(d=>{ if(d) list.push(d); renderBoard(list); }); }
 function renderBoard(list){
-  const limit=parseInt(document.getElementById('boardLimit').value)||25; const roleFilter=boardRole.value;
   list.sort((a,b)=>b.score-a.score);
-  const filtered=list.filter(x=>!roleFilter||x.role===roleFilter).slice(0,limit);
-  const div=document.getElementById('board'); div.innerHTML='';
-  filtered.forEach(r=>div.appendChild(el('div',{class:'row',style:'display:flex;justify-content:space-between;align-items:center;margin:.3rem 0'}, `${r.name} ${r.role?`(${r.role})`:''}`, el('span',{}, r.score))));
+  boardDiv.innerHTML='';
+  const now=new Date(); boardInfo.textContent=`${list.length} Einträge, zuletzt: ${now.toLocaleTimeString()}`;
+  list.forEach((r,i)=>{
+    const row=el('div',{class:'row',style:'display:flex;justify-content:space-between;align-items:center;margin:.3rem 0'},
+      `${i+1}. ${r.name||'Anon'} ${r.role?`(${r.role})`:''}`, el('strong',{}, r.score??0));
+    boardDiv.appendChild(row);
+  });
 }
 
-/* ====== Settings (Name & Script) ====== */
+/* ====== Settings (Name & Script mit Auto-Discovery) ====== */
 const playerName=document.getElementById('playerName');
 const saveSettings=document.getElementById('saveSettings');
+const scriptSelect=document.getElementById('scriptSelect');
+const manualToggle=document.getElementById('manualToggle');
 const scriptInput=document.getElementById('scriptInput');
 const loadScriptBtn=document.getElementById('loadScriptBtn');
+const discHint=document.getElementById('discHint');
 
 playerName.value = localStorage.getItem(LS.nameKey)||'';
-nameField.value = playerName.value;
-scriptInput.value = jsonSrc;
+document.getElementById('jsonSrcLabel').textContent = jsonSrc;
 
 saveSettings.onclick=()=>{
   localStorage.setItem(LS.nameKey, playerName.value.trim()||'Anon');
-  nameField.value = playerName.value.trim();
+};
+
+manualToggle.onchange=()=>{
+  const on=manualToggle.checked;
+  scriptInput.style.display = on ? '' : 'none';
 };
 
 loadScriptBtn.onclick=()=>{
-  const v = (scriptInput.value||'').trim();
-  if(!v) return;
-  localStorage.setItem(LS.scriptKey, v);
-  jsonSrc = v;
-  if(document.getElementById('jsonSrcLabel')) document.getElementById('jsonSrcLabel').textContent = jsonSrc;
-  // neu laden
+  const manual = manualToggle.checked;
+  const chosen = manual ? (scriptInput.value||'').trim() : scriptSelect.value;
+  if(!chosen) return;
+  localStorage.setItem(LS.scriptKey, chosen);
+  jsonSrc = chosen;
+  document.getElementById('jsonSrcLabel').textContent = jsonSrc;
   loadJSON();
 };
+
+async function discoverJsonFiles(){
+  discHint.textContent='Suche JSONs im Repo …';
+  const found = new Set();
+  // 1) aktuelle Quelle immer anbieten
+  if(jsonSrc) found.add(jsonSrc);
+
+  // 2) Versuch: GitHub API (funktioniert bei öffentlichen Repos)
+  try{
+    const host=location.hostname; // z.B. jakobklucke.github.io
+    const user = host.split('.')[0];
+    const repo = location.pathname.split('/')[1] || (user+'.github.io');
+    const base = `https://api.github.com/repos/${user}/${repo}/contents`;
+    const paths = ['', '/data', '/scripts'];
+    for(const p of paths){
+      const url = base + p;
+      const res = await fetch(url, {headers:{'Accept':'application/vnd.github.v3+json'}});
+      if(!res.ok) continue;
+      const arr = await res.json();
+      (arr||[]).forEach(entry=>{
+        if(entry && entry.name && /\.json$/i.test(entry.name)){
+          const path = (p ? p+'/' : '') + entry.name;
+          found.add(path);
+        }
+      });
+    }
+    discHint.textContent = found.size ? 'Gefundene JSON-Dateien im Repo.' : 'Keine JSONs per API gefunden.';
+  }catch(e){
+    discHint.textContent = 'Konnte die Repo-Dateien nicht abrufen (evtl. privat). Du kannst oben „Manuell eingeben“ aktivieren.';
+  }
+
+  // 3) Fallback: häufige Namen anbieten
+  ['horrorladen_final_with_acts.json','script.json','data.json'].forEach(n=>found.add(n));
+
+  // Dropdown füllen (alphabetisch)
+  const list=[...found].sort((a,b)=>a.localeCompare(b));
+  scriptSelect.innerHTML = list.map(v=>`<option value="${v}">${v}</option>`).join('');
+  // aktuellen Wert markieren, falls vorhanden
+  const hasCurrent = list.includes(jsonSrc);
+  if(hasCurrent) scriptSelect.value = jsonSrc;
+}
+
+discoverJsonFiles();
 
 /* ====== Gesten & Mobile Zoom blocken ====== */
 let touchStartX=0; addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;});
