@@ -573,7 +573,7 @@ prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();}; nextPage.onclick=(
 
 /* ---------- Viewer ---------- */
 const viewerRoot=document.getElementById('viewerRoot'); const viewerPager=document.getElementById('viewerPager'); const viewerPagerInfo=document.getElementById('viewerPagerInfo'); const viewerPrev=document.getElementById('viewerPrev'); const viewerNext=document.getElementById('viewerNext'); const viewerProg=document.getElementById('viewerProg'); const viewerCount=document.getElementById('viewerCount');
-function renderViewer(){ state.viewerLast=applyFilters(state.items',{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage(); }
+function renderViewer(){ state.viewerLast=applyFilters(state.items,{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage(); }
 function renderViewerPage(){
   const items=state.viewerLast,total=items.length;
   if(!items.length){ viewerRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; viewerPager.hidden=true; viewerCount.textContent=`0/${state.items.length}`; viewerProg.style.width='0%'; return; }
