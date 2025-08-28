@@ -52,7 +52,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 @media (min-width:760px){.controls{grid-template-columns:1fr 1fr auto}}
 .controls .cta{display:flex;justify-content:flex-end}
 
-/* Buttons – Duolingo/Uiverse */
+/* Duo-like Buttons */
 .btn{
   position:relative; appearance:button; background-color: var(--green); border: solid transparent;
   border-radius: 16px; border-width: 0 0 4px; color:#0b1220; cursor:pointer; display:inline-block;
@@ -71,7 +71,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .btn:disabled{opacity:.5; cursor:default}
 .btn.secondary{ background:#fff; color:var(--ink); border:2px solid #00000014; text-transform:none; letter-spacing:.2px }
 .btn.secondary:after{display:none}
-.btn.secondary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1)} /* sanfter Hover */
+.btn.secondary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1)}
 .btn.blue{ background:var(--blue-dark); color:#fff }
 .btn.blue:after{ background:var(--blue) }
 
@@ -88,7 +88,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 /* Cards & Lines */
 .card{--border-radius:22px;width:min(100%,42rem);padding:1.1rem;border-radius:var(--border-radius);background:#fff;border:2px solid #00000010;box-shadow:var(--shadow);margin:1rem auto;position:relative;color:var(--ink)}
 .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid #00000010;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
-.exchange:hover{transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.08)} /* helle Card Hover */
+.exchange:hover{transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.08)}
 .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25);color:var(--ink)}
 .faded{opacity:.9;color:var(--muted);font-size:.96rem}
 .big{font-size:clamp(1.05rem,2.7vw,1.25rem);line-height:1.6;word-break:break-word;overflow-wrap:anywhere;color:var(--ink)}
@@ -114,7 +114,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 @media (min-width:640px){.home-menu{grid-template-columns:1fr 1fr}}
 @media (min-width:900px){.home-menu{grid-template-columns:repeat(4,1fr)}}
 .tile{display:flex;align-items:center;justify-content:center;gap:.6rem;min-height:64px;padding:.9rem;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-weight:900;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
-.tile:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)} /* sanfter Hover für helle Kacheln */
+.tile:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)}
 
 .bottom{position:sticky;bottom:0;z-index:35;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.85))}
 .bottom-nav{display:grid;grid-template-columns:repeat(1,1fr);gap:.6rem;max-width:20rem;margin:0 auto}
@@ -272,28 +272,18 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
       </div>
 
       <div style="display:grid;gap:.6rem">
-        <label for="scriptSelect">JSON-Quelle</label>
+        <label for="scriptSelect">JSON-Quelle (aus scripts.json)</label>
         <select id="scriptSelect"></select>
         <div style="display:flex;gap:.6rem;align-items:end;flex-wrap:wrap">
           <label class="checkbox-container" style="padding-left:35px">
             <input id="manualToggle" class="custom-checkbox" type="checkbox">
             <span class="checkmark"></span><span class="label">Manuell eingeben</span>
           </label>
-          <input id="scriptInput" type="text" placeholder="Pfad/Datei.json" style="display:none;flex:1 1 260px">
+          <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
           <button class="btn primary" id="loadScriptBtn" data-sfx>Neu laden</button>
         </div>
         <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
-        <div class="faded" id="discHint"></div>
-      </div>
-
-      <!-- Index-Picker für scripts.json -->
-      <div id="indexPicker" class="panel" style="display:none; margin-top:.4rem">
-        <div class="title" style="font-size:1rem;margin-bottom:.4rem">Skript aus Index wählen</div>
-        <div class="controls" style="grid-template-columns:1fr auto">
-          <div><label for="indexScriptSel">Skripte in dieser Datei</label><select id="indexScriptSel"></select></div>
-          <div class="cta"><button class="btn primary" id="loadFromIndexBtn" data-sfx>Dieses Skript laden</button></div>
-        </div>
-        <div class="faded" id="indexSourceNote">Hinweis: Die aktuell geladene Datei ist ein Index (scripts.json).</div>
+        <div class="faded" id="scriptsNote">Suche nach /scripts.json …</div>
       </div>
     </div>
   </section>
@@ -301,21 +291,21 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 
 <div class="bottom">
   <div class="bottom-nav">
-    <button class="navbtn" data-nav="home"    data-sfx>🏠</button>
+    <button class="navbtn" data-nav="home" data-sfx>🏠</button>
   </div>
 </div>
 
 <script>
 /* ---------- Prefs/State ---------- */
 const LS={name:'hl_player_name',src:'hl_json_src',sfx:'hl_sfx_on',motion:'hl_reduce_motion'};
-let jsonSrc=localStorage.getItem(LS.src)||'horrorladen_final_with_acts.json';
+let jsonSrc=localStorage.getItem(LS.src)||'/horrorladen_final_with_acts.json';
 let sfxOn=JSON.parse(localStorage.getItem(LS.sfx)??'true');
 let reduceMotion=JSON.parse(localStorage.getItem(LS.motion)??'false');
 
 const state={items:[],roles:[],actsList:[],scenesByAct:{},songsSet:new Set(),
   pageIndex:0,pageSizeClassic:8,pageSizeSingle:1,lastFiltered:[],
   viewerIndex:0,viewerPageSize:20,viewerLast:[],viewerHighlightRole:'',
-  indexList:[]
+  indexFromScriptsJson:[]
 };
 
 const norm=s=>(s||'').trim().toUpperCase();
@@ -342,7 +332,7 @@ const sfxGood =()=>tone([0,7,12,19],.07,'sine',720);
 const sfxBad  =()=>tone([0,-3,-5],.09,'sawtooth',200);
 document.addEventListener('click',e=>{ if(e.target.closest('[data-sfx]')) sfxClick(); },{capture:true});
 
-/* ---------- JSON/Index ---------- */
+/* ---------- Parse helpers ---------- */
 const scanTitleLike=o=>{if(!o||typeof o!=='object')return null;for(const k of ['title','name','label','id'])if(typeof o[k]==='string'&&o[k].trim())return o[k].trim();return null;}
 const normalizeTitle=v=> typeof v==='string'?v: (typeof v==='number'?String(v): (v&&typeof v==='object'? (scanTitleLike(v)||'') : '') );
 
@@ -352,27 +342,31 @@ function isFullScript(data){
   if(typeof data==='object') return !!(data.acts || data.segments || data.children || data.items);
   return false;
 }
-function parseIndexList(data){
+function parseScriptsJson(data){
+  // Accepts:
+  // { "scripts": ["a.json","b.json"] }
+  // { "scripts": [{ "title":"X","src":"x.json"}, "y.json", {"name":"Z","file":"z.json"}] }
+  // [ "a.json", {"title":"B","src":"b.json"} ]
   const out=[];
-  if(!data) return out;
-  if(Array.isArray(data)){
-    data.forEach((it,i)=>{
-      if(typeof it==='string') out.push({label:it, value:it});
-      else if(it && typeof it==='object'){
-        const value = it.src || it.file || it.path || it.url || '';
-        const label = it.title || it.name || it.label || value || `Skript ${i+1}`;
-        if(value) out.push({label,value});
-      }
-    });
-  } else if (typeof data==='object'){
-    if(Array.isArray(data.scripts)) return parseIndexList(data.scripts);
-    if(typeof data.scripts==='object'){
+  const push=(label,value)=>{ if(value) out.push({label:label||value, value}); };
+  const parseEntry=(it,i)=>{
+    if(typeof it==='string'){ push(it,it); }
+    else if(it && typeof it==='object'){
+      const value= it.src || it.file || it.path || it.url || '';
+      const label= it.title || it.name || it.label || value || `Skript ${i+1}`;
+      push(label,value);
+    }
+  };
+  if(Array.isArray(data)){ data.forEach(parseEntry); }
+  else if(data && typeof data==='object'){
+    if(Array.isArray(data.scripts)){ data.scripts.forEach(parseEntry); }
+    else if(typeof data.scripts==='object'){
       Object.entries(data.scripts).forEach(([k,v])=>{
-        if(typeof v==='string') out.push({label:k||v, value:v});
+        if(typeof v==='string') push(k||v,v);
         else if(v && typeof v==='object'){
           const value=v.src||v.file||v.path||'';
           const label=v.title||v.name||k||value;
-          if(value) out.push({label,value});
+          push(label,value);
         }
       });
     }
@@ -402,44 +396,63 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
 }
 
-/* ---------- Robust Loader ---------- */
+/* ---------- Fetch helpers ---------- */
 const jsonLabel=document.getElementById('jsonSrcLabel');
-const indexPicker=document.getElementById('indexPicker');
-const indexScriptSel=document.getElementById('indexScriptSel');
-const loadFromIndexBtn=document.getElementById('loadFromIndexBtn');
-
-async function fetchFirstOk(paths){
+async function fetchJsonAny(paths){
   for(const p of paths){
     try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok){ return await r.json(); } }catch{}
   }
-  throw new Error('Keine der JSON-Pfade konnte geladen werden: '+paths.join(', '));
+  throw new Error('Konnte keine Datei laden aus: '+paths.join(', '));
 }
 
+/* ---------- scripts.json -> dropdown ---------- */
+const scriptSelect=document.getElementById('scriptSelect');
+const scriptsNote=document.getElementById('scriptsNote');
+
+async function loadScriptsIndex(){
+  const candidates=['/scripts.json','scripts.json','./scripts.json','/data/scripts.json','data/scripts.json'];
+  try{
+    const idx=await fetchJsonAny(candidates);
+    const list=parseScriptsJson(idx);
+    if(list.length){
+      state.indexFromScriptsJson=list;
+      scriptSelect.innerHTML=list.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+      // Preselect current jsonSrc if present in list
+      const plain=jsonSrc.replace(/^\//,'');
+      const found=list.find(o=>o.value===jsonSrc || o.value===plain || '/'+o.value===jsonSrc);
+      if(found) scriptSelect.value=found.value;
+      scriptsNote.textContent='Quelle: scripts.json';
+      return true;
+    }
+    scriptsNote.textContent='scripts.json gefunden, aber leer.';
+    return false;
+  }catch{
+    scriptsNote.textContent='Keine scripts.json gefunden – du kannst einen Pfad manuell eingeben.';
+    // Fallback: show current src as a single option
+    scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
+    return false;
+  }
+}
+
+/* ---------- Loader for content JSON ---------- */
+const indexPicker=document.getElementById('indexPicker'); // (not used now; we rely on scripts.json)
 async function loadJSON(){
   jsonLabel.textContent=jsonSrc;
-  indexPicker.style.display='none';
-
-  const tryPaths=[jsonSrc, './'+jsonSrc, '/'+jsonSrc];
+  const tryPaths=[jsonSrc, '/'+jsonSrc.replace(/^\//,''), './'+jsonSrc.replace(/^\//,'')];
   let data;
-  try{
-    data=await fetchFirstOk(tryPaths);
-  }catch(err){
-    showError('JSON konnte nicht geladen werden', err.message);
-    return;
+  try{ data=await fetchJsonAny(tryPaths); }
+  catch(err){ showError('JSON konnte nicht geladen werden', err.message); return; }
+
+  // If someone accidentally points to an index-like file here, try to resolve via parseScriptsJson:
+  const maybeIndex=parseScriptsJson(data);
+  if(maybeIndex.length && !isFullScript(data)){
+    // choose first as fallback
+    jsonSrc=maybeIndex[0].value;
+    localStorage.setItem(LS.src,jsonSrc);
+    return loadJSON();
   }
 
-  // Index?
-  const indexList = parseIndexList(data);
-  if(indexList.length>0 && !isFullScript(data)){
-    state.indexList=indexList;
-    indexScriptSel.innerHTML=indexList.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
-    indexPicker.style.display='';
-    if(indexList[0]) indexScriptSel.value=indexList[0].value;
-    switchViewImmediate('settings');
-    return;
-  }
-
-  // Vollständiges Skript
+  // Full script → flatten
   const out=[]; const meta={roles:new Set(),songs:new Set()};
   Array.isArray(data)?flattenAny({segments:data},{},out,meta):flattenAny(data,{},out,meta);
   state.items=out; state.roles=[...meta.roles];
@@ -455,12 +468,13 @@ async function loadJSON(){
   populateFilters();
 }
 
+/* ---------- Error box ---------- */
 function showError(title,msg){
   const root=document.querySelector('[data-view].active')||document.body;
   const box=el('div',{class:'card'},
     el('div',{class:'big'},`❗ ${title}`),
     el('div',{class:'faded'},String(msg||'')),
-    el('div',{class:'faded'},`Gesucht: ${jsonSrc}`)
+    el('div',{class:'faded'},`Quelle: ${jsonSrc}`)
   );
   root.appendChild(box);
 }
@@ -621,45 +635,30 @@ function renderBoard(list){ list.sort((a,b)=>b.score-a.score); boardDiv.innerHTM
 
 /* ---------- Settings ---------- */
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
-const scriptSelect=document.getElementById('scriptSelect'), manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn'), discHint=document.getElementById('discHint');
+const manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn');
 playerName.value=localStorage.getItem(LS.name)||''; document.getElementById('jsonSrcLabel').textContent=jsonSrc;
 saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); sfxGood(); };
 manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'none'; };
 loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; sfxOpen(); loadJSON(); };
 
-async function discoverJsonFiles(){
-  // Leichte Heuristik – listet ein paar sinnvolle Defaults + vorhandene Fundstücke
-  const candidates=new Set([jsonSrc,'horrorladen_final_with_acts.json','data.json','script.json','scripts.json']);
-  // Falls du im privaten Repo bist, ist die GitHub API ggf. geblockt – daher optional:
-  try{
-    const host=location.hostname, user=host.split('.')[0]; const repo=location.pathname.split('/')[1] || (user+'.github.io');
-    const base=`https://api.github.com/repos/${user}/${repo}/contents`;
-    for(const p of ['','/data','/scripts']){
-      const r=await fetch(base+p,{headers:{Accept:'application/vnd.github.v3+json'}});
-      if(!r.ok) continue; const arr=await r.json(); (arr||[]).forEach(e=>{ if(e && /\.json$/i.test(e.name)) candidates.add((p?p+'/':'')+e.name); });
-    }
-    discHint.textContent='Gefundene JSON-Dateien im Repo.';
-  }catch{ discHint.textContent='Privates Repo? Dann manuell eingeben.' }
-  const list=[...candidates].sort((a,b)=>a.localeCompare(b));
-  scriptSelect.innerHTML=list.map(v=>`<option value="${v}">${v}</option>`).join('');
-  if(list.includes(jsonSrc)) scriptSelect.value=jsonSrc;
-}
-
-/* ---------- Mobile: Zoom/Bounce aus ---------- */
+/* ---------- Mobile: prevent zoom/bounce ---------- */
 (function(){
   ['gesturestart','gesturechange','gestureend'].forEach(evt=>document.addEventListener(evt,e=>e.preventDefault(),{passive:false}));
   document.addEventListener('touchmove',e=>{ if(typeof e.scale==='number' && e.scale!==1) e.preventDefault(); },{passive:false});
   let lt=0; document.addEventListener('touchend',e=>{const n=Date.now(); if(n-lt<=300) e.preventDefault(); lt=n;},{passive:false});
 })();
 
-/* ---------- Init ---------- */
-document.getElementById('toggleSound')?.addEventListener('change',e=>{sfxOn=e.target.checked; localStorage.setItem(LS.sfx,JSON.stringify(sfxOn));});
-document.getElementById('toggleMotion')?.addEventListener('change',e=>{reduceMotion=e.target.checked; localStorage.setItem(LS.motion,JSON.stringify(reduceMotion));});
-document.getElementById('toggleSound')&&(document.getElementById('toggleSound').checked=sfxOn);
-document.getElementById('toggleMotion')&&(document.getElementById('toggleMotion').checked=reduceMotion);
+/* ---------- Boot ---------- */
+function switchHome(){switchViewImmediate('home');}
+document.querySelector('[data-nav="home"]').onclick=switchHome;
 
-function boot(){ switchViewImmediate('home'); loadJSON(); renderBoardAuto(); discoverJsonFiles(); }
-document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
+async function boot(){
+  switchViewImmediate('home');
+  await loadScriptsIndex();          // Fill dropdown from scripts.json if available
+  await loadJSON();                  // Load the selected or default script
+  renderBoardAuto();                 // Start scores listener
+}
+document.readyState==='loading' ? document.addEventListener('DOMContentLoaded',boot) : boot();
 </script>
 </body>
 </html>
