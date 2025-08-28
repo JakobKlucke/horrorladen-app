@@ -3,27 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Horrorladen – Lernapp (Duolingo-Style)</title>
+  <title>Horrorladen – Lernapp</title>
   <meta name="theme-color" content="#58CC02" />
-
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
-  <!-- Motion One (leichte Animations-Lib, kein Build nötig) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@motionone/dom/dist/motion-one.umd.min.js"></script>
-
   <style>
     :root{
-      /* Farbpalette */
       --green:#58CC02; --green-strong:#8EE000; --green-dark:#1FAF38;
       --yellow:#FFC715; --blue:#1CB0F6; --purple:#A560E8; --red:#FF4B4B;
       --ink:#2F2F2F; --paper:#FFFFFF; --bg:#F6F7FB; --muted:#6F6F6F;
       --ring: rgba(88,204,2,.35); --shadow:0 12px 30px rgba(0,0,0,.10);
       --radius:20px;
-      /* Motion tokens */
       --duo-ease-out: cubic-bezier(.17,.67,.16,1);
       --duo-ease-in: cubic-bezier(.5,0,1,.5);
       --duo-spring: cubic-bezier(.2,.8,.2,1);
-      --t-fast: 120ms; --t-reg: 200ms; --t-slow: 320ms;
+      --t-fast:120ms; --t-reg:200ms; --t-slow:320ms;
     }
 
     html{font-size:16px;height:100dvh;overscroll-behavior:none;background:var(--bg);-webkit-text-size-adjust:100%;}
@@ -31,12 +24,11 @@
     body{
       margin:0;height:100dvh;display:flex;flex-direction:column;
       background:var(--bg);color:var(--ink);
-      font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif;
+      font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       overflow:hidden; /* verhindert Bounce */
-      touch-action: manipulation; /* verhindert Double-Tap-Zoom */
+      touch-action:manipulation; /* verhindert Double-Tap-Zoom */
     }
 
-    /* Header */
     header{position:sticky;top:0;z-index:30;padding-top:env(safe-area-inset-top);
       backdrop-filter:saturate(120%) blur(10px);
       background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.75));
@@ -52,19 +44,16 @@
     }
     .logo:active{transform:scale(.94);}
     .logo svg{width:36px;height:36px;display:block}
-
-    .title{font-family:Nunito, Inter, sans-serif;font-weight:900;font-size:1.35rem;letter-spacing:.2px}
+    .title{font-family:Nunito,Inter,sans-serif;font-weight:900;font-size:1.35rem}
     .badge{font-size:.8rem;padding:.25rem .6rem;border-radius:999px;background:rgba(88,204,2,.15);color:#0D6A00;font-weight:700}
 
     .compact .hero{padding:.45rem .25rem;gap:.55rem}
     .compact .logo{width:36px;height:36px;border-radius:10px}
     .compact .title{font-size:1.05rem}
 
-    /* Bottom Nav (mobile-first) */
-    .bottom-nav{position:sticky;bottom:0;z-index:25;padding-bottom:env(safe-area-inset-bottom);}
-    .bottom-nav .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
-
-    nav.menu button{
+    /* Menu */
+    .menu{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin:.6rem 0}
+    .menu button{
       display:flex;gap:.35rem;align-items:center;justify-content:center;
       padding:.85rem;border-radius:18px;border:2px solid rgba(0,0,0,.06);
       background:linear-gradient(180deg,#fff,#F5FFF0);
@@ -73,8 +62,8 @@
       will-change: transform;
       transition: transform var(--t-fast) var(--duo-spring), box-shadow var(--t-reg) var(--duo-ease-out), border-color var(--t-reg) var(--duo-ease-out);
     }
-    nav.menu button:hover{ transform: translateY(-1px) scale(1.02);}
-    nav.menu button:active{ transform: translateY(0) scale(.98); box-shadow:0 4px 12px rgba(0,0,0,.10)}
+    .menu button:hover{ transform: translateY(-1px) scale(1.02);}
+    .menu button:active{ transform: translateY(0) scale(.98); box-shadow:0 4px 12px rgba(0,0,0,.10)}
 
     /* Panels & Inputs */
     .panel{
@@ -84,54 +73,49 @@
       animation: slideUp var(--t-slow) var(--duo-ease-out);
     }
     label{font-size:.95rem;color:var(--muted);display:block;margin-bottom:.35rem}
-
     select,input[type=text],button{
       width:100%;padding:.85rem 1rem;border-radius:16px;border:2px solid rgba(0,0,0,.08);
       background:#fff;color:var(--ink);min-height:48px;outline:none;
       transition: transform var(--t-fast) var(--duo-spring), border-color var(--t-reg) var(--duo-ease-out), box-shadow var(--t-reg) var(--duo-ease-out)
     }
     select:focus,input:focus{border-color:var(--green); box-shadow:0 0 0 6px var(--ring); transform: translateY(-1px)}
-    button{font-weight:800;letter-spacing:.02em;cursor:pointer}
     button.primary{background:linear-gradient(180deg,var(--green-strong),var(--green));color:#0b1220;border-color:transparent}
-    button.secondary{background:#fff}
-
-    /* Controls-Layout: klar und konsistent */
     .controls{display:grid;gap:.75rem;grid-template-columns:repeat(2,1fr);align-items:end}
     @media (min-width:760px){ .controls{grid-template-columns:repeat(3,1fr)} }
     .controls .cta{display:flex;justify-content:flex-end;align-items:end}
 
-    .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid rgba(0,0,0,.06)}
-    .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25)}
-    .faded{opacity:.8;color:var(--muted);font-size:.95rem}
-
-    .card{margin:1rem 0;padding:1.1rem;border-radius:22px;background:#fff;border:2px solid rgba(0,0,0,.06);
-      text-align:center;display:flex;flex-direction:column;gap:.6rem;box-shadow:var(--shadow);
-      animation: slideUp var(--t-slow) var(--duo-ease-out);
-    }
-    .choices{display:grid;gap:.6rem;margin-top:.6rem}
-    .big{font-size:1.06rem;line-height:1.55}
-
-    .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .65rem;border-radius:999px;background:#fff;border:2px solid rgba(0,0,0,.06); font-weight:800}
-    .pill.heart{color:var(--red)}
-
-    .cloze-gap{border-bottom:3px dotted var(--green-dark); padding:0 .25rem}
-
-    [data-view]{display:none}
-    [data-view].active{display:block}
-
-    /* Filter-Bar (Acts/Scenes/Songs/Lyrics) */
+    /* Filters */
     .filters{display:grid;gap:.6rem;margin:.6rem 0}
     @media (min-width:760px){ .filters{grid-template-columns:repeat(4,1fr)} }
     .chipbar{display:flex;gap:.5rem;overflow:auto;padding:.2rem .1rem}
     .chip{flex:0 0 auto; padding:.45rem .8rem;border-radius:999px;border:2px solid rgba(0,0,0,.06); background:#fff;font-weight:800}
     .chip.active{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25)}
 
+    /* Learn rows */
+    .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid rgba(0,0,0,.06)}
+    .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25)}
+    .faded{opacity:.8;color:var(--muted);font-size:.95rem}
+    .big{font-size:1.06rem;line-height:1.55}
+
+    /* Viewer rows */
+    .row{padding:.85rem 1rem;border-radius:14px;border:2px solid rgba(0,0,0,.06);background:#fff}
+    .row.me{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25);}
+
+    /* Cards */
+    .card{margin:1rem 0;padding:1.1rem;border-radius:22px;background:#fff;border:2px solid rgba(0,0,0,.06);
+      text-align:center;display:flex;flex-direction:column;gap:.6rem;box-shadow:var(--shadow);
+      animation: slideUp var(--t-slow) var(--duo-ease-out);
+    }
+
     /* Pagination */
     .pager{display:flex;justify-content:space-between;align-items:center;gap:.8rem;margin:1rem 0}
     .pager .info{font-size:.92rem;color:var(--muted)}
     .pager .group{display:flex;gap:.5rem}
 
-    /* Micro-Animationen */
+    [data-view]{display:none}
+    [data-view].active{display:block}
+
+    /* Micro-anim */
     @keyframes slideUp{0%{opacity:0; transform:translateY(10px)}100%{opacity:1; transform:translateY(0)}}
     .enter{animation: slideUp var(--t-slow) var(--duo-ease-out);}
   </style>
@@ -141,7 +125,6 @@
   <div class="wrap">
     <div class="hero">
       <div class="logo" aria-hidden="true">
-        <!-- Simple Owl-ish mark -->
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs><clipPath id="r"><rect rx="16" width="64" height="64"/></clipPath></defs>
           <g clip-path="url(#r)">
@@ -166,6 +149,7 @@
     <div class="panel">
       <nav class="menu">
         <button data-nav="learn">📖 Lernen</button>
+        <button data-nav="viewer">📜 Textviewer</button>
         <button data-nav="survival">🎮 Survival</button>
         <button data-nav="scores">🏆 Highscores</button>
         <button data-nav="settings">⚙️ Einstellungen</button>
@@ -176,7 +160,6 @@
   <!-- LEARN -->
   <section data-view="learn">
     <div class="panel">
-      <!-- Filter-Bar -->
       <div class="filters">
         <div>
           <label for="actFilter">Akt</label>
@@ -197,11 +180,8 @@
           </label>
         </div>
       </div>
-
-      <!-- Schnellwahl Akte -->
       <div id="actChips" class="chipbar" aria-label="Akte"></div>
 
-      <!-- Lern-Controls (Rolle, Modus, Start) -->
       <div class="controls" style="margin-top:.6rem">
         <div>
           <label for="roleSel">Rolle</label>
@@ -223,12 +203,48 @@
 
     <div id="learnRoot"></div>
 
-    <!-- Pagination -->
     <div class="pager" id="learnPager" hidden>
       <div class="info" id="pagerInfo">Seite 1/1</div>
       <div class="group">
         <button id="prevPage" class="secondary">← Zurück</button>
         <button id="nextPage" class="primary">Weiter →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEWER (eigener Menüpunkt) -->
+  <section data-view="viewer">
+    <div class="panel">
+      <div class="filters">
+        <div>
+          <label for="actFilterV">Akt</label>
+          <select id="actFilterV"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="sceneFilterV">Szene</label>
+          <select id="sceneFilterV"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="songFilterV">Song</label>
+          <select id="songFilterV"><option value="">Alle</option></select>
+        </div>
+        <div>
+          <label for="lyricsOnlyV">Lyrics-only</label>
+          <label style="display:flex;gap:.5rem;align-items:center">
+            <input id="lyricsOnlyV" type="checkbox" /> <span>nur Gesang</span>
+          </label>
+        </div>
+      </div>
+      <div class="faded" id="viewerLegend">Hervorhebung: <strong id="viewerRoleLabel">—</strong></div>
+    </div>
+
+    <div id="viewerRoot"></div>
+
+    <div class="pager" id="viewerPager" hidden>
+      <div class="info" id="viewerPagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="viewerPrev" class="secondary">← Zurück</button>
+        <button id="viewerNext" class="primary">Weiter →</button>
       </div>
     </div>
   </section>
@@ -315,12 +331,13 @@
   <nav class="menu">
     <button data-nav="home" aria-label="Home">🏠</button>
     <button data-nav="learn" aria-label="Lernen">📖</button>
+    <button data-nav="viewer" aria-label="Textviewer">📜</button>
     <button data-nav="survival" aria-label="Survival">🎮</button>
     <button data-nav="scores" aria-label="Highscores">🏆</button>
   </nav>
 </div>
 
-<!-- Delight libs -->
+<!-- libs -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
 
@@ -338,11 +355,15 @@ const state = {
   items: [],           // {type:'dialogue', speaker, text, kind:'line'|'lyric', meta:{act,scene,song}}
   acts: [], scenes: [], songs: [],
   roles: [],
-  // Pagination
+  // Learn pagination
   pageIndex: 0,
-  pageSizeClassic: 8,  // mehrere pro Seite
-  pageSizeSingle: 1,   // 1 pro Seite (Flash/Cloze)
-  lastFiltered: []
+  pageSizeClassic: 8,
+  pageSizeSingle: 1,
+  lastFiltered: [],
+  // Viewer pagination
+  viewerIndex: 0,
+  viewerPageSize: 20,
+  viewerLast: []
 };
 
 const norm = s => (s||'').trim().toUpperCase();
@@ -408,7 +429,7 @@ async function loadJSON(){
   if (Array.isArray(data)) flattenAny({segments:data}, {}, out, metaSets);
   else flattenAny(data, {}, out, metaSets);
 
-  // Rollenliste aus Daten ableiten (alle Speaker uppercased)
+  // Rollen aus Daten
   const roleSet = new Set(out.map(i=>norm(i.speaker)).filter(Boolean));
   state.roles = [...roleSet];
 
@@ -446,46 +467,19 @@ function makeCloze(text,ratio=.35){
   return{html:out,gaps};
 }
 
-/* Motion & Haptik */
+/* Motion & small helpers */
 const Motion = {
-  haptic(type='soft'){ try{ if(!('vibrate' in navigator)) return;
-    if(type==='success') navigator.vibrate(12);
-    else if(type==='error') navigator.vibrate([20,40,20]);
-    else navigator.vibrate(8);
-  }catch{} },
   stagger(nodes, step=60){ nodes.forEach((n,i)=>{ n.style.animationDelay=(i*step)+'ms'; n.classList.add('enter');
     n.addEventListener('animationend',()=>{n.style.animationDelay=''; n.classList.remove('enter');},{once:true}); }); }
 };
-
-/* Sounds */
-function playTone(steps=[0], duration=0.18, type='sine', base=440){
-  if(!soundOn||typeof window.AudioContext==='undefined') return;
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const osc=ctx.createOscillator(); const gain=ctx.createGain();
-  osc.type=type; osc.connect(gain); gain.connect(ctx.destination);
-  const now=ctx.currentTime; let t=now; gain.gain.setValueAtTime(.0001, now);
-  gain.gain.linearRampToValueAtTime(.22, now+.01);
-  steps.forEach(semi=>{ const f=base*Math.pow(2, semi/12); osc.frequency.setValueAtTime(f, t); t+=duration; });
-  gain.gain.exponentialRampToValueAtTime(.0001, t+.05);
-  osc.start(now); osc.stop(t+.06);
-}
-function sfxCorrect(){ playTone([0,4,7,12], .07, 'triangle', 660); Motion.haptic('success'); }
-function sfxWrong(){   playTone([0,-3,-5], .08, 'sawtooth', 180);  Motion.haptic('error'); }
-function sfxOpen(){    playTone([0,2,5,9,12], .06, 'square', 520);  Motion.haptic('soft'); }
-
-/* Gems/Coins */
-function gemBurst(origin={x:window.innerWidth/2, y:window.innerHeight*0.6}){
-  const colors=['#FFD700','#FFF2A6','#8EE000','#58CC02','#1CB0F6'];
-  confetti({particleCount:36, spread:60, origin:{x:origin.x/window.innerWidth, y:origin.y/window.innerHeight}, scalar:1.1, colors});
-  setTimeout(()=>confetti({particleCount:22, spread:80, origin:{x:origin.x/window.innerWidth, y:(origin.y-40)/window.innerHeight}, scalar:.9, colors}),120);
-}
+function sfxOpen(){ try{ if(!('vibrate' in navigator)) return; navigator.vibrate(8);}catch{} }
 
 /* View Navigation */
 function switchViewImmediate(name){
   document.querySelectorAll('[data-view]').forEach(v=>{
     const active = v.dataset.view===name;
     v.classList.toggle('active',active);
-    if(active){ const cards = v.querySelectorAll('.panel,.card,.row'); Motion.stagger([...cards]); }
+    if(active){ const cards = v.querySelectorAll('.panel,.card,.row,.exchange'); Motion.stagger([...cards]); }
   });
   document.getElementById('hdr').classList.toggle('compact',name!=='home');
   document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
@@ -504,6 +498,14 @@ const roleSel = document.getElementById('roleSel');
 const roleSurv = document.getElementById('roleSurv');
 const boardRole = document.getElementById('boardRole');
 
+/* Viewer filter controls */
+const actSelV   = document.getElementById('actFilterV');
+const sceneSelV = document.getElementById('sceneFilterV');
+const songSelV  = document.getElementById('songFilterV');
+const lyricsOnlyV = document.getElementById('lyricsOnlyV');
+const viewerLegend = document.getElementById('viewerLegend');
+const viewerRoleLabel = document.getElementById('viewerRoleLabel');
+
 function populateFiltersAndRoles(){
   roleSel.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
   roleSurv.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
@@ -511,7 +513,9 @@ function populateFiltersAndRoles(){
 
   const fillSel = (sel, arr) => sel.innerHTML = '<option value="">Alle</option>' + arr.map(v=>`<option>${v}</option>`).join('');
   fillSel(actSel, state.acts); fillSel(sceneSel, state.scenes); fillSel(songSel, state.songs);
+  fillSel(actSelV, state.acts); fillSel(sceneSelV, state.scenes); fillSel(songSelV, state.songs);
 
+  // Chips für Learn (Akte)
   actChips.innerHTML = '';
   state.acts.forEach(a=>{
     const chip=el('button',{class:'chip', type:'button'}, a);
@@ -519,6 +523,7 @@ function populateFiltersAndRoles(){
     actChips.appendChild(chip);
   });
   highlightChips();
+  updateViewerLegend();
 }
 
 function highlightChips(){
@@ -527,28 +532,32 @@ function highlightChips(){
   });
 }
 
-function applyFilters(items){
+function applyFilters(items, options={byRole:true, useViewerFilters:false}){
   const role = roleSel.value;
-  const act = actSel.value, scene = sceneSel.value, song = songSel.value;
-  const lyrOnly = !!lyricsOnly.checked;
+  const act = options.useViewerFilters ? actSelV.value : actSel.value;
+  const scene = options.useViewerFilters ? sceneSelV.value : sceneSel.value;
+  const song = options.useViewerFilters ? songSelV.value : songSel.value;
+  const lyrOnlyFlag = options.useViewerFilters ? !!lyricsOnlyV.checked : !!lyricsOnly.checked;
 
   return items
     .filter(it=>{
-      const sp = treatSpeaker(it.speaker);
-      if (!sp || sp==='__IGNORE__') return false;
-      if (sp!=='ALLE' && sp!==norm(role)) return false;
+      if (options.byRole){
+        const sp = treatSpeaker(it.speaker);
+        if (!sp || sp==='__IGNORE__') return false;
+        if (sp!=='ALLE' && sp!==norm(role)) return false;
+      }
       return true;
     })
     .filter(it=>{
       if (act && (it.meta?.act||'') !== act) return false;
       if (scene && (it.meta?.scene||'') !== scene) return false;
       if (song && (it.meta?.song||'') !== song) return false;
-      if (lyrOnly && it.kind!=='lyric') return false;
+      if (lyrOnlyFlag && it.kind!=='lyric') return false;
       return true;
     });
 }
 
-/* ---- Lernmodus-Logik mit Pagination ---- */
+/* ---- Learn (Classic/Flash/Cloze) mit Kontext über/unter ---- */
 const learnRoot=document.getElementById('learnRoot');
 const modeSel=document.getElementById('modeSel');
 const startLearnBtn=document.getElementById('startLearn');
@@ -558,7 +567,6 @@ const pagerInfo=document.getElementById('pagerInfo');
 const prevPage=document.getElementById('prevPage');
 const nextPage=document.getElementById('nextPage');
 
-// Kontext-Helfer: nimmt Nachbarzeilen fern deiner Rolle als Kontext
 function neighborContext(all, idx, roleUC){
   const prev = all[idx-1] && norm(all[idx-1].speaker)!==roleUC ? all[idx-1] : null;
   const next = all[idx+1] && norm(all[idx+1].speaker)!==roleUC ? all[idx+1] : null;
@@ -566,17 +574,12 @@ function neighborContext(all, idx, roleUC){
 }
 
 function renderLearn(){
-  // Filter anwenden
-  state.lastFiltered = applyFilters(state.items);
-  // PageSize je nach Modus
-  const mode = modeSel.value;
-  const size = (mode==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
-  // Zurück auf Seite 0
+  state.lastFiltered = applyFilters(state.items, {byRole:true, useViewerFilters:false});
+  const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
   state.pageIndex = 0;
-  renderLearnPage(size, mode);
+  renderLearnPage(size, modeSel.value);
   sfxOpen();
 }
-
 function renderLearnPage(pageSize, mode){
   const items = state.lastFiltered;
   const total = items.length;
@@ -586,25 +589,22 @@ function renderLearnPage(pageSize, mode){
   state.pageIndex = Math.min(Math.max(0, state.pageIndex), pages-1);
   const start = state.pageIndex * pageSize;
   const slice = items.slice(start, start + pageSize);
+  const roleUC = norm(roleSel.value||'');
 
   learnRoot.innerHTML='';
 
-  const roleUC = norm(roleSel.value||'');
-
   if(mode==='classic'){
-    // Mehrere Einträge pro Seite: Kontext + deine Zeile
     slice.forEach((line, iInSlice)=>{
       const idx = start + iInSlice;
       const {prev, next} = neighborContext(items, idx, roleUC);
       const box=el('div',{class:'exchange'});
       if(prev) box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
       box.appendChild(el('div',{class:'line big'}, `${line.speaker}: ${line.text}`));
-      if(next) box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+      if(next) box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`)); // dezente „erste Antwort danach“
       learnRoot.appendChild(box);
     });
     Motion.stagger([...learnRoot.querySelectorAll('.exchange')], 40);
   } else if(mode==='flash'){
-    // 1 Karte pro Seite: zum Aufdecken tippen
     const idx = start; const line = slice[0];
     const {prev, next} = neighborContext(items, idx, roleUC);
     const card = el('div',{class:'card'});
@@ -613,14 +613,9 @@ function renderLearnPage(pageSize, mode){
     const reveal = el('div',{class:'big', html:`${line.speaker}: ${escapeHtml(line.text)}`}); reveal.style.display='none';
     card.appendChild(secret); card.appendChild(reveal);
     if(next) card.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
-    card.addEventListener('click', ()=>{
-      secret.style.display='none';
-      reveal.style.display='';
-      sfxOpen();
-    }, {once:true});
+    card.addEventListener('click', ()=>{ secret.style.display='none'; reveal.style.display=''; sfxOpen(); }, {once:true});
     learnRoot.appendChild(card);
-  } else {
-    // Cloze: 1 Karte pro Seite mit Lücken
+  } else { // cloze
     const idx = start; const line = slice[0];
     const {prev, next} = neighborContext(items, idx, roleUC);
     const card = el('div',{class:'card'});
@@ -631,24 +626,18 @@ function renderLearnPage(pageSize, mode){
     learnRoot.appendChild(card);
   }
 
-  // Pager aktualisieren
   pager.hidden = pages<=1;
   pagerInfo.textContent = `Seite ${state.pageIndex+1}/${pages}`;
   prevPage.disabled = state.pageIndex===0;
   nextPage.disabled = state.pageIndex>=pages-1;
 }
 
-// Events
 startLearnBtn.onclick=renderLearn;
 [actSel, sceneSel, songSel, lyricsOnly, roleSel, modeSel].forEach(elm=>elm.addEventListener('change', ()=>{
-  const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
-  // bei Filter-Wechsel neu starten
-  state.pageIndex = 0;
-  renderLearn();
+  state.pageIndex = 0; renderLearn();
 }));
-
-prevPage.onclick = ()=>{ state.pageIndex--; const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle; renderLearnPage(size, modeSel.value); };
-nextPage.onclick = ()=>{ state.pageIndex++; const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle; renderLearnPage(size, modeSel.value); };
+prevPage.onclick = ()=>{ state.pageIndex--; renderLearnPage((modeSel.value==='classic')?state.pageSizeClassic:state.pageSizeSingle, modeSel.value); };
+nextPage.onclick = ()=>{ state.pageIndex++; renderLearnPage((modeSel.value==='classic')?state.pageSizeClassic:state.pageSizeSingle, modeSel.value); };
 document.addEventListener('keydown', (e)=>{
   if(currentView!=='learn') return;
   const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
@@ -656,17 +645,76 @@ document.addEventListener('keydown', (e)=>{
   if(e.key==='ArrowLeft' && !prevPage.disabled){ state.pageIndex--; renderLearnPage(size, modeSel.value); }
 });
 
-/* Survival */
+/* ---- Textviewer (eigener Menüpunkt) ---- */
+const viewerRoot = document.getElementById('viewerRoot');
+const viewerPager = document.getElementById('viewerPager');
+const viewerPagerInfo = document.getElementById('viewerPagerInfo');
+const viewerPrev = document.getElementById('viewerPrev');
+const viewerNext = document.getElementById('viewerNext');
+
+function updateViewerLegend(){
+  const r = roleSel.value || '—';
+  viewerRoleLabel.textContent = r || '—';
+}
+
+function renderViewer(){
+  // ohne Rollenfilter; eigene Rolle nur zur Hervorhebung
+  state.viewerLast = applyFilters(state.items, {byRole:false, useViewerFilters:true});
+  state.viewerIndex = 0;
+  renderViewerPage();
+  updateViewerLegend();
+  sfxOpen();
+}
+
+function renderViewerPage(){
+  const items = state.viewerLast;
+  const total = items.length;
+  if(!total){ viewerRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; viewerPager.hidden=true; return; }
+
+  const pages = Math.max(1, Math.ceil(total / state.viewerPageSize));
+  state.viewerIndex = Math.min(Math.max(0, state.viewerIndex), pages-1);
+  const start = state.viewerIndex * state.viewerPageSize;
+  const slice = items.slice(start, start + state.viewerPageSize);
+
+  viewerRoot.innerHTML='';
+  const roleUC = norm(roleSel.value||'');
+
+  slice.forEach(line=>{
+    const isMe = norm(line.speaker)===roleUC && roleUC!=='';
+    const row = el('div', {class:'row'+(isMe?' me':'')}, `${line.speaker}: ${line.text}`);
+    viewerRoot.appendChild(row);
+  });
+  Motion.stagger([...viewerRoot.querySelectorAll('.row')], 30);
+
+  viewerPager.hidden = pages<=1;
+  viewerPagerInfo.textContent = `Seite ${state.viewerIndex+1}/${pages}`;
+  viewerPrev.disabled = state.viewerIndex===0;
+  viewerNext.disabled = state.viewerIndex>=pages-1;
+}
+
+/* Viewer events */
+[actSelV, sceneSelV, songSelV, lyricsOnlyV].forEach(elm=>elm.addEventListener('change', ()=>{ state.viewerIndex=0; renderViewer(); }));
+viewerPrev.onclick = ()=>{ state.viewerIndex--; renderViewerPage(); };
+viewerNext.onclick = ()=>{ state.viewerIndex++; renderViewerPage(); };
+document.addEventListener('keydown', (e)=>{
+  if(currentView!=='viewer') return;
+  if(e.key==='ArrowRight' && !viewerNext.disabled){ state.viewerIndex++; renderViewerPage(); }
+  if(e.key==='ArrowLeft' && !viewerPrev.disabled){ state.viewerIndex--; renderViewerPage(); }
+});
+roleSel.addEventListener('change', ()=>{ // nur Legende/Hervorhebung aktualisieren
+  if(currentView==='viewer'){ renderViewerPage(); updateViewerLegend(); }
+});
+
+/* Survival (Quiz ohne Nachher-Kontext) */
 const survRoot=document.getElementById('survRoot');
 let survLives=3,survScore=0;
 function renderHearts(){ document.getElementById('heartPill').textContent='❤️'.repeat(Math.max(0,survLives)); }
 function renderScore(){ const pill=document.getElementById('scorePill'); pill.textContent=survScore; }
 
 function startSurv(){
-  const pool = applyFilters(state.items);
+  const pool = applyFilters(state.items, {byRole:true, useViewerFilters:false});
   if(!pool.length){ survRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; return; }
-
-  survLives=3; survScore=0; renderHearts(); renderScore(); nextSurv(pool); sfxOpen();
+  survLives=3; survScore=0; renderHearts(); renderScore(); nextSurv(pool);
 }
 function nextSurv(pool){
   if(survLives<=0){gameOver();return;}
@@ -682,10 +730,10 @@ function nextSurv(pool){
     const btn=el('button',{class:'secondary'},opt);
     btn.onclick=(ev)=>{
       if(opt===correct){
-        survScore++; renderScore(); sfxCorrect();
-        gemBurst({x:(ev.clientX||window.innerWidth/2), y:(ev.clientY||window.innerHeight*0.6)});
+        survScore++; renderScore();
+        confetti({particleCount:36, spread:60, origin:{x:(ev.clientX||window.innerWidth/2)/window.innerWidth, y:(ev.clientY||window.innerHeight*0.6)/window.innerHeight}, scalar:1.1});
       }else{
-        survLives--; renderHearts(); sfxWrong();
+        survLives--; renderHearts();
         card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter');
       }
       nextSurv(pool);
@@ -744,10 +792,17 @@ const soundPackSel = document.getElementById('soundPackSel');
 
 if(toggleSound){ soundOn = toggleSound.checked; toggleSound.onchange=()=>{soundOn=toggleSound.checked;}; }
 if(toggleMotion){ toggleMotion.onchange=()=>{reduceMotion=toggleMotion.checked; document.documentElement.style.setProperty('scroll-behavior', reduceMotion?'auto':'smooth'); }; }
-if(soundPackSel){ soundPackSel.onchange=()=>{ soundPack=soundPackSel.value; sfxOpen(); }; }
+if(soundPackSel){ soundPackSel.onchange=()=>{ soundPack=soundPackSel.value; }; }
 
-function switchViewImmediateSetup(){ switchViewImmediate('learn'); }
-document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', ()=>loadJSON().then(switchViewImmediateSetup)) : (loadJSON().then(switchViewImmediateSetup));
+function switchViewImmediateSetup(){
+  switchViewImmediate('home');
+  // Standard: Learn + Viewer initial render vorbereiten
+  renderLearn();
+  renderViewer();
+}
+document.readyState==='loading'
+  ? document.addEventListener('DOMContentLoaded', ()=>loadJSON().then(switchViewImmediateSetup))
+  : loadJSON().then(switchViewImmediateSetup);
 </script>
 </body>
 </html>
