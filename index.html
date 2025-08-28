@@ -317,6 +317,19 @@ async function fetchJsonAny(paths){
   }
   throw new Error('Konnte keine Datei laden aus: '+paths.map(withBase).join(', '));
 }
+  
+// >>> Pfad-Grundlage für alle Skripte im Repo-Unterordner
+const APP_DIR = 'horrorladen-app/';
+
+// Normalisiert einen Eintrag aus scripts.json zu einem fetch-baren Pfad
+function normalizeScriptPath(p) {
+  if (!p) return p;
+  if (/^https?:\/\//i.test(p)) return p;          // absolute URL
+  if (p.startsWith(APP_DIR)) return p;             // bereits korrekt
+  if (p.startsWith('/')) return APP_DIR + p.slice(1);
+  return APP_DIR + p;                              // nur Dateiname -> in Ordner hängen
+}
+
 
 /* ---------- Prefs/State ---------- */
 const LS={name:'hl_player_name',src:'hl_json_src',sfx:'hl_sfx_on',motion:'hl_reduce_motion'};
@@ -406,28 +419,9 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
 const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote=document.getElementById('scriptsNote');
 async function loadScriptsIndex(){
-  // Try current folder first
-  const candidates=['scripts.json','./scripts.json', '/scripts.json']; // '/scripts.json' nur falls die Seite direkt im Root liegt
-  try{
-    const idx=await fetchJsonAny(candidates);
-    const list=parseScriptsJson(idx);
-    if(list.length){
-      state.indexFromScriptsJson=list;
-      scriptSelect.innerHTML=list.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
-      // Preselect current jsonSrc if present
-      const found=list.find(o=>o.value===jsonSrc || ('/'+o.value)===jsonSrc);
-      if(found) scriptSelect.value=found.value;
-      scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
-      return true;
-    }
-    scriptsNote.textContent='scripts.json gefunden, aber leer.';
-    return false;
-  }catch{
-    scriptsNote.textContent='Keine scripts.json im Ordner gefunden – Pfad kann manuell gesetzt werden.';
-    scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
-    return false;
-  }
-}
+  try {
+    // NEU: immer aus dem App-Unterordner laden
+    const idx = await (await fetch(APP_DIR + 'scripts.json', {cache:'no-store'})).json();
 
 /* ---------- Loader for content JSON ---------- */
 const jsonLabel=document.getElementById('jsonSrcLabel');
@@ -632,7 +626,16 @@ const manualToggle=document.getElementById('manualToggle'), scriptInput=document
 playerName.value=localStorage.getItem(LS.name)||''; document.getElementById('jsonSrcLabel').textContent=jsonSrc;
 saveSettings.onclick=()=>{ localStorage.setItem(LS.name,playerName.value.trim()||'Anon'); tone([0,7],.06); };
 manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'none'; };
-loadScriptBtn.onclick=()=>{ const chosen=manualToggle.checked?(scriptInput.value||'').trim():scriptSelect.value; if(!chosen) return; localStorage.setItem(LS.src,chosen); jsonSrc=chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; loadJSON(); };
+loadScriptBtn.onclick = () => {
+  const raw = manualToggle.checked ? (scriptInput.value || '').trim()
+                                   : scriptSelect.value;
+  const chosen = normalizeScriptPath(raw);   // <<< neu
+  if (!chosen) return;
+  localStorage.setItem(LS.src, chosen);
+  jsonSrc = chosen;
+  jsonLabel.textContent = jsonSrc;
+  loadJSON();
+};
 
 /* ---------- Mobile: prevent zoom/bounce ---------- */
 (function(){
