@@ -8,25 +8,18 @@
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <!-- Motion One (leichte Animations-Lib, kein Build nötig) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@motionone/dom/dist/motion-one.umd.min.js"></script>
 
   <style>
     :root{
       /* Farbpalette */
-      --green:#58CC02;
-      --green-strong:#8EE000;
-      --green-dark:#1FAF38;
-      --yellow:#FFC715;
-      --blue:#1CB0F6;
-      --purple:#A560E8;
-      --red:#FF4B4B;
-      --ink:#2F2F2F;
-      --paper:#FFFFFF;
-      --bg:#F6F7FB;
-      --muted:#6F6F6F;
-      --ring: rgba(88,204,2,.35);
-      --shadow:0 12px 30px rgba(0,0,0,.10);
+      --green:#58CC02; --green-strong:#8EE000; --green-dark:#1FAF38;
+      --yellow:#FFC715; --blue:#1CB0F6; --purple:#A560E8; --red:#FF4B4B;
+      --ink:#2F2F2F; --paper:#FFFFFF; --bg:#F6F7FB; --muted:#6F6F6F;
+      --ring: rgba(88,204,2,.35); --shadow:0 12px 30px rgba(0,0,0,.10);
       --radius:20px;
-      /* Motion tokens (nahe Mobile-App) */
+      /* Motion tokens */
       --duo-ease-out: cubic-bezier(.17,.67,.16,1);
       --duo-ease-in: cubic-bezier(.5,0,1,.5);
       --duo-spring: cubic-bezier(.2,.8,.2,1);
@@ -68,11 +61,11 @@
     .compact .title{font-size:1.05rem}
 
     /* Bottom Nav (mobile-first) */
-    .bottom-nav{position:sticky;bottom:0;z-index:25}
+    .bottom-nav{position:sticky;bottom:0;z-index:25;padding-bottom:env(safe-area-inset-bottom);}
     .bottom-nav .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
 
     nav.menu button{
-      display:flex;gap:.6rem;align-items:center;justify-content:center;
+      display:flex;gap:.35rem;align-items:center;justify-content:center;
       padding:.85rem;border-radius:18px;border:2px solid rgba(0,0,0,.06);
       background:linear-gradient(180deg,#fff,#F5FFF0);
       color:var(--ink);font-weight:800;letter-spacing:.2px;
@@ -92,7 +85,7 @@
     }
     label{font-size:.95rem;color:var(--muted);display:block;margin-bottom:.35rem}
 
-    select,input[type=number],input[type=text],button{
+    select,input[type=text],button{
       width:100%;padding:.85rem 1rem;border-radius:16px;border:2px solid rgba(0,0,0,.08);
       background:#fff;color:var(--ink);min-height:48px;outline:none;
       transition: transform var(--t-fast) var(--duo-spring), border-color var(--t-reg) var(--duo-ease-out), box-shadow var(--t-reg) var(--duo-ease-out)
@@ -102,19 +95,21 @@
     button.primary{background:linear-gradient(180deg,var(--green-strong),var(--green));color:#0b1220;border-color:transparent}
     button.secondary{background:#fff}
 
-    .controls{display:grid;gap:.75rem}
-    @media (min-width:760px){ .controls{grid-template-columns:repeat(4,1fr)} }
-    @media (max-width:759px){ .controls{grid-template-columns:repeat(2,1fr)} }
+    /* Controls-Layout: klar und konsistent */
+    .controls{display:grid;gap:.75rem;grid-template-columns:repeat(2,1fr);align-items:end}
+    @media (min-width:760px){ .controls{grid-template-columns:repeat(3,1fr)} }
+    .controls .cta{display:flex;justify-content:flex-end;align-items:end}
 
     .exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid rgba(0,0,0,.06)}
-    .line{padding:.85rem 1rem;border-radius:14px;background:#F7FAFF;border:2px solid rgba(0,0,0,.06)}
-    .line.you{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25)}
+    .line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25)}
+    .faded{opacity:.8;color:var(--muted);font-size:.95rem}
 
     .card{margin:1rem 0;padding:1.1rem;border-radius:22px;background:#fff;border:2px solid rgba(0,0,0,.06);
       text-align:center;display:flex;flex-direction:column;gap:.6rem;box-shadow:var(--shadow);
       animation: slideUp var(--t-slow) var(--duo-ease-out);
     }
     .choices{display:grid;gap:.6rem;margin-top:.6rem}
+    .big{font-size:1.06rem;line-height:1.55}
 
     .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .65rem;border-radius:999px;background:#fff;border:2px solid rgba(0,0,0,.06); font-weight:800}
     .pill.heart{color:var(--red)}
@@ -131,27 +126,14 @@
     .chip{flex:0 0 auto; padding:.45rem .8rem;border-radius:999px;border:2px solid rgba(0,0,0,.06); background:#fff;font-weight:800}
     .chip.active{background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border-color:rgba(37,168,0,.25)}
 
+    /* Pagination */
+    .pager{display:flex;justify-content:space-between;align-items:center;gap:.8rem;margin:1rem 0}
+    .pager .info{font-size:.92rem;color:var(--muted)}
+    .pager .group{display:flex;gap:.5rem}
+
     /* Micro-Animationen */
     @keyframes slideUp{0%{opacity:0; transform:translateY(10px)}100%{opacity:1; transform:translateY(0)}}
     .enter{animation: slideUp var(--t-slow) var(--duo-ease-out);}
-
-    .pop{animation:pop .36s var(--duo-spring)}
-    @keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
-
-    .shake{animation:shake .36s cubic-bezier(.36,.07,.19,.97)}
-    @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
-
-    .flash{animation:flash .7s ease}
-    @keyframes flash{0%{background:#fff}30%{background:#E5FFD6}100%{background:#fff}}
-
-    /* Level-Up Overlay / View-Transition */
-    #levelup{position:fixed;inset:0;pointer-events:none;display:grid;place-items:center;z-index:60}
-    .ripple{position:absolute;inset:auto; width:120px;height:120px;border-radius:50%; background:radial-gradient(circle at center, var(--green-strong), var(--green)); transform:scale(0); opacity:.9;}
-    .ripple.run{animation:rippleGrow 420ms var(--duo-spring) forwards}
-    @keyframes rippleGrow{to{transform:scale(20); opacity:0}}
-    .levelup-card{position:relative;background:#fff;border:2px solid rgba(0,0,0,.06);box-shadow:var(--shadow);border-radius:22px;padding:16px 20px;display:flex;align-items:center;gap:10px;transform:translateY(8px);opacity:0}
-    .levelup-card.show{animation:cardIn 360ms var(--duo-ease-out) forwards}
-    @keyframes cardIn{to{transform:translateY(0);opacity:1}}
   </style>
 </head>
 <body>
@@ -161,15 +143,11 @@
       <div class="logo" aria-hidden="true">
         <!-- Simple Owl-ish mark -->
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <clipPath id="r"><rect rx="16" width="64" height="64"/></clipPath>
-          </defs>
+          <defs><clipPath id="r"><rect rx="16" width="64" height="64"/></clipPath></defs>
           <g clip-path="url(#r)">
             <rect width="64" height="64" fill="#8EE000"/>
-            <circle cx="22" cy="28" r="10" fill="#fff"/>
-            <circle cx="42" cy="28" r="10" fill="#fff"/>
-            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/>
-            <circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
             <path d="M10 44 C 20 52, 44 52, 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
           </g>
         </svg>
@@ -185,7 +163,7 @@
 <main class="wrap">
   <!-- HOME -->
   <section data-view="home" class="active">
-    <div class="panel pop">
+    <div class="panel">
       <nav class="menu">
         <button data-nav="learn">📖 Lernen</button>
         <button data-nav="survival">🎮 Survival</button>
@@ -197,7 +175,7 @@
 
   <!-- LEARN -->
   <section data-view="learn">
-    <div class="panel pop">
+    <div class="panel">
       <!-- Filter-Bar -->
       <div class="filters">
         <div>
@@ -223,15 +201,11 @@
       <!-- Schnellwahl Akte -->
       <div id="actChips" class="chipbar" aria-label="Akte"></div>
 
-      <!-- Lern-Controls -->
+      <!-- Lern-Controls (Rolle, Modus, Start) -->
       <div class="controls" style="margin-top:.6rem">
         <div>
           <label for="roleSel">Rolle</label>
           <select id="roleSel"></select>
-        </div>
-        <div id="blockWrap">
-          <label for="sessionSize">Blockgröße</label>
-          <input id="sessionSize" type="number" min="1" max="25" value="5"/>
         </div>
         <div>
           <label for="modeSel">Modus</label>
@@ -241,18 +215,27 @@
             <option value="cloze">Cloze</option>
           </select>
         </div>
-        <div>
-          <label>&nbsp;</label>
+        <div class="cta">
           <button class="primary" id="startLearn">Start</button>
         </div>
       </div>
     </div>
+
     <div id="learnRoot"></div>
+
+    <!-- Pagination -->
+    <div class="pager" id="learnPager" hidden>
+      <div class="info" id="pagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="prevPage" class="secondary">← Zurück</button>
+        <button id="nextPage" class="primary">Weiter →</button>
+      </div>
+    </div>
   </section>
 
   <!-- SURVIVAL -->
   <section data-view="survival">
-    <div class="panel controls pop">
+    <div class="panel controls">
       <div>
         <label for="roleSurv">Rolle</label>
         <select id="roleSurv"></select>
@@ -265,8 +248,7 @@
         <label>Score</label>
         <div id="scorePill" class="pill" aria-live="polite">0</div>
       </div>
-      <div>
-        <label>&nbsp;</label>
+      <div class="cta">
         <button class="primary" id="startSurv">Neu starten</button>
       </div>
     </div>
@@ -275,7 +257,7 @@
 
   <!-- SCORES -->
   <section data-view="scores">
-    <div class="panel controls pop">
+    <div class="panel controls">
       <div>
         <label for="nameField">Dein Name</label>
         <input id="nameField" type="text" placeholder="z.B. Alex"/>
@@ -288,8 +270,7 @@
         <label for="boardLimit">Anzahl</label>
         <select id="boardLimit"><option>10</option><option selected>25</option><option>50</option></select>
       </div>
-      <div>
-        <label>&nbsp;</label>
+      <div class="cta">
         <button class="primary" id="refreshBoard">Aktualisieren</button>
       </div>
     </div>
@@ -298,7 +279,7 @@
 
   <!-- SETTINGS -->
   <section data-view="settings">
-    <div class="panel pop">
+    <div class="panel">
       <div class="list" style="display:grid;gap:.8rem">
         <div class="row" style="display:flex;justify-content:space-between;align-items:center">
           <span>JSON-Quelle</span><span><code id="jsonSrcLabel">horrorladen_final_with_acts.json</code></span>
@@ -330,8 +311,6 @@
   </section>
 </main>
 
-<div id="levelup" aria-hidden="true"></div>
-
 <div class="wrap bottom-nav">
   <nav class="menu">
     <button data-nav="home" aria-label="Home">🏠</button>
@@ -347,7 +326,7 @@
 
 <script>
 /* =========================
-   JSON-Loader (acts/scenes/songs + speaker_blocks) – robust & rekursiv
+   JSON-Loader (acts/scenes/songs + speaker_blocks)
    ========================= */
 const q=new URLSearchParams(location.search);
 const jsonSrc=q.get('src')||'horrorladen_final_with_acts.json';
@@ -358,7 +337,12 @@ let soundOn=true, reduceMotion=false, soundPack='synth', currentView='home';
 const state = {
   items: [],           // {type:'dialogue', speaker, text, kind:'line'|'lyric', meta:{act,scene,song}}
   acts: [], scenes: [], songs: [],
-  roles: []
+  roles: [],
+  // Pagination
+  pageIndex: 0,
+  pageSizeClassic: 8,  // mehrere pro Seite
+  pageSizeSingle: 1,   // 1 pro Seite (Flash/Cloze)
+  lastFiltered: []
 };
 
 const norm = s => (s||'').trim().toUpperCase();
@@ -376,8 +360,6 @@ function scanTitleLike(node, keys=['title','name','label','id']) {
 
 function flattenAny(node, ctx={act:null,scene:null,song:null}, out=[], metaSets){
   if (!node || typeof node!=='object') return;
-
-  // Node-level context
   const t = (node.type||'').toLowerCase();
 
   if (t==='act' || 'act' in node) {
@@ -393,7 +375,6 @@ function flattenAny(node, ctx={act:null,scene:null,song:null}, out=[], metaSets)
     if (songName) ctx={...ctx, song: String(songName)};
   }
 
-  // speaker_block
   if (t==='speaker_block' && node.speaker) {
     const speaker = node.speaker;
     const content = Array.isArray(node.content) ? node.content : [];
@@ -405,13 +386,11 @@ function flattenAny(node, ctx={act:null,scene:null,song:null}, out=[], metaSets)
         if (text) {
           out.push({type:'dialogue', speaker, text, kind: ty, meta:{...ctx}});
           metaSets.acts.add(ctx.act||''); metaSets.scenes.add(ctx.scene||''); metaSets.songs.add(ctx.song||'');
-          metaSets.roles.add(norm(speaker));
         }
       }
     });
   }
 
-  // Recurse into known children arrays
   const kids = []
     .concat(node.segments||[])
     .concat(node.children||[])
@@ -425,29 +404,24 @@ async function loadJSON(){
   const res = await fetch(jsonSrc, {cache:'no-store'});
   const data = await res.json();
 
-  const out=[]; const metaSets={acts:new Set(),scenes:new Set(),songs:new Set(),roles:new Set()};
+  const out=[]; const metaSets={acts:new Set(),scenes:new Set(),songs:new Set()};
   if (Array.isArray(data)) flattenAny({segments:data}, {}, out, metaSets);
   else flattenAny(data, {}, out, metaSets);
 
-  // roles vom Feld roles übernehmen, sonst aus Sprecher sammeln
-  let roles=[];
-  if (data && Array.isArray(data.roles) && data.roles.length){
-    roles = data.roles.map(r => typeof r==='string' ? norm(r) : norm(r.name||''));
-  } else roles = [...metaSets.roles].filter(Boolean);
+  // Rollenliste aus Daten ableiten (alle Speaker uppercased)
+  const roleSet = new Set(out.map(i=>norm(i.speaker)).filter(Boolean));
+  state.roles = [...roleSet];
 
   state.items = out;
   state.acts = [...metaSets.acts].filter(Boolean);
   state.scenes = [...metaSets.scenes].filter(Boolean);
   state.songs = [...metaSets.songs].filter(Boolean);
-  state.roles = roles;
 
   populateFiltersAndRoles();
   document.dispatchEvent(new CustomEvent('script-ready', {detail:{src:jsonSrc, count:state.items.length}}));
 }
 
-/* =========================
-   UI Helpers & Rendering
-   ========================= */
+/* ============ UI Helpers ============ */
 function el(tag,attrs={},...children){
   const n=document.createElement(tag);
   for (const[k,v]of Object.entries(attrs)){
@@ -495,9 +469,9 @@ function playTone(steps=[0], duration=0.18, type='sine', base=440){
   gain.gain.exponentialRampToValueAtTime(.0001, t+.05);
   osc.start(now); osc.stop(t+.06);
 }
-function sfxCorrect(){ if(soundPack==='chime') playTone([0,7,12,19], .08, 'triangle', 720); else playTone([0,4,7,12], .07, 'triangle', 660); Motion.haptic('success'); }
-function sfxWrong(){   if(soundPack==='chime') playTone([0,-2,-5], .09, 'sine', 200);    else playTone([0,-3,-5], .08, 'sawtooth', 180); Motion.haptic('error'); }
-function sfxOpen(){    if(soundPack==='chime') playTone([0,2,5,9,12], .06, 'sine', 560); else playTone([0,2,5,9,12], .06, 'square', 520); Motion.haptic('soft'); }
+function sfxCorrect(){ playTone([0,4,7,12], .07, 'triangle', 660); Motion.haptic('success'); }
+function sfxWrong(){   playTone([0,-3,-5], .08, 'sawtooth', 180);  Motion.haptic('error'); }
+function sfxOpen(){    playTone([0,2,5,9,12], .06, 'square', 520);  Motion.haptic('soft'); }
 
 /* Gems/Coins */
 function gemBurst(origin={x:window.innerWidth/2, y:window.innerHeight*0.6}){
@@ -506,19 +480,19 @@ function gemBurst(origin={x:window.innerWidth/2, y:window.innerHeight*0.6}){
   setTimeout(()=>confetti({particleCount:22, spread:80, origin:{x:origin.x/window.innerWidth, y:(origin.y-40)/window.innerHeight}, scalar:.9, colors}),120);
 }
 
-/* View Transition / LevelUp */
-const levelupEl=document.getElementById('levelup');
-function runViewTransition(targetName){
-  const r=el('div',{class:'ripple'}); r.style.left='50%'; r.style.bottom='16%'; r.style.transform='translate(-50%,0) scale(0)';
-  levelupEl.innerHTML=''; levelupEl.appendChild(r);
-  requestAnimationFrame(()=>{ r.classList.add('run'); });
-  setTimeout(()=>{ switchViewImmediate(targetName); }, 220);
+/* View Navigation */
+function switchViewImmediate(name){
+  document.querySelectorAll('[data-view]').forEach(v=>{
+    const active = v.dataset.view===name;
+    v.classList.toggle('active',active);
+    if(active){ const cards = v.querySelectorAll('.panel,.card,.row'); Motion.stagger([...cards]); }
+  });
+  document.getElementById('hdr').classList.toggle('compact',name!=='home');
+  document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
+  currentView=name;
 }
-function levelUpToast(text='Level Up!'){
-  const card=el('div',{class:'levelup-card'} , el('div',{html:'✨'}), el('div',{}, text));
-  levelupEl.appendChild(card); requestAnimationFrame(()=>card.classList.add('show'));
-  setTimeout(()=>{ levelupEl.innerHTML=''; }, 1200);
-}
+function showView(name){ if(name===currentView){return;} switchViewImmediate(name); }
+Array.from(document.querySelectorAll('[data-nav]')).forEach(btn=>btn.onclick=()=>showView(btn.dataset.nav));
 
 /* Filters & Roles UI */
 const actSel   = document.getElementById('actFilter');
@@ -526,22 +500,18 @@ const sceneSel = document.getElementById('sceneFilter');
 const songSel  = document.getElementById('songFilter');
 const lyricsOnly = document.getElementById('lyricsOnly');
 const actChips = document.getElementById('actChips');
-
 const roleSel = document.getElementById('roleSel');
 const roleSurv = document.getElementById('roleSurv');
 const boardRole = document.getElementById('boardRole');
 
 function populateFiltersAndRoles(){
-  // Roles
   roleSel.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
   roleSurv.innerHTML = state.roles.map(r=>`<option>${r}</option>`).join('');
   boardRole.innerHTML = '<option value="">Alle</option>' + state.roles.map(r=>`<option>${r}</option>`).join('');
 
-  // Filters
   const fillSel = (sel, arr) => sel.innerHTML = '<option value="">Alle</option>' + arr.map(v=>`<option>${v}</option>`).join('');
   fillSel(actSel, state.acts); fillSel(sceneSel, state.scenes); fillSel(songSel, state.songs);
 
-  // Chips for acts
   actChips.innerHTML = '';
   state.acts.forEach(a=>{
     const chip=el('button',{class:'chip', type:'button'}, a);
@@ -578,97 +548,113 @@ function applyFilters(items){
     });
 }
 
-/* Views Navigation */
-const views=document.querySelectorAll('[data-view]');
-function switchViewImmediate(name){
-  views.forEach(v=>{
-    const active = v.dataset.view===name;
-    v.classList.toggle('active',active);
-    if(active){ const cards = v.querySelectorAll('.panel,.card,.row'); Motion.stagger([...cards]); }
-  });
-  document.getElementById('hdr').classList.toggle('compact',name!=='home');
-  document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
-  currentView=name;
-}
-function showView(name){ if(name===currentView){return;} runViewTransition(name); }
-Array.from(document.querySelectorAll('[data-nav]')).forEach(btn=>btn.onclick=()=>showView(btn.dataset.nav));
-
-/* Lernen Render */
+/* ---- Lernmodus-Logik mit Pagination ---- */
 const learnRoot=document.getElementById('learnRoot');
-const sessionSize=document.getElementById('sessionSize');
 const modeSel=document.getElementById('modeSel');
-const blockWrap=document.getElementById('blockWrap');
+const startLearnBtn=document.getElementById('startLearn');
+
+const pager=document.getElementById('learnPager');
+const pagerInfo=document.getElementById('pagerInfo');
+const prevPage=document.getElementById('prevPage');
+const nextPage=document.getElementById('nextPage');
+
+// Kontext-Helfer: nimmt Nachbarzeilen fern deiner Rolle als Kontext
+function neighborContext(all, idx, roleUC){
+  const prev = all[idx-1] && norm(all[idx-1].speaker)!==roleUC ? all[idx-1] : null;
+  const next = all[idx+1] && norm(all[idx+1].speaker)!==roleUC ? all[idx+1] : null;
+  return {prev, next};
+}
 
 function renderLearn(){
-  const items = applyFilters(state.items);
-  if (modeSel.value==='classic') renderClassic(items, parseInt(sessionSize.value)||5);
-  else if (modeSel.value==='flash') renderFlash(items);
-  else renderCloze(items);
-  blockWrap.style.display = (modeSel.value==='classic') ? 'block' : 'none';
+  // Filter anwenden
+  state.lastFiltered = applyFilters(state.items);
+  // PageSize je nach Modus
+  const mode = modeSel.value;
+  const size = (mode==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
+  // Zurück auf Seite 0
+  state.pageIndex = 0;
+  renderLearnPage(size, mode);
   sfxOpen();
 }
 
-function renderClassic(filtered, N){
+function renderLearnPage(pageSize, mode){
+  const items = state.lastFiltered;
+  const total = items.length;
+  if(!total){ learnRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; pager.hidden=true; return; }
+
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  state.pageIndex = Math.min(Math.max(0, state.pageIndex), pages-1);
+  const start = state.pageIndex * pageSize;
+  const slice = items.slice(start, start + pageSize);
+
   learnRoot.innerHTML='';
-  const chunks = []; // baue Exchanges (einfach: je 1 Kontextzeile vor deiner Zeile)
-  for (let i=0;i<filtered.length;i++){
-    const line = filtered[i];
-    const prev = filtered[i-1] || null;
-    chunks.push({context: prev && treatSpeaker(prev.speaker)!==norm(roleSel.value) ? prev : null, yours: line});
+
+  const roleUC = norm(roleSel.value||'');
+
+  if(mode==='classic'){
+    // Mehrere Einträge pro Seite: Kontext + deine Zeile
+    slice.forEach((line, iInSlice)=>{
+      const idx = start + iInSlice;
+      const {prev, next} = neighborContext(items, idx, roleUC);
+      const box=el('div',{class:'exchange'});
+      if(prev) box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+      box.appendChild(el('div',{class:'line big'}, `${line.speaker}: ${line.text}`));
+      if(next) box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+      learnRoot.appendChild(box);
+    });
+    Motion.stagger([...learnRoot.querySelectorAll('.exchange')], 40);
+  } else if(mode==='flash'){
+    // 1 Karte pro Seite: zum Aufdecken tippen
+    const idx = start; const line = slice[0];
+    const {prev, next} = neighborContext(items, idx, roleUC);
+    const card = el('div',{class:'card'});
+    if(prev) card.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+    const secret = el('div',{class:'big', html:`${line.speaker}: <em>(tippen zum Aufdecken)</em>`});
+    const reveal = el('div',{class:'big', html:`${line.speaker}: ${escapeHtml(line.text)}`}); reveal.style.display='none';
+    card.appendChild(secret); card.appendChild(reveal);
+    if(next) card.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+    card.addEventListener('click', ()=>{
+      secret.style.display='none';
+      reveal.style.display='';
+      sfxOpen();
+    }, {once:true});
+    learnRoot.appendChild(card);
+  } else {
+    // Cloze: 1 Karte pro Seite mit Lücken
+    const idx = start; const line = slice[0];
+    const {prev, next} = neighborContext(items, idx, roleUC);
+    const card = el('div',{class:'card'});
+    if(prev) card.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+    const {html} = makeCloze(line.text, .35);
+    card.appendChild(el('div',{class:'big', html:`${line.speaker}: ${html}`}));
+    if(next) card.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+    learnRoot.appendChild(card);
   }
-  chunks.slice(0,N).forEach(b=>{
-    const box=el('div',{class:'exchange'});
-    if(b.context){
-      const ctxDiv=el('div',{class:'faded row'},`${b.context.speaker}: ${b.context.text}`);
-      box.appendChild(ctxDiv);
-    }
-    const you=el('div',{class:'line you row'},`${b.yours.speaker}: ${b.yours.text}`);
-    box.appendChild(you);
-    learnRoot.appendChild(box);
-  });
-  Motion.stagger([...learnRoot.querySelectorAll('.row')], 40);
+
+  // Pager aktualisieren
+  pager.hidden = pages<=1;
+  pagerInfo.textContent = `Seite ${state.pageIndex+1}/${pages}`;
+  prevPage.disabled = state.pageIndex===0;
+  nextPage.disabled = state.pageIndex>=pages-1;
 }
 
-function renderFlash(filtered){
-  const pool = filtered.map((line,i)=>({line, prev: filtered[i-1]||null, next: filtered[i+1]||null}));
-  let idx=0, revealed=false;
-  learnRoot.innerHTML='';
-  const card=el('div',{class:'card'}); learnRoot.appendChild(card);
+// Events
+startLearnBtn.onclick=renderLearn;
+[actSel, sceneSel, songSel, lyricsOnly, roleSel, modeSel].forEach(elm=>elm.addEventListener('change', ()=>{
+  const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
+  // bei Filter-Wechsel neu starten
+  state.pageIndex = 0;
+  renderLearn();
+}));
 
-  function show(){
-    const it=pool[idx]; if(!it) return;
-    card.innerHTML='';
-    if(it.prev) card.appendChild(el('div',{class:'faded row'},`${it.prev.speaker}: ${it.prev.text}`));
-    card.appendChild(el('div',{class:'big row'}, revealed ? `${it.line.speaker}: ${it.line.text}` : `${it.line.speaker}: (verborgen)`));
-    if(it.next) card.appendChild(el('div',{class:'faded row'},`${it.next.speaker}: ${it.next.text}`));
-    Motion.stagger([...card.querySelectorAll('.row')], 70);
-  }
-  card.addEventListener('click',()=>{ revealed=!revealed; if(revealed) sfxOpen(); show(); });
-  show();
-}
-
-function renderCloze(filtered){
-  const pool = filtered.map((line,i)=>({line, prev: filtered[i-1]||null, next: filtered[i+1]||null}));
-  learnRoot.innerHTML='';
-  const card=el('div',{class:'card'}); learnRoot.appendChild(card);
-
-  function show(i=0){
-    const it=pool[i]; if(!it) return;
-    card.innerHTML='';
-    if(it.prev) card.appendChild(el('div',{class:'faded row'},`${it.prev.speaker}: ${it.prev.text}`));
-    const {html}=makeCloze(it.line.text,.35);
-    card.appendChild(el('div',{class:'big row', html:`${it.line.speaker}: ${html}`}));
-    if(it.next) card.appendChild(el('div',{class:'faded row'},`${it.next.speaker}: ${it.next.text}`));
-    Motion.stagger([...card.querySelectorAll('.row')], 70);
-  }
-  show(0);
-}
-
-/* Start-Button + Filter-Events */
-document.getElementById('startLearn').onclick=renderLearn;
-modeSel.onchange=()=>{blockWrap.style.display=(modeSel.value==='classic')?'block':'none'; renderLearn();};
-sessionSize.oninput=()=>{ if(modeSel.value==='classic') renderLearn(); };
-[actSel, sceneSel, songSel, lyricsOnly, roleSel].forEach(elm=>elm.addEventListener('change', ()=>{ renderLearn(); highlightChips(); }));
+prevPage.onclick = ()=>{ state.pageIndex--; const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle; renderLearnPage(size, modeSel.value); };
+nextPage.onclick = ()=>{ state.pageIndex++; const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle; renderLearnPage(size, modeSel.value); };
+document.addEventListener('keydown', (e)=>{
+  if(currentView!=='learn') return;
+  const size = (modeSel.value==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
+  if(e.key==='ArrowRight' && !nextPage.disabled){ state.pageIndex++; renderLearnPage(size, modeSel.value); }
+  if(e.key==='ArrowLeft' && !prevPage.disabled){ state.pageIndex--; renderLearnPage(size, modeSel.value); }
+});
 
 /* Survival */
 const survRoot=document.getElementById('survRoot');
@@ -677,7 +663,7 @@ function renderHearts(){ document.getElementById('heartPill').textContent='❤�
 function renderScore(){ const pill=document.getElementById('scorePill'); pill.textContent=survScore; }
 
 function startSurv(){
-  const pool = applyFilters(state.items); // nutzt aktuelle Filter & Rolle
+  const pool = applyFilters(state.items);
   if(!pool.length){ survRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; return; }
 
   survLives=3; survScore=0; renderHearts(); renderScore(); nextSurv(pool); sfxOpen();
@@ -699,7 +685,8 @@ function nextSurv(pool){
         survScore++; renderScore(); sfxCorrect();
         gemBurst({x:(ev.clientX||window.innerWidth/2), y:(ev.clientY||window.innerHeight*0.6)});
       }else{
-        survLives--; renderHearts(); sfxWrong(); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+        survLives--; renderHearts(); sfxWrong();
+        card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter');
       }
       nextSurv(pool);
     };
@@ -710,7 +697,7 @@ function nextSurv(pool){
 function gameOver(){
   survRoot.innerHTML='';
   const over=el('div',{class:'card big'},`Game Over! Score: ${survScore}`);
-  survRoot.appendChild(over); saveScore(survScore); levelUpToast('Neuer Highscore? Prüfe die Liste!');
+  survRoot.appendChild(over); saveScore(survScore);
 }
 document.getElementById('startSurv').onclick=startSurv;
 
@@ -757,9 +744,9 @@ const soundPackSel = document.getElementById('soundPackSel');
 
 if(toggleSound){ soundOn = toggleSound.checked; toggleSound.onchange=()=>{soundOn=toggleSound.checked;}; }
 if(toggleMotion){ toggleMotion.onchange=()=>{reduceMotion=toggleMotion.checked; document.documentElement.style.setProperty('scroll-behavior', reduceMotion?'auto':'smooth'); }; }
-if(soundPackSel){ soundPackSel.onchange=()=>{ soundPack=soundPackSel.value; levelUpToast('Sound-Pack: '+(soundPack==='chime'?'Chime':'Synth')); sfxOpen(); }; }
+if(soundPackSel){ soundPackSel.onchange=()=>{ soundPack=soundPackSel.value; sfxOpen(); }; }
 
-function switchViewImmediateSetup(){ switchViewImmediate('home'); }
+function switchViewImmediateSetup(){ switchViewImmediate('learn'); }
 document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', ()=>loadJSON().then(switchViewImmediateSetup)) : (loadJSON().then(switchViewImmediateSetup));
 </script>
 </body>
