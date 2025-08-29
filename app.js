@@ -290,7 +290,7 @@ function switchViewImmediate(name){
   if (hdr) hdr.classList.toggle('compact', name !== 'home');
 
   const sub = document.getElementById('subtitle');
-  if (sub) sub.textContent = (name === 'home' ? 'Willkommen' : name[0].toUpperCase() + name.slice(1));
+  if (sub) sub.textContent = (name === 'home' ? 'made by Jakob with ❤️' : name[0].toUpperCase() + name.slice(1));
 
   // Body-Flag (z.B. für .home-only CSS)
   document.body.classList.toggle('show-home', name === 'home');
