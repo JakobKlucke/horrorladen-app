@@ -655,7 +655,6 @@ function nextQ(pool){
 const over=()=>{ survRoot.innerHTML=''; survRoot.appendChild(el('div',{class:'card big'},`Game Over! Score: ${survScore}`)); saveScore(survScore); }
 document.getElementById('startSurv').onclick=startSurv;
 
-/* ---------------- Leaderboard ---------------- */
 /* ---------------- Leaderboard (robust) ---------------- */
 const boardDiv = document.getElementById('board');
 const boardInfo = document.getElementById('boardInfo');
@@ -703,15 +702,18 @@ function renderBoard(list){
   boardDiv.innerHTML='';
   const now=new Date();
   boardInfo.textContent=`${list.length} Einträge, zuletzt: ${now.toLocaleTimeString()}`;
-  list.forEach((r,i)=>boardDiv.appendChild(
-    el('div',{class:'exchange',style:'display:flex;justify-content:space-between;align-items:center'},
-      `${i+1}. ${r?.name||'Anon'} ${r?.role?`(${r.role})`:''}`,
-      el('strong',{}, r?.score??0)
-    )
-  ));
+
+  list.forEach((r,i)=>{
+    boardDiv.appendChild(
+      el(
+        'div',
+        {class:'exchange', style:'display:flex;justify-content:space-between;align-items:center'},
+        `${i+1}. ${ (r?.name || 'Anon') } ${ r?.role ? `(${r.role})` : '' }`,
+        el('strong', {}, r?.score ?? 0)
+      )
+    );
+  });
 }
-  list.forEach((r,i)=>boardDiv.appendChild(el('div',{class:'exchange',style:'display:flex;justify-content:space-between;align-items:center'},
-    `${i+1}. ${r.name||'Anon'} ${r.role?`(${r.role})`:''}`, el('strong',{}, r.score??0)))); }
 
 /* ---------------- Settings ---------------- */
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
