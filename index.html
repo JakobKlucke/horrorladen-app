@@ -19,7 +19,7 @@
 <header id="hdr">
   <div class="wrap">
     <div class="topbar">
-      <div class="brand">
+      <div id="brand" class="brand">
         <div class="logo" aria-hidden="true">
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <rect width="64" height="64" rx="16" fill="#8EE000"/>
@@ -29,7 +29,7 @@
           </svg>
         </div>
         <div>
-          <div class="title">Horrorladen – Lernapp</div>
+          <div class="title">Musical Skript Lernapp</div>
           <div class="badge" id="subtitle">Willkommen</div>
         </div>
       </div>
@@ -43,14 +43,24 @@
 <main class="wrap">
   <!-- HOME -->
   <section data-view="home" class="active">
-    <div class="panel">
-      <div class="home-menu">
-        <button class="tile" data-nav="learn"   data-sfx>📖 Lernen</button>
-        <button class="tile" data-nav="viewer"  data-sfx>📜 Textviewer</button>
-        <button class="tile" data-nav="survival"data-sfx>🎮 Survival</button>
-        <button class="tile" data-nav="scores"  data-sfx>🏆 Highscores</button>
-      </div>
-    </div>
+    <!-- Home: Lernen -->
+<section class="home-section">
+  <h2>Lernen📚</h2>
+  <div class="home-menu">
+    <button class="btn" data-goto-learn data-mode="classic">Classic</button>
+    <button class="btn" data-goto-learn data-mode="flash">Flashcards</button>
+    <button class="btn" data-goto-learn data-mode="cloze">Lücken</button>
+  </div>
+</section>
+
+<!-- Home: Competitive -->
+<section class="home-section">
+  <h2>Competitive🎮</h2>
+  <div class="home-menu">
+    <button class="btn" data-nav="survival">Survival❤️</button>
+    <button class="btn" data-nav="leaderboard">Leaderboard🏆</button>
+  </div>
+</section>
   </section>
 
   <!-- LEARN -->
