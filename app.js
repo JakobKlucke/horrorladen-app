@@ -334,13 +334,6 @@ if (brand){
   brand.style.cursor = 'pointer';
 }
 
-// Globaler Klick-Sound nur über data-sfx (einheitlich, kein Doppel-Sound)
-document.addEventListener('click', e=>{
-  if (e.target.closest('[data-sfx]')) {
-    tone([0], .07); // deine vorhandene tone()-Funktion
-  }
-}, { capture:true });
-
 
 /* =================== Filter & Learn =================== */
 function fillSongs(sel){ if(!sel) return; sel.innerHTML='<option value="">Alle</option>'+[...state.songsSet].map(s=>`<option>${s}</option>`).join(''); }
