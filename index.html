@@ -401,17 +401,37 @@ const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote=document.getElementById('scriptsNote');
 async function loadScriptsIndex(){
   try{
-    const idx=await fetchJson([CURRENT_DIR + 'scripts.json',
+    const idx = await fetchJson([
+      CURRENT_DIR + 'scripts.json',
       'scripts.json',
-      './scripts.json']);
-    const list=parseScriptsJson(idx);
+      './scripts.json'
+    ]);
+    const list = parseScriptsJson(idx);
     if(list.length){
-      state.indexFromScriptsJson=list.map(o=>({label:o.label||o.value, value:o.value}));
-      const options=state.indexFromScriptsJson.map(o=>({label:o.label, value: normalizeScriptPath(o.value)}));
-      scriptSelect.innerHTML=options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+      // normalisierte Einträge
+      state.indexFromScriptsJson = list.map(o => ({
+        label: o.label || o.value,
+        value: normalizeScriptPath(o.value)
+      }));
+
+      scriptSelect.innerHTML = state.indexFromScriptsJson
+        .map(o=>`<option value="${o.value}">${o.label}</option>`)
+        .join('');
+
       scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
-      const found=options.find(o=>o.value===jsonSrc || normalizeScriptPath(o.value)===jsonSrc);
-      if(found) scriptSelect.value=found.value;
+
+      const found = state.indexFromScriptsJson.find(o =>
+        o.value===jsonSrc || normalizeScriptPath(o.value)===jsonSrc
+      );
+
+      if(found){
+        scriptSelect.value = found.value;
+      } else {
+        scriptSelect.value = state.indexFromScriptsJson[0].value;
+        jsonSrc = scriptSelect.value;
+        localStorage.setItem(LS.src,jsonSrc);
+      }
+
       return true;
     } else {
       scriptsNote.textContent='scripts.json gefunden, aber leer.';
@@ -653,6 +673,17 @@ manualToggle.onchange=()=>{ scriptInput.style.display=manualToggle.checked?'':'n
 loadScriptBtn.onclick=()=>{ const raw = manualToggle.checked ? (scriptInput.value||'').trim() : scriptSelect.value; if(!raw) return;
   const chosen = normalizeScriptPath(raw);
   localStorage.setItem(LS.src, chosen); jsonSrc = chosen; document.getElementById('jsonSrcLabel').textContent=jsonSrc; loadJSON(); };
+
+if(scriptSelect){
+  scriptSelect.addEventListener('change', async e=>{
+    const chosen = normalizeScriptPath(e.target.value);
+    jsonSrc = chosen;
+    localStorage.setItem(LS.src, chosen);
+    document.getElementById('jsonSrcLabel').textContent = chosen;
+    await loadJSON();
+  });
+}
+
 
 /* ---------------- Mobile: Zoom strikt verbieten ---------------- */
 (function(){
