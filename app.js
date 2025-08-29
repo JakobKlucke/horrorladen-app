@@ -1,0 +1,322 @@
+/* ---------------- BaseDir & Path Normalisierung ---------------- */
+const CURRENT_DIR = (() => {
+  const p = location.pathname;
+  return p.endsWith('/') ? p : p.replace(/[^/]+$/, '/');
+})();
+
+function normalizeScriptPath(p){
+  if (!p) return p;
+  if (/^https?:\/\//i.test(p)) return p;                   // externe URL
+  if (p.startsWith(CURRENT_DIR) || p.startsWith('/')) return p; // bereits projekt-abs.
+  if (p.startsWith('./')) p = p.slice(2);
+  return CURRENT_DIR + p;
+}
+
+async function fetchJson(paths){
+  for(const raw of paths){
+    const url = normalizeScriptPath(raw);
+    try{
+      const r = await fetch(url, {cache:'no-store'});
+      if(r.ok) return await r.json();
+    }catch(e){}
+  }
+  throw new Error('Konnte keine Datei laden aus: '+paths.join(', '));
+}
+
+/* ---------------- Prefs/State ---------------- */
+const LS={name:'hl_player_name',src:'hl_json_src',sfx:'hl_sfx_on',motion:'hl_reduce_motion'};
+
+// LS-Bereinigung einmalig
+let jsonSrcRaw = localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json';
+let jsonSrc = normalizeScriptPath(jsonSrcRaw);
+localStorage.setItem(LS.src, jsonSrc);
+
+let sfxOn = true;
+
+const state={items:[],roles:[],actsList:[],scenesByAct:{},songsSet:new Set(),
+  pageIndex:0,pageSizeClassic:8,pageSizeSingle:1,lastFiltered:[],
+  viewerIndex:0,viewerPageSize:20,viewerLast:[],viewerHighlightRole:'',
+  indexFromScriptsJson:[]
+};
+
+const norm=s=>(s||'').trim().toUpperCase();
+const treatSpeaker=sp=>{const s=norm(sp); if(s==='DIE ANDEREN')return'ALLE'; if(s==='BARAPAPAPA'||s==='BARAPAPAPABA')return'__IGNORE__'; return s;};
+const el=(t,a={},...c)=>{const n=document.createElement(t);for(const[k,v]of Object.entries(a)){k==='class'?n.className=v:k==='html'?n.innerHTML=v:n.setAttribute(k,v)} c.forEach(x=>{if(x!=null)n.appendChild(typeof x==='string'?document.createTextNode(x):x)});return n};
+const escapeHtml=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------------- Sounds ---------------- */
+const AudioC=window.AudioContext||window.webkitAudioContext; let ac;
+function tone(seq=[0],dur=.12,type='triangle',base=640){ if(!sfxOn||!AudioC)return; ac=ac||new AudioC();
+  const o=ac.createOscillator(), g=ac.createGain(); o.type=type; o.connect(g).connect(ac.destination);
+  const now=ac.currentTime; let t=now; g.gain.setValueAtTime(.0001,now); g.gain.linearRampToValueAtTime(.22,now+.01);
+  seq.forEach(semi=>{o.frequency.setValueAtTime(base*Math.pow(2,semi/12),t); t+=dur;});
+  g.gain.exponentialRampToValueAtTime(.0001,t+.04); o.start(now); o.stop(t+.05);
+}
+document.addEventListener('click',e=>{ if(e.target.closest('[data-sfx]')) tone([0],.07); },{capture:true});
+
+/* ---------------- Parser & Flatten ---------------- */
+const scanTitleLike=o=>{if(!o||typeof o!=='object')return null;for(const k of ['title','name','label','id'])if(typeof o[k]==='string'&&o[k].trim())return o[k].trim();return null;}
+const normalizeTitle=v=> typeof v==='string'?v: (typeof v==='number'?String(v): (v&&typeof v==='object'? (scanTitleLike(v)||'') : '') );
+function isFullScript(data){
+  if(!data) return false;
+  if(Array.isArray(data)) return data.some(n=>typeof n==='object' && (n.type||'')==='speaker_block') || data.some(n=>n&&n.acts) || data.some(n=>n.children||n.segments||n.items);
+  if(typeof data==='object') return !!(data.acts || data.segments || data.children || data.items);
+  return false;
+}
+function parseScriptsJson(data){
+  const out=[]; const push=(label,value)=>{ if(value) out.push({label:label||value, value}); };
+  const each=(it,i)=>{
+    if(typeof it==='string'){ push(it,it); }
+    else if(it && typeof it==='object'){
+      const value= it.src || it.file || it.path || it.url || '';
+      const label= it.title || it.name || it.label || value || `Skript ${i+1}`;
+      push(label,value);
+    }
+  };
+  if(Array.isArray(data)){ data.forEach(each); }
+  else if(data && typeof data==='object'){
+    if(Array.isArray(data.scripts)) data.scripts.forEach(each);
+    else if(typeof data.scripts==='object') Object.entries(data.scripts).forEach(([k,v])=>{
+      if(typeof v==='string') push(k||v,v);
+      else if(v && typeof v==='object') push(v.title||v.name||k||v.src||v.path||'', v.src||v.file||v.path||'');
+    });
+  }
+  return out;
+}
+function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
+  if(!node||typeof node!=='object')return;
+  const t=(node.type||'').toLowerCase();
+  if(t==='act'||'act'in node){const a=normalizeTitle('act'in node?node.act:node); if(a) ctx={...ctx,act:a}}
+  if(t==='scene'||'scene'in node){const s=normalizeTitle('scene'in node?node.scene:node); if(s) ctx={...ctx,scene:s}}
+  if(t==='song'||'song'in node){const sg=normalizeTitle('song'in node?node.song:node); if(sg) ctx={...ctx,song:sg}}
+  if(t==='speaker_block'&&node.speaker){
+    const content=Array.isArray(node.content)?node.content:[];
+    content.forEach(c=>{
+      if(!c||!c.type)return; const ty=String(c.type).toLowerCase();
+      if(ty==='line'||ty==='lyric'){
+        const text=(c.text||'').trim(); if(!text)return;
+        out.push({type:'dialogue',speaker:node.speaker,text,kind:ty,meta:{...ctx}});
+        meta.roles.add(norm(node.speaker)); if(ctx.song) meta.songs.add(ctx.song);
+      }
+    });
+  }
+  const kids=[].concat(node.segments||[],node.children||[],node.parts||[],node.items||[],Array.isArray(node)?node:[]);
+  kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
+}
+
+/* ---------------- scripts.json -> Dropdown ---------------- */
+const scriptSelect=document.getElementById('scriptSelect');
+const scriptsNote=document.getElementById('scriptsNote');
+
+async function loadScriptsIndex(){
+  try{
+    const idx=await fetchJson([CURRENT_DIR + 'scripts.json','scripts.json','./scripts.json']);
+    const list=parseScriptsJson(idx);
+    if(list.length){
+      state.indexFromScriptsJson=list.map(o=>({label:o.label||o.value, value: normalizeScriptPath(o.value)}));
+      scriptSelect.innerHTML=state.indexFromScriptsJson.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+      scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
+      const found=state.indexFromScriptsJson.find(o=>o.value===jsonSrc || normalizeScriptPath(o.value)===jsonSrc);
+      if(found){ scriptSelect.value=found.value; }
+      else {
+        scriptSelect.value = state.indexFromScriptsJson[0].value;
+        jsonSrc = scriptSelect.value; localStorage.setItem(LS.src, jsonSrc);
+      }
+      return true;
+    } else {
+      scriptsNote.textContent='scripts.json gefunden, aber leer.';
+      scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
+      return false;
+    }
+  }catch{
+    scriptsNote.textContent='Keine scripts.json gefunden – Pfad kann manuell gesetzt werden.';
+    scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
+    return false;
+  }
+}
+
+/* ---------------- Content JSON laden ---------------- */
+const jsonLabel = document.getElementById('jsonSrcLabel');
+async function loadJSON(){
+  jsonSrc = normalizeScriptPath(jsonSrc);
+  if (jsonLabel) jsonLabel.textContent = jsonSrc;
+
+  const tryPaths = [jsonSrc, '/'+jsonSrc.replace(/^\//,''), './'+jsonSrc.replace(/^\//,'')];
+
+  let data;
+  try {
+    data = await fetchJson(tryPaths);
+  } catch (err) {
+    showError('JSON konnte nicht geladen werden', err.message);
+    return;
+  }
+
+  const maybeIndex = parseScriptsJson(data);
+  if (maybeIndex.length && !isFullScript(data)){
+    jsonSrc = normalizeScriptPath(maybeIndex[0].value);
+    localStorage.setItem(LS.src, jsonSrc);
+    return loadJSON();
+  }
+
+  const out = [];
+  const meta = { roles: new Set(), songs: new Set() };
+  Array.isArray(data) ? flattenAny({segments:data}, {}, out, meta)
+                      : flattenAny(data, {}, out, meta);
+
+  state.items = out;
+  state.roles = [...meta.roles];
+
+  state.songsSet = new Set(
+    [...meta.songs]
+      .map(normalizeTitle)
+      .filter(Boolean)
+      .sort((a,b)=>a.localeCompare(b))
+  );
+
+  state.actsList = [];
+  state.scenesByAct = {};
+  if (data && Array.isArray(data.acts)){
+    data.acts.forEach(act=>{
+      const a = normalizeTitle(act); 
+      if (!a) return;
+      state.actsList.push(a);
+      state.scenesByAct[a] = (Array.isArray(act.scenes)?act.scenes:[])
+        .map(s=>normalizeTitle(s))
+        .filter(Boolean);
+    });
+  }
+
+  populateFilters();
+}
+
+/* ---------------- Errorbox ---------------- */
+function showError(title,msg){
+  const root=document.querySelector('[data-view].active')||document.body;
+  const box=el('div',{class:'card'},
+    el('div',{class:'big'},`❗ ${title}`),
+    el('div',{class:'faded'},String(msg||'')),
+    el('div',{class:'faded'},`Quelle: ${jsonSrc}`)
+  );
+  root.appendChild(box);
+}
+
+/* ---------------- Navigation ---------------- */
+let currentView='home';
+function switchViewImmediate(name){
+  document.querySelectorAll('[data-view]').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
+  document.getElementById('hdr').classList.toggle('compact',name!=='home');
+  document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
+  currentView=name;
+}
+document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{switchViewImmediate(b.dataset.nav); tone([0,4],.05);});
+document.getElementById('goSettings').onclick=()=>{switchViewImmediate('settings'); tone([0,4],.05);};
+
+/* ---------------- Controls & Filter ---------------- */
+const actSel=document.getElementById('actFilter'), sceneSel=document.getElementById('sceneFilter'), songSel=document.getElementById('songFilter'), lyricsOnly=document.getElementById('lyricsOnly'), roleSel=document.getElementById('roleSel');
+const actSelV=document.getElementById('actFilterV'), sceneSelV=document.getElementById('sceneFilterV'), songSelV=document.getElementById('songFilterV'), lyricsOnlyV=document.getElementById('lyricsOnlyV'), viewerRoleSel=document.getElementById('viewerRoleSel');
+const roleSurv=document.getElementById('roleSurv');
+
+function fillSongs(sel){ sel.innerHTML='<option value="">Alle</option>'+[...state.songsSet].map(s=>`<option>${s}</option>`).join(''); }
+function populateFilters(){
+  const roleOpts=state.roles.map(r=>`<option>${r}</option>`).join('');
+  roleSel.innerHTML=roleOpts; roleSurv.innerHTML=roleOpts; viewerRoleSel.innerHTML=roleOpts; state.viewerHighlightRole=viewerRoleSel.value||'';
+  const fillActs=sel=> sel.innerHTML='<option value="">Alle</option>'+state.actsList.map(a=>`<option>${a}</option>`).join('');
+  fillActs(actSel); fillActs(actSelV);
+  const refreshScenes=(act,sel)=>{const list=act?(state.scenesByAct[act]||[]):Object.values(state.scenesByAct).flat(); sel.innerHTML='<option value="">Alle</option>'+list.map(s=>`<option>${s}</option>`).join('');};
+  refreshScenes('',sceneSel); refreshScenes('',sceneSelV);
+  fillSongs(songSel); fillSongs(songSelV);
+  renderLearn(); renderViewer();
+}
+actSel.addEventListener('change',()=>{const a=actSel.value; const l=a?(state.scenesByAct[a]||[]):Object.values(state.scenesByAct).flat(); sceneSel.innerHTML='<option value="">Alle</option>'+l.map(s=>`<option>${s}</option>`).join(''); renderLearn();});
+actSelV.addEventListener('change',()=>{const a=actSelV.value; const l=a?(state.scenesByAct[a]||[]):Object.values(state.scenesByAct).flat(); sceneSelV.innerHTML='<option value="">Alle</option>'+l.map(s=>`<option>${s}</option>`).join(''); renderViewer();});
+
+function applyFilters(items,{byRole=true,useViewer=false,roleOverride=null}={}){
+  const role=roleOverride||roleSel.value; const act=useViewer?actSelV.value:actSel.value; const scene=useViewer?sceneSelV.value:sceneSel.value; const song=useViewer?songSelV.value:songSel.value; const lyr=useViewer?!!lyricsOnlyV.checked:!!lyricsOnly.checked;
+  return items.filter(it=>{
+    if(byRole){const sp=treatSpeaker(it.speaker); if(!sp||sp==='__IGNORE__') return false; if(sp!=='ALLE'&&sp!==norm(role)) return false;}
+    if(act&&(it.meta?.act||'')!==act) return false; if(scene&&(it.meta?.scene||'')!==scene) return false; if(song&&(it.meta?.song||'')!==song) return false; if(lyr&&it.kind!=='lyric') return false; return true;
+  });
+}
+function getContextForLine(line,fullSeq,myRoleUC,onlySameSong){
+  const idx=fullSeq.findIndex(x=>norm(x.speaker)===norm(line.speaker)&&x.text===line.text&&(x.meta?.act||'')===(line.meta?.act||'')&&(x.meta?.scene||'')===(line.meta?.scene||'')&&(x.meta?.song||'')===(line.meta?.song||'')); if(idx<0) return {prev:null,next:null};
+  let prev=null; for(let i=idx-1;i>=0;i--){const okRole=norm(fullSeq[i].speaker)!==myRoleUC; const okSong=!onlySameSong||(fullSeq[i].meta?.song||'')===(line.meta?.song||''); if(okRole&&okSong){prev=fullSeq[i];break;}}
+  let next=null; for(let i=idx+1;i<fullSeq.length;i++){const okRole=norm(fullSeq[i].speaker)!==myRoleUC; const okSong=!onlySameSong||(fullSeq[i].meta?.song||'')===(line.meta?.song||''); if(okRole&&okSong){next=fullSeq[i];break;}}
+  return {prev,next};
+}
+
+/* ---------------- Learn ---------------- */
+const learnRoot=document.getElementById('learnRoot'); const modeSel=document.getElementById('modeSel'); const startLearnBtn=document.getElementById('startLearn');
+const pager=document.getElementById('learnPager'); const pagerInfo=document.getElementById('pagerInfo'); const prevPage=document.getElementById('prevPage'); const nextPage=document.getElementById('nextPage'); const learnProg=document.getElementById('learnProg'); const learnCount=document.getElementById('learnCount');
+function setProg(p){ learnProg.style.width=p; }
+function renderLearn(){ state.lastFiltered=applyFilters(state.items,{byRole:true}); state.pageIndex=0; renderLearnPage(true); }
+function renderLearnPage(reset=false){
+  const mode=modeSel.value; const pageSize=(mode==='classic')?state.pageSizeClassic:state.pageSizeSingle;
+  const items=state.lastFiltered; const total=items.length;
+  if(!items.length){ learnRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; pager.hidden=true; learnCount.textContent=`0/${state.items.length}`; setProg('0%'); return; }
+  const pages=Math.max(1,Math.ceil(total/pageSize)); state.pageIndex=Math.min(Math.max(0,state.pageIndex),pages-1);
+  const slice=items.slice(state.pageIndex*pageSize,state.pageIndex*pageSize+pageSize);
+
+  learnRoot.innerHTML=''; const myRoleUC=norm(roleSel.value||''); const fullSeq=applyFilters(state.items,{byRole:false}); const sameSong=!!songSel.value;
+
+  if(mode==='classic'){
+    slice.forEach(line=>{
+      const box=el('div',{class:'exchange'});
+      const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
+      if(prev) box.appendChild(el('div',{class:'faded'},`${prev.speaker}: ${prev.text}`));
+      box.appendChild(el('div',{class:'line big'},`${line.speaker}: ${line.text}`));
+      if(next) box.appendChild(el('div',{class:'faded'},`${next.speaker}: ${next.text}`));
+      learnRoot.appendChild(box);
+    });
+  } else if(mode==='flash'){
+    const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
+    const card=el('div',{class:'card flip'});
+    if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
+    const inner=el('div',{class:'card-inner'},
+      el('div',{class:'face big'},`${line.speaker}: (tippen zum Aufdecken)`),
+      el('div',{class:'back big'},`${line.speaker}: ${escapeHtml(line.text)}`)
+    );
+    card.appendChild(inner);
+    if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
+    // toggle statt once:true -> stabileres UX
+    card.addEventListener('click',()=>{ card.classList.toggle('flipped'); });
+    learnRoot.appendChild(card);
+  } else { // cloze
+    const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
+    const card=el('div',{class:'card'});
+    if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
+    const html=(line.text||'').replace(/\b(\w{3,})\b/g,'<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">&nbsp;&nbsp;&nbsp;</span>');
+    card.appendChild(el('div',{class:'big',html:`${line.speaker}: ${html}`}));
+    if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
+    learnRoot.appendChild(card);
+  }
+
+  pager.hidden=pages<=1;
+  pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
+  prevPage.disabled=state.pageIndex===0; nextPage.disabled=state.pageIndex>=pages-1;
+  learnCount.textContent=`${total}/${state.items.length}`;
+  setProg(`${((state.pageIndex+1)/pages)*100}%`);
+}
+startLearnBtn.onclick=renderLearn;
+[sceneSel,songSel,lyricsOnly,roleSel,modeSel].forEach(e=>e.addEventListener('change',()=>{state.pageIndex=0; renderLearn();}));
+prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();}; nextPage.onclick=()=>{state.pageIndex++; renderLearnPage();};
+
+/* ---------------- Viewer ---------------- */
+const viewerRoot=document.getElementById('viewerRoot'); const viewerPager=document.getElementById('viewerPager'); const viewerPagerInfo=document.getElementById('viewerPagerInfo'); const viewerPrev=document.getElementById('viewerPrev'); const viewerNext=document.getElementById('viewerNext'); const viewerProg=document.getElementById('viewerProg'); const viewerCount=document.getElementById('viewerCount');
+function renderViewer(){ state.viewerLast=applyFilters(state.items,{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage(); }
+function renderViewerPage(){
+  const items=state.viewerLast,total=items.length;
+  if(!items.length){ viewerRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; viewerPager.hidden=true; viewerCount.textContent=`0/${state.items.length}`; viewerProg.style.width='0%'; return; }
+  const pages=Math.max(1,Math.ceil(items.length/state.viewerPageSize)); state.viewerIndex=Math.min(Math.max(0,state.viewerIndex),pages-1);
+  const slice=items.slice(state.viewerIndex*state.viewerPageSize,state.viewerIndex*state.viewerPageSize+state.viewerPageSize);
+
+  viewerRoot.innerHTML=''; const hl=norm(state.viewerHighlightRole||'');
+  slice.forEach(line=>{
+    const isMatch = !!hl && norm(line.speaker) === hl;
+    const cls = isMatch ? 'line big hl' : 'line big dim';
+    viewerRoot.appendChild(el('div',{class:'exchange'}, el('div',{class:cls}, `${line.speaker}: ${line.text}`)));
+  });
+
+  viewerPager.hidden=pages<=1; viewerPagerInfo.textContent=`Seite ${state.viewerIndex+1}/${pages}`; viewerPrev.disabled=state.viewerIndex===0; viewerNext.disabled=state.viewerIndex>=pages-1;
+  viewerCount.textContent=`${total}/${state.items.length}`; viewerProg.style.width=`${((state.viewerIndex+1)/pages)*100}%`;
+}
+[actSelV,sceneSelV,songSelV,l]()
