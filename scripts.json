@@ -1,5 +1,9 @@
 {
   "scripts": [
-    "horrorladen_final_with_acts.json"
+    {
+      "id": "horrorladen-final",
+      "label": "Horrorladen (Final mit Acts)",
+      "file": "horrorladen_final_with_acts.json"
+    }
   ]
 }
