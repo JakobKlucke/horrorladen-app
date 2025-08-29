@@ -44,33 +44,77 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8EE000,#58CC02);transition:width .25s var(--ease)}
 .faded{opacity:.9;color:var(--muted);font-size:.96rem}
 
-/* Duolingo-like Buttons */
+/* Duolingo-Style 2.5D Button – mit echtem "Press-in" */
 .btn{
-  position:relative; appearance:button; background-color: var(--green); border: solid transparent;
-  border-radius: 16px; border-width: 0 0 4px; color:#0b1220; cursor:pointer; display:inline-block;
-  font-size:15px; font-weight:800; letter-spacing:.8px; line-height:20px; padding:13px 19px;
-  text-transform:uppercase; transition:filter .2s, transform .08s var(--ease);
-  user-select:none; -webkit-user-select:none; white-space:nowrap; box-sizing:border-box;
+  position: relative;
+  appearance: button;
+  background-color: var(--green-dark);       /* Fläche */
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;                /* behält Kompatibilität */
+  color: #0b1220;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .8px;
+  line-height: 20px;
+  padding: 13px 19px;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  transform: translateZ(0);             /* smoother on Safari */
+  transition: filter .2s, transform .08s var(--ease);
+  outline: none;
 }
-.btn:after{
-  background-clip:padding-box; background-color: var(--green-dark);
-  border: solid transparent; border-radius:16px; border-width:0 0 4px;
-  content:""; position:absolute; inset:0; bottom:-4px; z-index:-1;
-}
-.btn:hover:not(:disabled){ filter:brightness(1.06) }
-.btn:active:after{ border-width:0 }
-.btn:active{ padding-bottom:10px; transform:translateY(2px) }
-.btn:disabled{opacity:.5; cursor:default}
-.btn.secondary{ background:#fff; color:var(--ink); border:2px solid #00000014; text-transform:none; letter-spacing:.2px }
-.btn.secondary:after{display:none}
-.btn.secondary:hover{transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1)}
 
-.card{--border-radius:22px;width:min(100%,42rem);padding:1.1rem;border-radius:var(--border-radius);background:#fff;border:2px solid #00000010;box-shadow:var(--shadow);margin:1rem auto;position:relative;color:var(--ink)}
-.exchange{margin:1rem 0;padding:1rem;border-radius:18px;background:#fff;border:2px solid #00000010;color:var(--ink);transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
-.exchange:hover{transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.08)}
-.line{padding:.85rem 1rem;border-radius:14px;background:linear-gradient(180deg,#F2FFF2,#E9FFE0);border:2px solid rgba(37,168,0,.25);color:var(--ink)}
-.big{font-size:clamp(1.05rem,2.7vw,1.25rem);line-height:1.6;word-break:break-word;overflow-wrap:anywhere;color:var(--ink)}
-.list{max-width:42rem;margin:0 auto}
+.btn:after{
+  background-clip: padding-box;
+  background-color: var(--green);  /* Unterkante/Kante */
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;                /* sichtbare 4px-Kante */
+  content: "";
+  position: absolute;
+  inset: 0;
+  bottom: -4px;                         /* Kante „steht unten raus“ */
+  z-index: -1;
+}
+
+.btn:hover:not(:disabled){
+  filter: brightness(1.06);
+}
+
+/* Press-in: Kante weg + etwas weniger Padding unten */
+.btn:active:after{ border-width: 0; }
+.btn:active{
+  padding-bottom: 10px;                 /* 13px → 10px: wirkt eingedrückt */
+  transform: translateY(2px);           /* noch etwas „reindrücken“ */
+}
+
+.btn:disabled{ opacity: .5; cursor: default; }
+
+/* Secondary bleibt wie gehabt */
+.btn.secondary{
+  background:#fff; color:var(--ink);
+  border:2px solid #00000014;
+  text-transform:none; letter-spacing:.2px;
+}
+.btn.secondary:after{ display:none; }
+.btn.secondary:hover{ transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1); }
+
+/* Optional: bei reduziertem Motion keine Translation */
+@media (prefers-reduced-motion: reduce){
+  .btn{ transition: filter .2s; }
+  .btn:active{ transform:none; }
+}
+
+
+/* (Optional) enge Buttons im Pager */
+.pager .btn{ padding: 10px 16px; border-radius: 14px; }
+
 
 /* Viewer – nur eine Kante & klare Hervorhebung */
 [data-view="viewer"] .exchange{border:0;background:transparent;box-shadow:none;padding:.35rem 0}
@@ -366,4 +410,3 @@ body::before{
   background: linear-gradient(180deg, #F2FFF7 0%, #F8FFFB 100%);
   border:1px solid #d2f5e2;
 }
-
