@@ -53,7 +53,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
   user-select:none; -webkit-user-select:none; white-space:nowrap; box-sizing:border-box;
 }
 .btn:after{
-  background-clip:padding-box; background-color: var(--green2);
+  background-clip:padding-box; background-color: var(--green-dark);
   border: solid transparent; border-radius:16px; border-width:0 0 4px;
   content:""; position:absolute; inset:0; bottom:-4px; z-index:-1;
 }
