@@ -262,3 +262,7 @@ label.checkbox-label input[type="checkbox"]:checked::after {
   0% { height: 0; }
   100% { height: 10px; }
 }
+
+.home-section { margin-bottom: 28px; }
+.home-section > h2 { margin: 0 0 10px; font-size: 20px; }
+.home-menu { display: flex; flex-wrap: wrap; gap: 12px; }
