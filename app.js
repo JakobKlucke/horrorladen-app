@@ -469,10 +469,12 @@ function renderViewerPage(){
 );
 viewerRoleSel.addEventListener('change',()=>{ state.viewerHighlightRole = viewerRoleSel.value||''; renderViewerPage(); });
 
-/* ---------------- Survival ---------------- */
+/* ---------------- Survival (chronologisch + ähnliche Länge) ---------------- */
 const survRoot = document.getElementById('survRoot');
 const roleSurv = document.getElementById('roleSurv');
 let survLives = 3, survScore = 0;
+let survPool = [];   // chronologische Liste der Zeilen für die gewählte Rolle
+let survIdx  = 0;    // aktueller Index in survPool
 
 const hearts = () => {
   const pill = document.getElementById('heartPill');
@@ -484,34 +486,58 @@ const score  = () => {
 };
 
 function startSurv(){
-  const pool = applyFilters(state.items, { byRole:true, roleOverride: roleSurv.value });
-  if (!pool.length) {
+  // 1) chronologischer Pool: gefiltert nach Rolle, Reihenfolge = wie im Skript
+  survPool = applyFilters(state.items, { byRole:true, roleOverride: roleSurv.value });
+  if (!survPool.length) {
     survRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
     return;
   }
-  survLives = 3; survScore = 0; hearts(); score();
+  survLives = 3; survScore = 0; survIdx = 0; hearts(); score();
   state.inExercise = true;
-  nextQ(pool);
+  nextQ();
 }
 
-function nextQ(pool){
+// Hilfsfunktion: wählt 2 Texte ähnlicher Länge zur "correct" Line
+function pickSimilarLengthWrongs(correctText){
+  const targetLen = (correctText||'').length;
+  // Alle Items (ohne Rollenfilter), nur Texte
+  const all = applyFilters(state.items, { byRole:false })
+    .map(x => x.text)
+    .filter(t => t && t !== correctText);
+
+  // nach absoluten Längendifferenzen sortieren, dann die nächsten 2
+  const wrongs = [...new Set(all)] // uniq
+    .map(t => ({ t, d: Math.abs(t.length - targetLen) }))
+    .sort((a,b) => a.d - b.d)
+    .slice(0, 12)                // kleine Vorauswahl
+    .sort(() => Math.random() - .5)
+    .slice(0, 2)
+    .map(o => o.t);
+
+  // Fallback: falls zu wenig gefunden, irgendeinen auffüllen
+  while (wrongs.length < 2) {
+    const extra = all[Math.floor(Math.random()*all.length)];
+    if (extra && !wrongs.includes(extra) && extra !== correctText) wrongs.push(extra);
+  }
+  return wrongs.slice(0,2);
+}
+
+function nextQ(){
   if (survLives <= 0) { over(); return; }
+  if (survIdx >= survPool.length) { over(); return; }
+
+  const line    = survPool[survIdx];
+  const correct = line.text;
+  const wrongs  = pickSimilarLengthWrongs(correct);
+  const opts    = [correct, ...wrongs].sort(() => Math.random() - .5);
 
   survRoot.innerHTML = '';
   const card = el('div', { class: 'card' });
 
-  const line   = pool[Math.floor(Math.random() * pool.length)];
-  const correct= line.text;
-  const wrongs = pool.filter(l => l !== line)
-                     .sort(() => .5 - Math.random())
-                     .slice(0, 2)
-                     .map(l => l.text);
-  const opts   = [correct, ...wrongs].sort(() => .5 - Math.random());
-
-  // Frage
+  // Frage (nur Sprecher, Inhalt wird geraten)
   card.appendChild(el('div', { class: 'big' }, `${line.speaker}: …`));
 
-  // Antworten als vertikale Liste
+  // Antworten untereinander
   const list = el('div', { class: 'opt-list' });
   opts.forEach(o => {
     const b = el('button', { class: 'opt', 'data-sfx': '' }, o);
@@ -522,7 +548,9 @@ function nextQ(pool){
       } else {
         survLives--; hearts();
       }
-      nextQ(pool);
+      // Immer zur nächsten Zeile -> chronologisch vorwärts
+      survIdx++;
+      nextQ();
     };
     list.appendChild(b);
   });
@@ -534,12 +562,13 @@ function nextQ(pool){
 const over = () => {
   survRoot.innerHTML = '';
   survRoot.appendChild(el('div', { class: 'card big' }, `Game Over! Score: ${survScore}`));
-  saveScore(survScore);     // wenn GUN aktiv
-  state.inExercise = false; // Übung beendet
+  saveScore(survScore);     // noop, wenn GUN nicht verfügbar
+  state.inExercise = false;
 };
 
 const startBtn = document.getElementById('startSurv');
 if (startBtn) startBtn.onclick = startSurv;
+
 
 /* ---------------- Leaderboard (robust init) ---------------- */
 const boardDiv  = document.getElementById('board');
