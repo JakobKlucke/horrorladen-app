@@ -148,3 +148,59 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
   box-shadow: 0 6px 16px rgba(0,0,0,.08);
 }
 
+/* Flashcards – Uiverse-Style, aber grün */
+.fc-card{
+  --border-radius: .75rem;
+  --primary-color: var(--green-dark);
+  --secondary-color: #3c3852;
+  width: 100%;
+  padding: 1rem;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  background: #f1f1f3;
+  box-shadow: 0 8px 16px rgba(0,0,0,.06);
+  position: relative;
+}
+.fc-card > * + * { margin-top: 1.1em; }
+
+.fc-card__title{
+  margin:0; padding:0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.fc-card__content{
+  color: var(--secondary-color);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+.fc-card__arrow{
+  position:absolute; bottom:0; right:0;
+  background: var(--primary-color);
+  padding:.45rem;
+  border-top-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  display:flex; align-items:center; justify-content:center;
+  transition:.2s;
+}
+.fc-card__arrow svg{ transition:.2s; }
+
+/* Hover */
+.fc-card:hover .fc-card__title{ color: var(--primary-color); text-decoration: underline; }
+.fc-card:hover .fc-card__arrow{ background:#111; }
+.fc-card:hover .fc-card__arrow svg{ transform: translateX(3px); }
+
+/* Kontextzeilen oben/unten, fix (nicht flippend) */
+.fc-ctx{
+  font-size:.9rem;
+  color:#6b7280;
+  margin:.4rem 0;
+}
+.fc-ctx--top{ margin-bottom:.8rem; }
+.fc-ctx--bottom{ margin-top:.8rem; }
+
+/* „aufgedeckt“-Zustand: dezenter Grün-Schimmer */
+.fc-card.revealed{
+  background:#f7fff5;
+  box-shadow:0 12px 24px rgba(31,175,56,.12);
+}
