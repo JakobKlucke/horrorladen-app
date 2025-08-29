@@ -697,66 +697,80 @@ function nextQ(pool){
 const over=()=>{ survRoot.innerHTML=''; survRoot.appendChild(el('div',{class:'card big'},`Game Over! Score: ${survScore}`)); saveScore(survScore); }
 document.getElementById('startSurv').onclick=startSurv;
 
-/* ---------------- Leaderboard (robust) ---------------- */
-const boardDiv = document.getElementById('board');
+/* ---------------- Leaderboard (robust init) ---------------- */
+const boardDiv  = document.getElementById('board');
 const boardInfo = document.getElementById('boardInfo');
 
-let gun = null;
-let board = null;
+let gun = null, board = null, gunReady = false;
 
-// Versuche GUN zu initialisieren, aber lass die App weiterlaufen, wenn es fehlschlägt
-try {
-  if (window.Gun) {
-    // Nutze mindestens eine Relay-URL; deine alte kann down sein
-    gun = Gun([
-      'https://gun-manhattan.herokuapp.com/gun',   // alt, oft instabil
-      'https://relay.peer.ooo/gun'                 // zusätzliche Relay
-    ]);
-    board = gun.get('horrorladen-scores');
-  } else {
-    console.warn('Gun not available on window. Leaderboard disabled.');
+function enableBoardUI() {
+  if (!gunReady) {
+    boardInfo.textContent = 'Leaderboard deaktiviert';
+    return;
   }
-} catch (e) {
-  console.warn('Gun init failed:', e);
+  // Falls du eine andere UI haben willst, kannst du hier umschalten
 }
 
-// Nur wenn board existiert, Funktionen verdrahten – sonst No-ops
+function initGunIfAvailable() {
+  try {
+    if (window.Gun && !gunReady) {
+      // mehrere Relays; der Manhattan-Relay ist oft wackelig
+      gun   = Gun([
+        'https://relay.peer.ooo/gun',
+        'https://gun-manhattan.herokuapp.com/gun'
+      ]);
+      board = gun.get('horrorladen-scores');
+      gunReady = true;
+      // beim ersten Mal direkt rendern
+      renderBoardAuto();
+    }
+  } catch (e) {
+    console.warn('Gun init failed:', e);
+  } finally {
+    enableBoardUI();
+  }
+}
+
+// 1) Beim vollständigen Laden versuchen
+window.addEventListener('load', initGunIfAvailable);
+
+// 2) Falls das CDN minimal später feuert: kurze Nachversuche
+let retries = 10;
+const t = setInterval(() => {
+  if (gunReady) return clearInterval(t);
+  initGunIfAvailable();
+  if (--retries <= 0) clearInterval(t);
+}, 300);
+
 function saveScore(score){
-  if (!board) return; // Leaderboard deaktiviert
-  const name=(localStorage.getItem(LS.name)||'Anon');
-  const role=roleSurv.value;
-  board.set({name,role,score,time:Date.now()});
+  if (!gunReady || !board) return;  // still disabled? silently skip
+  const name = (localStorage.getItem(LS.name) || 'Anon');
+  const role = roleSurv.value;
+  board.set({ name, role, score, time: Date.now() });
   renderBoardAuto();
 }
 
 function renderBoardAuto(){
-  if (!board){
+  if (!gunReady || !board){
     boardInfo.textContent = 'Leaderboard deaktiviert';
     boardDiv.innerHTML = '';
     return;
   }
-  const list=[];
-  board.map().once(d=>{ if(d) list.push(d); renderBoard(list); });
+  const list = [];
+  board.map().once(d => { if (d) list.push(d); renderBoard(list); });
 }
 
 function renderBoard(list){
-  list.sort((a,b)=> (b.score||0)-(a.score||0) );
-  boardDiv.innerHTML='';
-  const now=new Date();
-  boardInfo.textContent=`${list.length} Einträge, zuletzt: ${now.toLocaleTimeString()}`;
-
-  list.forEach((r,i)=>{
-    boardDiv.appendChild(
-      el(
-        'div',
-        {class:'exchange', style:'display:flex;justify-content:space-between;align-items:center'},
-        `${i+1}. ${ (r?.name || 'Anon') } ${ r?.role ? `(${r.role})` : '' }`,
-        el('strong', {}, r?.score ?? 0)
-      )
-    );
-  });
+  list.sort((a,b)=> (b?.score||0) - (a?.score||0));
+  boardDiv.innerHTML = '';
+  boardInfo.textContent = `${list.length} Einträge, zuletzt: ${new Date().toLocaleTimeString()}`;
+  list.forEach((r,i) => boardDiv.appendChild(
+    el('div',{class:'exchange',style:'display:flex;justify-content:space-between;align-items:center'},
+      `${i+1}. ${r?.name||'Anon'} ${r?.role?`(${r.role})`:''}`,
+      el('strong',{}, r?.score ?? 0)
+    )
+  ));
 }
-
 /* ---------------- Settings ---------------- */
 const playerName=document.getElementById('playerName'), saveSettings=document.getElementById('saveSettings');
 const manualToggle=document.getElementById('manualToggle'), scriptInput=document.getElementById('scriptInput'), loadScriptBtn=document.getElementById('loadScriptBtn');
