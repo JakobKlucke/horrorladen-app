@@ -1,15 +1,19 @@
-/* ---------------- BaseDir & Pfade ---------------- */
+/* =================== BaseDir & Pfade =================== */
 const CURRENT_DIR = (() => {
   const p = location.pathname;
   return p.endsWith('/') ? p : p.replace(/[^/]+$/, '/');
 })();
 
+/* CodePen-Fallback: JSONs vom Repo via jsDelivr holen */
+const IS_PEN   = /codepen|cdpn\.io/.test(location.host);
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/jakobklucke/horrorladen-app@main/';
+
 function normalizeScriptPath(p){
-  if(!p) return p;
-  if(/^https?:\/\//i.test(p)) return p;
-  if(p.startsWith(CURRENT_DIR)) return p;
-  if(p.startsWith('./')) p = p.slice(2);
-  if(p.startsWith('/')) return p;
+  if (!p) return p;
+  if (/^https?:\/\//i.test(p)) return p;                // absolute URLs lassen
+  if (IS_PEN) return CDN_BASE + p.replace(/^\//,'');    // in CodePen -> CDN
+  if (p.startsWith(location.pathname) || p.startsWith('/')) return p;
+  if (p.startsWith('./')) p = p.slice(2);
   return CURRENT_DIR + p;
 }
 
@@ -24,8 +28,7 @@ async function fetchJson(paths){
   throw new Error('Konnte keine Datei laden aus: ' + paths.join(', '));
 }
 
-/* ---------------- Utilities ---------------- */
-// robustes Element-Helper (flacht Arrays ab, erlaubt Text/Nodes)
+/* =================== Utilities =================== */
 function toNodes(x){
   if(x==null) return [];
   if(Array.isArray(x)) return x.flatMap(toNodes);
@@ -46,12 +49,14 @@ const el = (t, a={}, ...kids)=>{
 const escapeHtml=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm=s=>(s||'').trim().toUpperCase();
 
-/* ---------------- Prefs/State ---------------- */
+/* =================== Prefs/State =================== */
 const LS={ name:'hl_player_name', src:'hl_json_src', sfx:'hl_sfx_on', motion:'hl_reduce_motion' };
 
-let jsonSrcRaw = localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json';
-let jsonSrc    = normalizeScriptPath(jsonSrcRaw);
-localStorage.setItem(LS.src, jsonSrc);
+let jsonSrc; {
+  const rawSrc = localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json';
+  jsonSrc = normalizeScriptPath(rawSrc);
+  localStorage.setItem(LS.src, jsonSrc);
+}
 
 let sfxOn = true;
 
@@ -76,7 +81,7 @@ const treatSpeaker=sp=>{
   return s;
 };
 
-/* ---------------- Sounds ---------------- */
+/* =================== Sound / Press Feedback =================== */
 const AudioC = window.AudioContext || window.webkitAudioContext; let ac;
 function tone(seq=[0],dur=.12,type='triangle',base=640){
   if(!sfxOn || !AudioC) return; ac=ac||new AudioC();
@@ -85,7 +90,6 @@ function tone(seq=[0],dur=.12,type='triangle',base=640){
   seq.forEach(semi=>{ o.frequency.setValueAtTime(base*Math.pow(2,semi/12),t); t+=dur; });
   g.gain.exponentialRampToValueAtTime(.0001,t+.04); o.start(now); o.stop(t+.05);
 }
-// schnellere Haptik + sichtbarer Press-in auf Touch
 document.addEventListener('pointerdown', (e)=>{
   const t=e.target.closest('.btn, .opt, .mode-card, [data-nav], [data-goto-learn], [data-sfx]');
   if(!t) return;
@@ -96,7 +100,7 @@ document.addEventListener('pointerdown', (e)=>{
   document.addEventListener(evt,()=>document.querySelectorAll('.btn.pressed').forEach(b=>b.classList.remove('pressed')), {capture:true});
 });
 
-/* ---------------- Parser ---------------- */
+/* =================== Parser =================== */
 const scanTitleLike=o=>{ if(!o||typeof o!=='object') return null; for(const k of ['title','name','label','id']) if(typeof o[k]==='string'&&o[k].trim()) return o[k].trim(); return null; };
 const normalizeTitle=v=> typeof v==='string'?v:(typeof v==='number'?String(v):(v&&typeof v==='object'?(scanTitleLike(v)||''):''));
 
@@ -150,7 +154,7 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
   kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
 }
 
-/* ---------------- DOM Refs ---------------- */
+/* =================== DOM Refs =================== */
 const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote =document.getElementById('scriptsNote');
 const jsonLabel   =document.getElementById('jsonSrcLabel');
@@ -187,20 +191,21 @@ const viewerRoot=document.getElementById('viewerRoot'),
       viewerProg=document.getElementById('viewerProg'),
       viewerCount=document.getElementById('viewerCount');
 
-/* ---------------- scripts.json -> Dropdown ---------------- */
+/* =================== scripts.json -> Dropdown =================== */
 async function loadScriptsIndex(){
   try{
-    const idx=await fetchJson([CURRENT_DIR+'scripts.json','scripts.json','./scripts.json']);
-    const list=parseScriptsJson(idx);
+    const base = IS_PEN ? CDN_BASE : CURRENT_DIR;
+    const idx  = await fetchJson([ base + 'scripts.json' ]);
+    const list = parseScriptsJson(idx);
     if(list.length){
       state.indexFromScriptsJson=list.map(o=>({label:o.label||o.value, value: normalizeScriptPath(o.value)}));
-      if(scriptSelect) {
+      if(scriptSelect){
         scriptSelect.innerHTML=state.indexFromScriptsJson.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
         const found=state.indexFromScriptsJson.find(o=>o.value===jsonSrc || normalizeScriptPath(o.value)===jsonSrc);
         scriptSelect.value = found ? found.value : state.indexFromScriptsJson[0].value;
         jsonSrc = scriptSelect.value; localStorage.setItem(LS.src, jsonSrc);
       }
-      if(scriptsNote) scriptsNote.textContent='Quelle: scripts.json im aktuellen Ordner';
+      if(scriptsNote) scriptsNote.textContent='Quelle: scripts.json';
       return true;
     }else{
       if(scriptsNote) scriptsNote.textContent='scripts.json gefunden, aber leer.';
@@ -214,11 +219,10 @@ async function loadScriptsIndex(){
   }
 }
 
-/* ---------------- Content JSON laden ---------------- */
+/* =================== Content JSON laden =================== */
 async function loadJSON(){
   jsonSrc = normalizeScriptPath(jsonSrc);
   if(jsonLabel) jsonLabel.textContent=jsonSrc;
-
   const tryPaths=[jsonSrc,'/'+jsonSrc.replace(/^\//,''),'./'+jsonSrc.replace(/^\//,'')];
 
   let data;
@@ -242,9 +246,7 @@ async function loadJSON(){
 
   state.items=out;
   state.roles=[...meta.roles];
-  state.songsSet=new Set(
-    [...meta.songs].map(normalizeTitle).filter(Boolean).sort((a,b)=>a.localeCompare(b))
-  );
+  state.songsSet=new Set([...meta.songs].map(normalizeTitle).filter(Boolean).sort((a,b)=>a.localeCompare(b)));
 
   state.actsList=[]; state.scenesByAct={};
   if(data && Array.isArray(data.acts)){
@@ -259,7 +261,7 @@ async function loadJSON(){
   populateFilters();
 }
 
-/* ---------------- Errorbox ---------------- */
+/* =================== Errorbox =================== */
 function showError(title,msg){
   const root=document.querySelector('[data-view].active')||document.body;
   const box=el('div',{class:'card'},
@@ -270,61 +272,77 @@ function showError(title,msg){
   root.appendChild(box);
 }
 
-/* ---------------- Navigation ---------------- */
-let currentView='home';
+/* =========================
+   Navigation & View Switch
+   ========================= */
 
+// Aktive View umschalten (robust: active + hidden + inert)
 function switchViewImmediate(name){
-  document.querySelectorAll('[data-view]').forEach(v=>v.classList.toggle('active', v.dataset.view===name));
-  const hdr=document.getElementById('hdr');
-  if(hdr) hdr.classList.toggle('compact', name!=='home');
-  const sub=document.getElementById('subtitle');
-  if(sub) sub.textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
-  currentView=name;
-  onViewChanged(name); // Hooks (z.B. Leaderboard)
+  document.querySelectorAll('[data-view]').forEach(v=>{
+    const on = v.dataset.view === name;
+    v.classList.toggle('active', on);
+    v.toggleAttribute('hidden', !on);   // wirklich aus Layout
+    try { v.inert = !on; } catch {}      // nicht fokussierbar
+  });
+
+  // Header-UI aktualisieren (falls vorhanden)
+  const hdr = document.getElementById('hdr');
+  if (hdr) hdr.classList.toggle('compact', name !== 'home');
+
+  const sub = document.getElementById('subtitle');
+  if (sub) sub.textContent = (name === 'home' ? 'Willkommen' : name[0].toUpperCase() + name.slice(1));
+
+  // Body-Flag (z.B. für .home-only CSS)
+  document.body.classList.toggle('show-home', name === 'home');
+
+  // Nach oben scrollen
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function switchView(name){
-  if(state.inExercise && name==='home'){
-    const ok=confirm('Willst du die aktuelle Übung wirklich beenden und ins Hauptmenü zurückkehren?');
-    if(!ok) return;
-    state.inExercise=false;
-  }
-  switchViewImmediate(name);
-}
-
-// Logo klickbar
-const brand=document.getElementById('brand');
-if(brand){ brand.style.cursor='pointer'; brand.onclick=()=>switchView('home'); }
-
-// data-nav Buttons
+// Alle Buttons/Links mit data-nav: nur View wechseln (KEIN tone() hier)
 document.querySelectorAll('[data-nav]').forEach(b=>{
-  b.onclick=()=>{ switchView(b.dataset.nav); tone([0,4],.05); };
-});
-// Settings-Kurzcut
-const goSettings=document.getElementById('goSettings');
-if(goSettings) goSettings.onclick=()=>{ switchView('settings'); tone([0,4],.05); };
-
-// Learn-Karten (Home)
-document.querySelectorAll('[data-goto-learn]').forEach(btn=>{
-  btn.onclick=()=>{
-    const m=btn.dataset.mode||'classic';
-    if(modeSel) modeSel.value=m;
-    switchView('learn');
-    // NICHT automatisch starten – erst nach Klick auf „Start“
-    markLearnDirty();
-  };
-});
-
-// ganze Karte klickbar halten
-document.querySelectorAll('.mode-card').forEach(card=>{
-  card.addEventListener('click', (e)=>{
-    const btn = card.querySelector('[data-goto-learn],[data-nav]');
-    if(!btn) return;
-    btn.click();
+  b.addEventListener('click', () => {
+    const target = b.dataset.nav;
+    if (target) switchViewImmediate(target);
   });
 });
 
-/* ---------------- Filter & Learn ---------------- */
+// Karten auf der Startseite klickbar machen
+document.querySelectorAll('.mode-card').forEach(card=>{
+  card.addEventListener('click', (e)=>{
+    // wenn die Karte einen Button mit data-nav / data-goto-learn enthält, den bevorzugen
+    const btn = card.querySelector('[data-nav], [data-goto-learn]');
+    if (btn) btn.click();
+  });
+});
+
+// Lernen-Karten setzen Mode vor & wechseln zur Learn-View
+document.querySelectorAll('[data-goto-learn]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const mode = el.dataset.mode || 'classic';
+    const modeSel = document.getElementById('modeSel');
+    if (modeSel) modeSel.value = mode;
+    switchViewImmediate('learn');
+    // Hinweis: Render startet erst nach Klick auf "Start" – so gewollt
+  });
+});
+
+// Brand/Logo oben: zurück zur Startseite
+const brand = document.getElementById('brand');
+if (brand){
+  brand.addEventListener('click', ()=> switchViewImmediate('home'));
+  brand.style.cursor = 'pointer';
+}
+
+// Globaler Klick-Sound nur über data-sfx (einheitlich, kein Doppel-Sound)
+document.addEventListener('click', e=>{
+  if (e.target.closest('[data-sfx]')) {
+    tone([0], .07); // deine vorhandene tone()-Funktion
+  }
+}, { capture:true });
+
+
+/* =================== Filter & Learn =================== */
 function fillSongs(sel){ if(!sel) return; sel.innerHTML='<option value="">Alle</option>'+[...state.songsSet].map(s=>`<option>${s}</option>`).join(''); }
 
 function populateFilters(){
@@ -341,12 +359,10 @@ function populateFilters(){
 
   fillSongs(songSel); fillSongs(songSelV);
 
-  // Viewer direkt rendern, Learn bleibt „dirty“ bis Start
   renderViewer();
   markLearnDirty();
 }
 
-// Filter-Events -> nur markieren, nicht sofort rendern
 function markLearnDirty(){
   if(!startLearnBtn) return;
   startLearnBtn.disabled=false;
@@ -354,7 +370,6 @@ function markLearnDirty(){
 }
 [actSel,sceneSel,songSel,lyricsOnly,roleSel,modeSel].filter(Boolean).forEach(e=>e.addEventListener('change',()=>{ state.pageIndex=0; markLearnDirty(); }));
 
-/* Filter-Anwendung */
 function applyFilters(items,{byRole=true,useViewer=false,roleOverride=null}={}){
   const role = roleOverride || (byRole && roleSel ? roleSel.value : '');
   const act  = useViewer?(actSelV?.value||''):(actSel?.value||'');
@@ -371,7 +386,7 @@ function applyFilters(items,{byRole=true,useViewer=false,roleOverride=null}={}){
     if(act  && (it.meta?.act||'')   !== act)   return false;
     if(scene&& (it.meta?.scene||'') !== scene) return false;
     if(song && (it.meta?.song||'')  !== song)  return false;
-    if(lyr  && it.kind!=='lyric')            return false;
+    if(lyr  && it.kind!=='lyric')             return false;
     return true;
   });
 }
@@ -453,22 +468,23 @@ function renderLearnPage(){
     learnRoot.appendChild(card);
     if(next) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--bottom'},`${next.speaker}: ${next.text}`));
   }
-  else { // cloze mit Aufdecken
+  else { // cloze (mit Aufdecken) – im exchange/line-Stil
     const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
-    const card=el('div',{class:'card'});
-    if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
+    const box=el('div',{class:'exchange'});
+    if(prev) box.appendChild(el('div',{class:'faded'},`${prev.speaker}: ${prev.text}`));
 
-    const content=el('div',{class:'big'});
+    const content=el('div',{class:'line big'});
     const masked=clozeHtmlLimitTwo(line.text||''); const full=escapeHtml(line.text||''); let revealed=false;
     const renderText=()=>{ content.innerHTML = `${line.speaker}: ${revealed?full:masked}`; };
-    renderText(); card.appendChild(content);
+    renderText();
+    box.appendChild(content);
 
-    const bar=el('div',{style:'margin-top:.75rem'}, el('button',{class:'btn secondary','data-sfx':''},'Aufdecken'));
-    const btn=bar.querySelector('button'); btn.onclick=()=>{ revealed=!revealed; btn.textContent = revealed?'Verbergen':'Aufdecken'; renderText(); };
-    card.appendChild(bar);
+    const actions=el('div',{style:'margin-top:.5rem'}, el('button',{class:'btn secondary','data-sfx':''},'Aufdecken'));
+    const btn=actions.querySelector('button'); btn.onclick=()=>{ revealed=!revealed; btn.textContent=revealed?'Verbergen':'Aufdecken'; renderText(); };
+    box.appendChild(actions);
 
-    if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
-    learnRoot.appendChild(card);
+    if(next) box.appendChild(el('div',{class:'faded'},`${next.speaker}: ${next.text}`));
+    learnRoot.appendChild(box);
   }
 
   if(pager){
@@ -483,7 +499,7 @@ if(prevPage) prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();};
 if(nextPage) nextPage.onclick=()=>{state.pageIndex++; renderLearnPage();};
 if(startLearnBtn) startLearnBtn.onclick=()=>{ state.inExercise=true; startLearnBtn.classList.remove('pulse'); renderLearn(); };
 
-/* ---------------- Viewer ---------------- */
+/* =================== Viewer =================== */
 function renderViewer(){
   if(!viewerRoot) return;
   state.viewerLast=applyFilters(state.items,{byRole:false,useViewer:true}); state.viewerIndex=0; renderViewerPage();
@@ -518,7 +534,7 @@ if(viewerRoleSel) viewerRoleSel.addEventListener('change',()=>{ state.viewerHigh
 if(viewerPrev) viewerPrev.onclick=()=>{ state.viewerIndex--; renderViewerPage(); };
 if(viewerNext) viewerNext.onclick=()=>{ state.viewerIndex++; renderViewerPage(); };
 
-/* ---------------- Survival (chronologisch + ähnliche Länge) ---------------- */
+/* =================== Survival (chronologisch + ähnliche Länge) =================== */
 const survRoot=document.getElementById('survRoot');
 let survLives=3, survScore=0, survPool=[], survIdx=0;
 
@@ -580,8 +596,8 @@ function over(){
 }
 const startBtn=document.getElementById('startSurv'); if(startBtn) startBtn.onclick=startSurv;
 
-/* ---------------- Leaderboard ohne GUN ---------------- */
-const SCORES_URL = `${CURRENT_DIR}scores.json`;  // ggf. absolut setzen
+/* =================== Leaderboard (ohne GUN) =================== */
+const SCORES_URL = (IS_PEN ? CDN_BASE : CURRENT_DIR) + 'scores.json';
 
 function getPlayerName(){ return localStorage.getItem(LS.name)||'Anon'; }
 function getLocalScores(){ try{ return JSON.parse(localStorage.getItem('hl_local_scores')||'[]'); }catch{ return []; } }
@@ -602,8 +618,13 @@ async function fetchScoresJson(){
   }catch(e){ console.warn('scores.json konnte nicht geladen werden:', e); return []; }
 }
 async function renderBoard(){
-  const boardDiv=document.getElementById('board'); if(!boardDiv) return;
+  const boardDiv=document.getElementById('board');
+  const info=document.getElementById('boardInfo');
+  if(!boardDiv) return;
+
   const remote=await fetchScoresJson(); const local=getLocalScores();
+  if(info) info.textContent = (remote.length||local.length) ? `Einträge: ${remote.length} (Repo) + ${local.length} (lokal)` : '—';
+
   const combined=[...remote,...local]
     .filter(s=>typeof s.score==='number' && s.score>=0)
     .sort((a,b)=> b.score - a.score || String(a.name).localeCompare(String(b.name)))
@@ -627,9 +648,10 @@ async function renderBoard(){
     )
   );
 }
-function onViewChanged(name){ if(name==='leaderboard') renderBoard(); }
+/* Achtung: deine View heißt "scores" → hier rendern */
+function onViewChanged(name){ if(name==='scores') renderBoard(); }
 
-/* ---------------- Scripts-Auswahl Events ---------------- */
+/* =================== Scripts-Auswahl Events =================== */
 if(scriptSelect){
   scriptSelect.addEventListener('change', async e=>{
     const chosen=normalizeScriptPath(e.target.value);
@@ -639,14 +661,14 @@ if(scriptSelect){
   });
 }
 
-/* ---------------- Mobile: Pinch-Zoom killen ---------------- */
+/* =================== Mobile: Pinch-Zoom killen =================== */
 (function(){ ['gesturestart','gesturechange','gestureend'].forEach(evt=>document.addEventListener(evt,e=>e.preventDefault(),{passive:false})); })();
 
-/* ---------------- Boot ---------------- */
+/* =================== Boot =================== */
 async function boot(){
   switchViewImmediate('home');
   await loadScriptsIndex();
   await loadJSON();
-  renderViewer(); // Learn wird erst nach Klick auf „Start“ gerendert
+  renderViewer(); // Learn erst nach Klick auf „Start“
 }
 document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
