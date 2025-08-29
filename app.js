@@ -1,3 +1,32 @@
+/* ---------------- Utilitys ---------------- */
+// Cloze Helper: max. 2 Wörter werden ersetzt
+function clozeHtmlLimitTwo(text){
+  const wordRe = /[A-Za-zÄÖÜäöüß]{3,}/g;
+  const matches = [];
+  let m;
+  while ((m = wordRe.exec(text)) !== null) {
+    matches.push({ start: m.index, end: m.index + m[0].length });
+  }
+  if (!matches.length) return escapeHtml(text);
+
+  const picks = matches
+    .sort(() => Math.random() - 0.5)
+    .slice(0, Math.min(2, matches.length))
+    .sort((a,b)=>a.start-b.start);
+
+  let out = '', cursor = 0;
+  for (const p of picks) {
+    out += escapeHtml(text.slice(cursor, p.start));
+    out += '<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">&nbsp;&nbsp;&nbsp;</span>';
+    cursor = p.end;
+  }
+  out += escapeHtml(text.slice(cursor));
+  return out;
+}
+
+
+
+
 /* ---------------- BaseDir & Path Normalisierung ---------------- */
 const CURRENT_DIR = (() => {
   const p = location.pathname;
@@ -205,15 +234,59 @@ function showError(title,msg){
 }
 
 /* ---------------- Navigation ---------------- */
-let currentView='home';
+let currentView = 'home';
+state.inExercise = false; // Trackt ob eine Übung läuft
+
 function switchViewImmediate(name){
-  document.querySelectorAll('[data-view]').forEach(v=>v.classList.toggle('active', v.dataset.view===name));
-  document.getElementById('hdr').classList.toggle('compact', name!=='home');
-  document.getElementById('subtitle').textContent = name==='home' ? 'Willkommen' : name[0].toUpperCase()+name.slice(1);
-  currentView=name;
+  document.querySelectorAll('[data-view]')
+    .forEach(v => v.classList.toggle('active', v.dataset.view === name));
+  document.getElementById('hdr').classList.toggle('compact', name !== 'home');
+  document.getElementById('subtitle').textContent =
+    name === 'home' ? 'Willkommen' : name[0].toUpperCase() + name.slice(1);
+  currentView = name;
 }
-document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ switchViewImmediate(b.dataset.nav); tone([0,4],.05); });
-document.getElementById('goSettings').onclick=()=>{ switchViewImmediate('settings'); tone([0,4],.05); };
+
+// Sanfter Wrapper mit Abfrage
+function switchView(name){
+  if(state.inExercise && name === 'home'){
+    const ok = confirm('Willst du die aktuelle Übung wirklich beenden und ins Hauptmenü zurückkehren?');
+    if(!ok) return;
+    state.inExercise = false;
+  }
+  switchViewImmediate(name);
+}
+
+// Normale Navigations-Buttons
+document.querySelectorAll('[data-nav]').forEach(b => {
+  b.onclick = () => {
+    switchView(b.dataset.nav);
+    tone([0,4], .05);
+  };
+});
+
+// Logo/Brand oben links klickbar machen → Home
+const brand = document.getElementById('brand');
+if(brand){
+  brand.style.cursor = 'pointer';
+  brand.onclick = () => switchView('home');
+}
+
+// Direkt-Buttons im Home für Lernmodi
+document.querySelectorAll('[data-goto-learn]').forEach(btn => {
+  btn.onclick = () => {
+    const m = btn.dataset.mode || 'classic';
+    modeSel.value = m;
+    switchView('learn');
+    state.inExercise = true;   // wir starten eine Lernsession
+    renderLearn();             // sofort laden
+  };
+});
+
+// Settings-Button
+document.getElementById('goSettings').onclick = () => {
+  switchView('settings');
+  tone([0,4], .05);
+};
 
 /* ---------------- Controls & Filter ---------------- */
 const actSel=document.getElementById('actFilter'), sceneSel=document.getElementById('sceneFilter'), songSel=document.getElementById('songFilter'), lyricsOnly=document.getElementById('lyricsOnly'), roleSel=document.getElementById('roleSel');
@@ -331,14 +404,20 @@ function renderLearnPage(){
     if(next) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--bottom'},`${next.speaker}: ${next.text}`));
   }
   else { // cloze
-    const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
-    const card=el('div',{class:'card'});
-    if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
-    const html=(line.text||'').replace(/\b(\w{3,})\b/g,'<span style="border-bottom:3px dotted var(--green-dark);padding:0 .25rem">&nbsp;&nbsp;&nbsp;</span>');
-    card.appendChild(el('div',{class:'big',html:`${line.speaker}: ${html}`}));
-    if(next) card.appendChild(el('div',{class:'ctx ctx-bottom'},`${next.speaker}: ${next.text}`));
-    learnRoot.appendChild(card);
-  }
+  const line = slice[0];
+  const { prev, next } = getContextForLine(line, fullSeq, myRoleUC, sameSong);
+
+  const card = el('div', { class: 'card' });
+
+  if (prev) card.appendChild(el('div', { class: 'ctx ctx-top' }, `${prev.speaker}: ${prev.text}`));
+
+  const html = clozeHtmlLimitTwo(line.text || '');
+  card.appendChild(el('div', { class: 'big', html: `${line.speaker}: ${html}` }));
+
+  if (next) card.appendChild(el('div', { class: 'ctx ctx-bottom' }, `${next.speaker}: ${next.text}`));
+
+  learnRoot.appendChild(card);
+}
 
   pager.hidden=pages<=1;
   pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
@@ -391,44 +470,76 @@ function renderViewerPage(){
 viewerRoleSel.addEventListener('change',()=>{ state.viewerHighlightRole = viewerRoleSel.value||''; renderViewerPage(); });
 
 /* ---------------- Survival ---------------- */
-const survRoot = document.getElementById('survRoot'); let survLives=3, survScore=0;
-const hearts =()=>{ const pill=document.getElementById('heartPill'); if(pill) pill.textContent='❤️'.repeat(Math.max(0,survLives)); }
-const score  =()=>{ const pill=document.getElementById('scorePill'); if(pill) pill.textContent=survScore; }
+const survRoot = document.getElementById('survRoot');
+const roleSurv = document.getElementById('roleSurv');
+let survLives = 3, survScore = 0;
+
+const hearts = () => {
+  const pill = document.getElementById('heartPill');
+  if (pill) pill.textContent = '❤️'.repeat(Math.max(0, survLives));
+};
+const score  = () => {
+  const pill = document.getElementById('scorePill');
+  if (pill) pill.textContent = survScore;
+};
 
 function startSurv(){
-  const pool = applyFilters(state.items,{byRole:true,roleOverride:roleSurv.value});
-  if(!pool.length){ survRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>'; return; }
-  survLives=3; survScore=0; hearts(); score(); nextQ(pool);
+  const pool = applyFilters(state.items, { byRole:true, roleOverride: roleSurv.value });
+  if (!pool.length) {
+    survRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
+    return;
+  }
+  survLives = 3; survScore = 0; hearts(); score();
+  state.inExercise = true;
+  nextQ(pool);
 }
-function nextQ(pool){
-  if(survLives<=0){ over(); return; }
-  survRoot.innerHTML='';
-  const card=el('div',{class:'card'});
-  const line=pool[Math.floor(Math.random()*pool.length)];
-  const correct=line.text;
-  const wrongs = pool.filter(l=>l!==line).sort(()=>.5-Math.random()).slice(0,2).map(l=>l.text);
-  const opts=[correct,...wrongs].sort(()=>.5-Math.random());
 
-  card.appendChild(el('div',{class:'big'},`${line.speaker}: …`));
-  const grid = el('div', { class: 'opt-list' });
-opts.forEach(o => {
-  const b = el('button', { class: 'opt', 'data-sfx': '' }, o);
-    b.onclick=(ev)=>{
-      if(o===correct){
+function nextQ(pool){
+  if (survLives <= 0) { over(); return; }
+
+  survRoot.innerHTML = '';
+  const card = el('div', { class: 'card' });
+
+  const line   = pool[Math.floor(Math.random() * pool.length)];
+  const correct= line.text;
+  const wrongs = pool.filter(l => l !== line)
+                     .sort(() => .5 - Math.random())
+                     .slice(0, 2)
+                     .map(l => l.text);
+  const opts   = [correct, ...wrongs].sort(() => .5 - Math.random());
+
+  // Frage
+  card.appendChild(el('div', { class: 'big' }, `${line.speaker}: …`));
+
+  // Antworten als vertikale Liste
+  const list = el('div', { class: 'opt-list' });
+  opts.forEach(o => {
+    const b = el('button', { class: 'opt', 'data-sfx': '' }, o);
+    b.onclick = (ev) => {
+      if (o === correct) {
         survScore++; score();
-        confetti({particleCount:24,spread:60,origin:{x:(ev.clientX||innerWidth/2)/innerWidth,y:(ev.clientY||innerHeight*.6)/innerHeight}});
+        try { confetti({ particleCount: 24, spread: 60, origin: { x:(ev.clientX||innerWidth/2)/innerWidth, y:(ev.clientY||innerHeight*.6)/innerHeight } }); } catch {}
       } else {
         survLives--; hearts();
       }
       nextQ(pool);
     };
-    grid.appendChild(b);
+    list.appendChild(b);
   });
-  card.appendChild(grid);
+
+  card.appendChild(list);
   survRoot.appendChild(card);
 }
-const over=()=>{ survRoot.innerHTML=''; survRoot.appendChild(el('div',{class:'card big'},`Game Over! Score: ${survScore}`)); saveScore(survScore); }
-document.getElementById('startSurv').onclick = startSurv;
+
+const over = () => {
+  survRoot.innerHTML = '';
+  survRoot.appendChild(el('div', { class: 'card big' }, `Game Over! Score: ${survScore}`));
+  saveScore(survScore);     // wenn GUN aktiv
+  state.inExercise = false; // Übung beendet
+};
+
+const startBtn = document.getElementById('startSurv');
+if (startBtn) startBtn.onclick = startSurv;
 
 /* ---------------- Leaderboard (robust init) ---------------- */
 const boardDiv  = document.getElementById('board');
