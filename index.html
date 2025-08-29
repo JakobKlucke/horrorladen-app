@@ -301,13 +301,26 @@ const CURRENT_DIR = (()=>{
   const p = location.pathname;
   return p.endsWith('/') ? p : p.replace(/[^/]+$/, '');
 })();
+
 function normalizeScriptPath(p){
-  if(!p) return p;
-  if(/^https?:\/\//i.test(p)) return p;
-  if(p.startsWith('./') || p.startsWith('../')) return p;
-  if(p.startsWith('/')) return CURRENT_DIR.replace(/\/$/,'') + p;
+  if (!p) return p;
+
+  // 1) Externe URLs unverändert
+  if (/^https?:\/\//i.test(p)) return p;
+
+  // 2) Bereits korrekt normalisiert? (beginnt schon mit CURRENT_DIR)
+  if (p.startsWith(CURRENT_DIR)) return p;
+
+  // 3) "./" entfernen
+  if (p.startsWith('./')) p = p.slice(2);
+
+  // 4) Absolute Root-Pfade "/foo.json" -> projektrelativ machen
+  if (p.startsWith('/')) p = p.slice(1); // führenden Slash weg
+
+  // 5) Alles andere: relativ zum aktuellen Projektordner auflösen
   return CURRENT_DIR + p;
 }
+
 async function fetchJson(paths){
   for(const raw of paths){
     const url = normalizeScriptPath(raw);
