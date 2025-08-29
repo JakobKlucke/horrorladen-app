@@ -319,4 +319,6 @@ function renderViewerPage(){
   viewerPager.hidden=pages<=1; viewerPagerInfo.textContent=`Seite ${state.viewerIndex+1}/${pages}`; viewerPrev.disabled=state.viewerIndex===0; viewerNext.disabled=state.viewerIndex>=pages-1;
   viewerCount.textContent=`${total}/${state.items.length}`; viewerProg.style.width=`${((state.viewerIndex+1)/pages)*100}%`;
 }
-[actSelV,sceneSelV,songSelV,l]()
+[actSelV, sceneSelV, songSelV, lyricsOnlyV].forEach(e => 
+  e.addEventListener('change', () => { state.viewerIndex = 0; renderViewer(); })
+);
