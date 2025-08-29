@@ -112,3 +112,39 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 
 /* small helpers */
 .script-row{display:flex;gap:.6rem;align-items:end;flex-wrap:wrap}
+
+/* Survival: Antwort-Optionen immer untereinander */
+.opt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.opt {
+  width: 100%;
+  background: #fff;
+  border: 2px solid #e6e9ef;
+  border-radius: 18px;
+  padding: .9rem 1rem;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  text-transform: none;
+  text-align: left;
+  white-space: normal;   /* mehrzeilig erlauben */
+  line-height: 1.4;
+  color: var(--ink);
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .12s var(--ease), box-shadow .2s var(--ease);
+}
+
+.opt:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0,0,0,.10);
+}
+
+.opt:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+}
+
