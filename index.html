@@ -42,27 +42,60 @@
 
 <main class="wrap">
   <!-- HOME -->
-  <section data-view="home" class="active">
-    <!-- Home: Lernen -->
-<section class="home-section">
-  <h2>Lernen📚</h2>
-  <div class="home-menu">
-    <button class="btn" data-goto-learn data-mode="classic">Classic</button>
-    <button class="btn" data-goto-learn data-mode="flash">Flashcards</button>
-    <button class="btn" data-goto-learn data-mode="cloze">Lücken</button>
-  </div>
-</section>
-
-<!-- Home: Competitive -->
-<section class="home-section">
-  <h2>Competitive🎮</h2>
-  <div class="home-menu">
-    <button class="btn" data-nav="survival">Survival❤️</button>
-    <button class="btn" data-nav="leaderboard">Leaderboard🏆</button>
-  </div>
-</section>
+<div data-view="home" class="active">
+  <section class="home-hero">
+    <h1>Horrorladen – Lernapp</h1>
+    <p>Wähle einen Modus und leg los.</p>
   </section>
 
+  <!-- Lernen -->
+  <section class="home-section">
+    <h2>Lernen</h2>
+    <div class="card-grid">
+      <article class="mode-card classic" data-goto-learn data-mode="classic">
+        <div class="mode-icon">📖</div>
+        <h3>Classic</h3>
+        <p>Zeilen mit Kontext üben</p>
+        <button class="btn" data-goto-learn data-mode="classic">Start</button>
+      </article>
+
+      <article class="mode-card flash" data-goto-learn data-mode="flash">
+        <div class="mode-icon">🃏</div>
+        <h3>Flashcards</h3>
+        <p>Teste dich mit Karteikarten</p>
+        <button class="btn" data-goto-learn data-mode="flash">Start</button>
+      </article>
+
+      <article class="mode-card cloze" data-goto-learn data-mode="cloze">
+        <div class="mode-icon">✏️</div>
+        <h3>Lücken</h3>
+        <p>Fülle die fehlenden Wörter</p>
+        <button class="btn" data-goto-learn data-mode="cloze">Start</button>
+      </article>
+    </div>
+  </section>
+
+  <!-- Competitive -->
+  <section class="home-section">
+    <h2>Competitive</h2>
+    <div class="card-grid">
+      <article class="mode-card survival" data-nav="survival">
+        <div class="mode-icon">🕹️</div>
+        <h3>Survival</h3>
+        <p>Wisse deinen Text so lange wie möglich</p>
+        <button class="btn" data-nav="survival">Play</button>
+      </article>
+
+      <article class="mode-card leaderboard" data-nav="leaderboard">
+        <div class="mode-icon">🏆</div>
+        <h3>Leaderboard</h3>
+        <p>Leaderboard der Top Text-Kenner</p>
+        <button class="btn" data-nav="leaderboard">Ansehen</button>
+      </article>
+    </div>
+  </section>
+</div>
+  
   <!-- LEARN -->
   <section data-view="learn">
     <div class="panel">
