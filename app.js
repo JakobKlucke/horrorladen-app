@@ -276,7 +276,7 @@ const pager=document.getElementById('learnPager'); const pagerInfo=document.getE
 function setProg(p){ learnProg.style.width=p; }
 function renderLearn(){ state.lastFiltered=applyFilters(state.items,{byRole:true}); state.pageIndex=0; renderLearnPage(true); }
 
-function renderLearnPage(reset=false){
+function renderLearnPage(){
   const mode=modeSel.value;
   const pageSize=(mode==='classic')?state.pageSizeClassic:state.pageSizeSingle;
   const items=state.lastFiltered;
@@ -284,13 +284,12 @@ function renderLearnPage(reset=false){
 
   if(!items.length){
     learnRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
-    pager.hidden=true; learnCount.textContent=`0/${state.items.length}`; setProg('0%');
-    return;
+    pager.hidden=true; learnCount.textContent=`0/${state.items.length}`; setProg('0%'); return;
   }
 
   const pages=Math.max(1,Math.ceil(total/pageSize));
   state.pageIndex=Math.min(Math.max(0,state.pageIndex),pages-1);
-  const slice=items.slice(state.pageIndex*pageSize,state.pageIndex*pageSize+pageSize);
+  const slice=items.slice(state.pageIndex*pageSize, state.pageIndex*pageSize+pageSize);
 
   learnRoot.innerHTML='';
   const myRoleUC=norm(roleSel.value||'');
@@ -298,58 +297,40 @@ function renderLearnPage(reset=false){
   const sameSong=!!songSel.value;
 
   if(mode==='classic'){
-    // --- dein bisheriger classic code ---
-  } 
+    slice.forEach(line=>{
+      const box=el('div',{class:'exchange'});
+      const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
+      if(prev) box.appendChild(el('div',{class:'faded'},`${prev.speaker}: ${prev.text}`));
+      box.appendChild(el('div',{class:'line big'},`${line.speaker}: ${line.text}`));
+      if(next) box.appendChild(el('div',{class:'faded'},`${next.speaker}: ${next.text}`));
+      learnRoot.appendChild(box);
+    });
+  }
   else if(mode==='flash'){
-    const line = slice[0];
-    const { prev, next } = getContextForLine(line, fullSeq, myRoleUC, sameSong);
+    const line=slice[0];
+    const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
 
-    if (prev) {
-      learnRoot.appendChild(
-        el('div', { class: 'fc-ctx fc-ctx--top' }, `${prev.speaker}: ${prev.text}`)
-      );
-    }
+    if(prev) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--top'},`${prev.speaker}: ${prev.text}`));
 
-    const card   = el('div', { class: 'fc-card', tabindex: '0', 'data-sfx': '' });
-    const title  = el('h3',  { class: 'fc-card__title' }, line.speaker);
-    const body   = el('p',   { class: 'fc-card__content' }, '(tippen zum Aufdecken)');
-    const arrow  = el('div', { class: 'fc-card__arrow', 'aria-hidden': 'true' },
+    const card = el('div',{class:'fc-card',tabindex:'0','data-sfx':''});
+    const title= el('h3',{class:'fc-card__title'}, line.speaker);
+    const body = el('p',{class:'fc-card__content'}, '(tippen zum Aufdecken)');
+    const arrow= el('div',{class:'fc-card__arrow','aria-hidden':'true'},
       el('svg',{xmlns:'http://www.w3.org/2000/svg',viewBox:'0 0 24 24',width:'15',height:'15'},
         el('path',{fill:'#fff',d:'M13.4697 17.9697C13.1768 18.2626 13.1768 18.7374 13.4697 19.0303C13.7626 19.3232 14.2374 19.3232 14.5303 19.0303L20.3232 13.2374C21.0066 12.554 21.0066 11.446 20.3232 10.7626L14.5303 4.96967C14.2374 4.67678 13.7626 4.67678 13.4697 4.96967C13.1768 5.26256 13.1768 5.73744 13.4697 6.03033L18.6893 11.25H4C3.58579 11.25 3.25 11.5858 3.25 12C3.25 12.4142 3.58579 12.75 4 12.75H18.6893L13.4697 17.9697Z'})
       )
     );
-
-    body.dataset.front = '(tippen zum Aufdecken)';
-    body.dataset.back  = `${line.text}`;
-
-    const reveal = () => {
-      const isRev = card.classList.toggle('revealed');
-      body.textContent = isRev ? body.dataset.back : body.dataset.front;
-    };
-    card.addEventListener('click', reveal);
-    card.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); reveal(); }});
-
-    card.append(title, body, arrow);
+    body.dataset.front='(tippen zum Aufdecken)';
+    body.dataset.back = `${line.text}`;
+    const reveal=()=>{ const isRev=card.classList.toggle('revealed'); body.textContent=isRev?body.dataset.back:body.dataset.front; };
+    card.addEventListener('click',reveal);
+    card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); reveal(); }});
+    card.append(title,body,arrow);
     learnRoot.appendChild(card);
 
-    if (next) {
-      learnRoot.appendChild(
-        el('div', { class: 'fc-ctx fc-ctx--bottom' }, `${next.speaker}: ${next.text}`)
-      );
-    }
+    if(next) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--bottom'},`${next.speaker}: ${next.text}`));
   }
-  else { 
-    // --- dein bisheriger cloze code ---
-  }
-
-  pager.hidden=pages<=1;
-  pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
-  prevPage.disabled=state.pageIndex===0; 
-  nextPage.disabled=state.pageIndex>=pages-1;
-  learnCount.textContent=`${total}/${state.items.length}`;
-  setProg(`${((state.pageIndex+1)/pages)*100}%`);
-}
- else { // cloze
+  else { // cloze
     const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
     const card=el('div',{class:'card'});
     if(prev) card.appendChild(el('div',{class:'ctx ctx-top'},`${prev.speaker}: ${prev.text}`));
@@ -361,7 +342,8 @@ function renderLearnPage(reset=false){
 
   pager.hidden=pages<=1;
   pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
-  prevPage.disabled=state.pageIndex===0; nextPage.disabled=state.pageIndex>=pages-1;
+  prevPage.disabled=state.pageIndex===0;
+  nextPage.disabled=state.pageIndex>=pages-1;
   learnCount.textContent=`${total}/${state.items.length}`;
   setProg(`${((state.pageIndex+1)/pages)*100}%`);
 }
