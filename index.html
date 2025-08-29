@@ -13,6 +13,13 @@
 
   <!-- App styles -->
   <link rel="stylesheet" href="./style.css">
+
+  <!-- View-Guard: nur aktive View anzeigen -->
+  <style>
+    [data-view]{display:none}
+    [data-view].active{display:block}
+    [hidden]{display:none!important}
+  </style>
 </head>
 <body>
 <header id="hdr">
@@ -29,7 +36,7 @@
         </div>
         <div>
           <div class="title">Musical Skript Lernapp</div>
-          <div class="badge" id="subtitle">Willkommen</div>
+          <div class="badge" id="subtitle">made by Jakob with ❤️</div>
         </div>
       </div>
       <div class="top-actions">
@@ -40,61 +47,72 @@
 </header>
 
 <main class="wrap">
-  <!-- HOME -->
-<div data-view="home" class="active">
-  <section class="home-hero">
-    <h1>Horrorladen – Lernapp</h1>
-    <p>Wähle einen Modus und leg los.</p>
+  <!-- HOME (als Section, nicht div!) -->
+  <section data-view="home" class="active" id="homeView">
+
+    <section class="home-hero">
+      <h1>Horrorladen – Lernapp</h1>
+      <p>Wähle einen Modus und leg los.</p>
+    </section>
+
+    <!-- Lernen -->
+    <section class="home-section">
+      <h2>Lernen</h2>
+      <div class="card-grid">
+        <article class="mode-card classic" data-goto-learn data-mode="classic">
+          <div class="mode-icon">📖</div>
+          <h3>Classic</h3>
+          <p>Zeilen mit Kontext üben</p>
+          <button class="btn" data-goto-learn data-mode="classic">Start</button>
+        </article>
+
+        <article class="mode-card flash" data-goto-learn data-mode="flash">
+          <div class="mode-icon">🃏</div>
+          <h3>Flashcards</h3>
+          <p>Teste dich mit Karteikarten</p>
+          <button class="btn" data-goto-learn data-mode="flash">Start</button>
+        </article>
+
+        <article class="mode-card cloze" data-goto-learn data-mode="cloze">
+          <div class="mode-icon">✏️</div>
+          <h3>Lücken</h3>
+          <p>Fülle die fehlenden Wörter</p>
+          <button class="btn" data-goto-learn data-mode="cloze">Start</button>
+        </article>
+
+        <!-- Viewer-Karte gehört zur HOME-View -->
+        <article class="mode-card viewer" data-nav="viewer">
+          <div class="mode-icon">👁️</div>
+          <h3>Viewer</h3>
+          <p>Alle Zeilen chronologisch ansehen</p>
+          <button class="btn" data-nav="viewer">Öffnen</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Competitive -->
+    <section class="home-section">
+      <h2>Competitive</h2>
+      <div class="card-grid">
+        <article class="mode-card survival" data-nav="survival">
+          <div class="mode-icon">🕹️</div>
+          <h3>Survival</h3>
+          <p>Wisse deinen Text so lange wie möglich</p>
+          <button class="btn" data-nav="survival">Play</button>
+        </article>
+
+        <article class="mode-card leaderboard" data-nav="scores">
+          <div class="mode-icon">🏆</div>
+          <h3>Leaderboard</h3>
+          <p>Leaderboard der Top Text-Kenner</p>
+          <button class="btn" data-nav="scores">Ansehen</button>
+        </article>
+      </div>
+    </section>
+
   </section>
+  <!-- /HOME -->
 
-  <!-- Lernen -->
-  <section class="home-section">
-    <h2>Lernen</h2>
-    <div class="card-grid">
-      <article class="mode-card classic" data-goto-learn data-mode="classic">
-        <div class="mode-icon">📖</div>
-        <h3>Classic</h3>
-        <p>Zeilen mit Kontext üben</p>
-        <button class="btn" data-goto-learn data-mode="classic">Start</button>
-      </article>
-
-      <article class="mode-card flash" data-goto-learn data-mode="flash">
-        <div class="mode-icon">🃏</div>
-        <h3>Flashcards</h3>
-        <p>Teste dich mit Karteikarten</p>
-        <button class="btn" data-goto-learn data-mode="flash">Start</button>
-      </article>
-
-      <article class="mode-card cloze" data-goto-learn data-mode="cloze">
-        <div class="mode-icon">✏️</div>
-        <h3>Lücken</h3>
-        <p>Fülle die fehlenden Wörter</p>
-        <button class="btn" data-goto-learn data-mode="cloze">Start</button>
-      </article>
-    </div>
-  </section>
-
-  <!-- Competitive -->
-  <section class="home-section">
-    <h2>Competitive</h2>
-    <div class="card-grid">
-      <article class="mode-card survival" data-nav="survival">
-        <div class="mode-icon">🕹️</div>
-        <h3>Survival</h3>
-        <p>Wisse deinen Text so lange wie möglich</p>
-        <button class="btn" data-nav="survival">Play</button>
-      </article>
-
-      <article class="mode-card leaderboard" data-nav="leaderboard">
-        <div class="mode-icon">🏆</div>
-        <h3>Leaderboard</h3>
-        <p>Leaderboard der Top Text-Kenner</p>
-        <button class="btn" data-nav="leaderboard">Ansehen</button>
-      </article>
-    </div>
-  </section>
-</div>
-  
   <!-- LEARN -->
   <section data-view="learn">
     <div class="panel">
@@ -223,7 +241,7 @@
 
 <div class="bottom">
   <div class="bottom-nav">
-    <button class="navbtn" data-nav="home" data-sfx>🏠</button>
+    <button class="navbtn" data-nav="home" >🏠</button>
   </div>
 </div>
 
