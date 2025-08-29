@@ -656,11 +656,60 @@ const over=()=>{ survRoot.innerHTML=''; survRoot.appendChild(el('div',{class:'ca
 document.getElementById('startSurv').onclick=startSurv;
 
 /* ---------------- Leaderboard ---------------- */
-const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);
-const board=gun.get('horrorladen-scores'); const boardDiv=document.getElementById('board'); const boardInfo=document.getElementById('boardInfo');
-function saveScore(score){ const name=(localStorage.getItem(LS.name)||'Anon'); const role=roleSurv.value; board.set({name,role,score,time:Date.now()}); renderBoardAuto(); }
-function renderBoardAuto(){ const list=[]; board.map().once(d=>{ if(d) list.push(d); renderBoard(list); }); }
-function renderBoard(list){ list.sort((a,b)=>b.score-a.score); boardDiv.innerHTML=''; const now=new Date(); boardInfo.textContent=`${list.length} Einträge, zuletzt: ${now.toLocaleTimeString()}`;
+/* ---------------- Leaderboard (robust) ---------------- */
+const boardDiv = document.getElementById('board');
+const boardInfo = document.getElementById('boardInfo');
+
+let gun = null;
+let board = null;
+
+// Versuche GUN zu initialisieren, aber lass die App weiterlaufen, wenn es fehlschlägt
+try {
+  if (window.Gun) {
+    // Nutze mindestens eine Relay-URL; deine alte kann down sein
+    gun = Gun([
+      'https://gun-manhattan.herokuapp.com/gun',   // alt, oft instabil
+      'https://relay.peer.ooo/gun'                 // zusätzliche Relay
+    ]);
+    board = gun.get('horrorladen-scores');
+  } else {
+    console.warn('Gun not available on window. Leaderboard disabled.');
+  }
+} catch (e) {
+  console.warn('Gun init failed:', e);
+}
+
+// Nur wenn board existiert, Funktionen verdrahten – sonst No-ops
+function saveScore(score){
+  if (!board) return; // Leaderboard deaktiviert
+  const name=(localStorage.getItem(LS.name)||'Anon');
+  const role=roleSurv.value;
+  board.set({name,role,score,time:Date.now()});
+  renderBoardAuto();
+}
+
+function renderBoardAuto(){
+  if (!board){
+    boardInfo.textContent = 'Leaderboard deaktiviert';
+    boardDiv.innerHTML = '';
+    return;
+  }
+  const list=[];
+  board.map().once(d=>{ if(d) list.push(d); renderBoard(list); });
+}
+
+function renderBoard(list){
+  list.sort((a,b)=> (b.score||0)-(a.score||0) );
+  boardDiv.innerHTML='';
+  const now=new Date();
+  boardInfo.textContent=`${list.length} Einträge, zuletzt: ${now.toLocaleTimeString()}`;
+  list.forEach((r,i)=>boardDiv.appendChild(
+    el('div',{class:'exchange',style:'display:flex;justify-content:space-between;align-items:center'},
+      `${i+1}. ${r?.name||'Anon'} ${r?.role?`(${r.role})`:''}`,
+      el('strong',{}, r?.score??0)
+    )
+  ));
+}
   list.forEach((r,i)=>boardDiv.appendChild(el('div',{class:'exchange',style:'display:flex;justify-content:space-between;align-items:center'},
     `${i+1}. ${r.name||'Anon'} ${r.role?`(${r.role})`:''}`, el('strong',{}, r.score??0)))); }
 
