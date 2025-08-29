@@ -95,12 +95,28 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 
 /* Flashcard Flip */
 .flip{perspective:1200px}
-.card-inner{position:relative;transform-style:preserve-3d;transition:transform .5s var(--ease);min-height:3.2em;display:grid;place-items:center;padding:.4rem .2rem}
-.face{backface-visibility:hidden}
-.back{position:absolute;inset:0;transform:rotateY(180deg);display:grid;place-items:center;padding:.4rem .2rem}
+.card-inner{
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .5s var(--ease);
+  min-height:3.2em;
+  display:grid;
+  place-items:center;
+  padding:.4rem .2rem;
+}
+/* Beide Seiten müssen absolut übereinander liegen + backface hidden (inkl. WebKit) */
+.face,.back{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:.4rem .2rem;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+}
+.back{transform:rotateY(180deg)}
 .flipped .card-inner{transform:rotateY(180deg)}
-.ctx{font-size:.95rem;color:var(--muted);text-align:center}
-.ctx-top{margin-bottom:.6rem}.ctx-bottom{margin-top:.6rem}
+
 
 /* Progress & Pager */
 .progress{height:8px;border-radius:999px;background:#e6e9ef;overflow:hidden}
@@ -631,7 +647,19 @@ function renderViewerPage(){
   const pages=Math.max(1,Math.ceil(items.length/state.viewerPageSize)); state.viewerIndex=Math.min(Math.max(0,state.viewerIndex),pages-1);
   const slice=items.slice(state.viewerIndex*state.viewerPageSize,state.viewerIndex*state.viewerPageSize+state.viewerPageSize);
   viewerRoot.innerHTML=''; const hl=norm(state.viewerHighlightRole||'');
-  slice.forEach(line=>{ const me=norm(line.speaker)===hl&&hl!==''; viewerRoot.appendChild(el('div',{class:'exchange'}, el('div',{class:'line big',style:me?'filter:contrast(1.1)':'opacity:.95'}, `${line.speaker}: ${line.text}`))); });
+  slice.forEach(line => {
+  const isMatch = !!hl && norm(line.speaker) === hl;
+  const style = isMatch
+    ? 'background:linear-gradient(180deg,#E8FFE6,#DFFFD7);box-shadow:inset 0 0 0 3px rgba(31,175,56,.35)'
+    : 'opacity:.55';
+
+  viewerRoot.appendChild(
+    el('div',{class:'exchange'},
+      el('div',{class:'line big', style}, `${line.speaker}: ${line.text}`)
+    )
+  );
+});
+
   viewerPager.hidden=pages<=1; viewerPagerInfo.textContent=`Seite ${state.viewerIndex+1}/${pages}`; viewerPrev.disabled=state.viewerIndex===0; viewerNext.disabled=state.viewerIndex>=pages-1;
   viewerCount.textContent=`${total}/${state.items.length}`; viewerProg.style.width=`${((state.viewerIndex+1)/pages)*100}%`;
 }
