@@ -394,9 +394,9 @@ function nextQ(pool){
   const opts=[correct,...wrongs].sort(()=>.5-Math.random());
 
   card.appendChild(el('div',{class:'big'},`${line.speaker}: …`));
-  const grid=el('div',{class:'home-menu'});
-  opts.forEach(o=>{
-    const b=el('button',{class:'btn secondary','data-sfx':''}, o);
+  const grid = el('div', { class: 'opt-list' });
+opts.forEach(o => {
+  const b = el('button', { class: 'opt', 'data-sfx': '' }, o);
     b.onclick=(ev)=>{
       if(o===correct){
         survScore++; score();
