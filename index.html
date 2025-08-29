@@ -649,9 +649,10 @@ function renderViewerPage(){
   viewerRoot.innerHTML=''; const hl=norm(state.viewerHighlightRole||'');
   slice.forEach(line => {
   const isMatch = !!hl && norm(line.speaker) === hl;
+
   const style = isMatch
-    ? 'background:linear-gradient(180deg,#E8FFE6,#DFFFD7);box-shadow:inset 0 0 0 3px rgba(31,175,56,.35)'
-    : 'opacity:.55';
+    ? 'background:#ccffcc;border:2px solid #3aa655;color:#000;font-weight:600'
+    : 'background:#f0f0f0;color:#777';
 
   viewerRoot.appendChild(
     el('div',{class:'exchange'},
