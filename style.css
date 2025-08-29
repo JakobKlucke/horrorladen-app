@@ -42,7 +42,12 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .bar{display:flex;align-items:center;gap:.8rem;margin:.8rem 0}
 .progress{height:8px;border-radius:999px;background:#e6e9ef;overflow:hidden;flex:1}
 .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8EE000,#58CC02);transition:width .25s var(--ease)}
-.faded{opacity:.9;color:var(--muted);font-size:.96rem}
+.faded {
+  color:#6b7280;
+  margin:1rem 0 .5rem;  /* oben 1rem, unten .5rem */
+  font-size:.98rem;
+  line-height:1.4;
+}
 
 /* Duolingo-Style 2.5D Button – mit echtem "Press-in" */
 .btn{
@@ -422,3 +427,56 @@ body::before{
 .board-list .rank{ font-weight:800; color:#2a9210; }
 .board-list .who{ color:#475467; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .board-list .when{ color:#98a2b3; font-size:.85rem; text-align:right; }
+
+/* ====== Text-Bubbles / Cards (Classic + Cloze + Viewer) ====== */
+:root{
+  --green:#6EE61E;
+  --green-dark:#2E9A00;
+  --ink:#0b1220;
+  --shadow:0 18px 30px rgba(0,0,0,.06);
+}
+
+/* Liste mittig halten (falls du .list benutzt) */
+.list{ max-width:42rem; margin:0 auto; }
+
+/* Umrahmung (Karte) der einzelnen Exchanges */
+.exchange{
+  margin:1rem 0;
+  padding:1rem;
+  border-radius:18px;
+  background:#fff;
+  border:2px solid #00000010;
+  color:var(--ink);
+  transition:transform .12s cubic-bezier(.2,.8,.2,1), box-shadow .2s;
+}
+.exchange:hover{ transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.08); }
+
+/* Die eigentliche grüne “Bubble” */
+.line{
+  padding:.85rem 1rem;
+  border-radius:14px;
+  background:linear-gradient(180deg,#F2FFF2,#E9FFE0);
+  border:2px solid rgba(37,168,0,.25);
+  color:var(--ink);
+}
+
+/* Varianten für Viewer (highlight/dim) – optional aber praktisch */
+.line.hl{
+  background:linear-gradient(180deg,#E6FFE6,#D9FFD0);
+  border-color:rgba(37,168,0,.45);
+  font-weight:600;
+}
+.line.dim{
+  background:linear-gradient(180deg,#F6F7F8,#F3F4F6);
+  border-color:#E7E9ED;
+  color:#4b5563;
+}
+
+.big{
+  font-size:clamp(1.05rem,2.7vw,
+/* nur die aktive View anzeigen */
+[data-view] { display: none; }
+[data-view].active { display: block; }
+
+/* falls irgendwo hidden gesetzt wird */
+[hidden] { display: none !important; }
