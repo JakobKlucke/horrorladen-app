@@ -415,38 +415,109 @@ function renderLearn(){ state.lastFiltered=applyFilters(state.items,{byRole:true
 
 function renderLearnPage(){
   if(!learnRoot) return;
-  const mode=modeSel?.value||'classic';
-  const pageSize=(mode==='classic')?state.pageSizeClassic:state.pageSizeSingle;
-  const items=state.lastFiltered, total=items.length;
+  const mode = modeSel?.value || 'classic';
+  const pageSize = (mode==='classic') ? state.pageSizeClassic : state.pageSizeSingle;
+  const items = state.lastFiltered, total = items.length;
 
   if(!items.length){
-    learnRoot.innerHTML='<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
-    if(pager) pager.hidden=true; if(learnCount) learnCount.textContent=`0/${state.items.length}`; setProg('0%'); return;
+    learnRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
+    if(pager) pager.hidden = true;
+    if(learnCount) learnCount.textContent = `0/${state.items.length}`;
+    setProg('0%');
+    return;
   }
 
-  const pages=Math.max(1,Math.ceil(total/pageSize));
-  state.pageIndex=Math.min(Math.max(0,state.pageIndex),pages-1);
-  const slice=items.slice(state.pageIndex*pageSize, state.pageIndex*pageSize+pageSize);
+  const pages = Math.max(1, Math.ceil(total/pageSize));
+  state.pageIndex = Math.min(Math.max(0, state.pageIndex), pages-1);
+  const slice = items.slice(state.pageIndex*pageSize, state.pageIndex*pageSize+pageSize);
 
-  learnRoot.innerHTML='';
-  const myRoleUC=norm(roleSel?.value||''); const fullSeq=applyFilters(state.items,{byRole:false}); const sameSong=!!(songSel&&songSel.value);
+  learnRoot.innerHTML = '';
+  const myRoleUC = norm(roleSel?.value||''); 
+  const fullSeq   = applyFilters(state.items,{byRole:false}); // gesamte gefilterte Abfolge
+  const sameSongSelected = !!(songSel && songSel.value);
+
+  // --- helpers ---
+  const sameSongLyric = (a,b)=>{
+    if(!a||!b) return false;
+    return (a.kind==='lyric' && b.kind==='lyric' &&
+      (a.meta?.song||'')  === (b.meta?.song||'') &&
+      (a.meta?.scene||'') === (b.meta?.scene||'') &&
+      (a.meta?.act||'')   === (b.meta?.act||''));
+  };
+  const eqLine = (a,b)=> a && b &&
+    norm(a.speaker)===norm(b.speaker) &&
+    a.text===b.text &&
+    (a.meta?.song||'')===(b.meta?.song||'') &&
+    (a.meta?.scene||'')===(b.meta?.scene||'') &&
+    (a.meta?.act||'')===(b.meta?.act||'');
+
+  const idxInFull = (line)=> fullSeq.findIndex(x=> x===line || eqLine(x,line));
+
+  const isGlobalBlockStart = (line)=>{
+    const i = idxInFull(line);
+    return (i<=0) || !sameSongLyric(fullSeq[i-1], line);
+  };
+  const isGlobalBlockEnd = (line)=>{
+    const i = idxInFull(line);
+    return (i>=fullSeq.length-1) || !sameSongLyric(fullSeq[i+1], line);
+  };
+  const prevAfterGlobalBlock = (line)=>{
+    const i = idxInFull(line);
+    let s=i; while(s>0 && sameSongLyric(fullSeq[s-1], line)) s--;
+    let e=i; while(e+1<fullSeq.length && sameSongLyric(fullSeq[e+1], line)) e++;
+    return { prev: fullSeq[s-1] || null, next: fullSeq[e+1] || null, startIdx:s, endIdx:e };
+  };
 
   if(mode==='classic'){
-    slice.forEach(line=>{
-      const box=el('div',{class:'exchange'});
-      const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
-      if(prev) box.appendChild(el('div',{class:'faded'},`${prev.speaker}: ${prev.text}`));
-      box.appendChild(el('div',{class:'line big'},`${line.speaker}: ${line.text}`));
-      if(next) box.appendChild(el('div',{class:'faded'},`${next.speaker}: ${next.text}`));
-      learnRoot.appendChild(box);
-    });
+    // wir iterieren manuell, um Lyrics-Blocks am Stück zu rendern
+    for(let k=0; k<slice.length; k++){
+      const line = slice[k];
+
+      if(line.kind==='lyric'){
+        // block im aktuellen Slice (zusammenhängende lyrics mit gleichem song)
+        let blockStart = k, blockEnd = k;
+        while(blockEnd+1<slice.length && sameSongLyric(slice[blockEnd+1], line)) blockEnd++;
+
+        const box = el('div',{class:'exchange'});
+
+        // Kontext nur am echten Block-Anfang/Ende der GLOBALEN Sequenz
+        const {prev, next} = prevAfterGlobalBlock(line);
+        const showPrev = isGlobalBlockStart(line);
+        const showNext = isGlobalBlockEnd(slice[blockEnd]);
+
+        if(showPrev && prev && norm(prev.speaker)!==myRoleUC){
+          box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+        }
+        // alle lyrics des Blocks (nur Zeilen, kein Kontext dazwischen)
+        for(let t=blockStart; t<=blockEnd; t++){
+          const L = slice[t];
+          box.appendChild(el('div',{class:'line big'}, `${L.speaker}: ${L.text}`));
+        }
+        if(showNext && next && norm(next.speaker)!==myRoleUC){
+          box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+        }
+
+        learnRoot.appendChild(box);
+        k = blockEnd; // überspringe bereits gerenderte Block-Zeilen
+      } else {
+        // normale Zeilen wie bisher
+        const box = el('div',{class:'exchange'});
+        const {prev,next} = getContextForLine(line, fullSeq, myRoleUC, sameSongSelected);
+        if(prev) box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+        box.appendChild(el('div',{class:'line big'}, `${line.speaker}: ${line.text}`));
+        if(next) box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+        learnRoot.appendChild(box);
+      }
+    }
   }
   else if(mode==='flash'){
-    const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
-    if(prev) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--top'},`${prev.speaker}: ${prev.text}`));
-    const card=el('div',{class:'fc-card',tabindex:'0','data-sfx':''});
+    const line = slice[0];
+    const {prev,next} = getContextForLine(line, fullSeq, myRoleUC, sameSongSelected);
+    if(prev) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--top'}, `${prev.speaker}: ${prev.text}`));
+
+    const card = el('div',{class:'fc-card',tabindex:'0','data-sfx':''});
     const title=el('h3',{class:'fc-card__title'}, line.speaker);
-    const body=el('p',{class:'fc-card__content'}, '(tippen zum Aufdecken)');
+    const body =el('p',{class:'fc-card__content'}, '(tippen zum Aufdecken)');
     const arrow=el('div',{class:'fc-card__arrow','aria-hidden':'true'},
       el('svg',{xmlns:'http://www.w3.org/2000/svg',viewBox:'0 0 24 24',width:'15',height:'15'},
         el('path',{fill:'#fff',d:'M13.4697 17.9697C13.1768 18.2626 13.1768 18.7374 13.4697 19.0303C13.7626 19.3232 14.2374 19.3232 14.5303 19.0303L20.3232 13.2374C21.0066 12.554 21.0066 11.446 20.3232 10.7626L14.5303 4.96967C14.2374 4.67678 13.7626 4.67678 13.4697 4.96967C13.1768 5.26256 13.1768 5.73744 13.4697 6.03033L18.6893 11.25H4C3.58579 11.25 3.25 11.5858 3.25 12C3.25 12.4142 3.58579 12.75 4 12.75H18.6893L13.4697 17.9697Z'})
@@ -459,33 +530,56 @@ function renderLearnPage(){
     card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); reveal(); }});
     card.append(title,body,arrow);
     learnRoot.appendChild(card);
-    if(next) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--bottom'},`${next.speaker}: ${next.text}`));
-  }
-  else { // cloze (mit Aufdecken) – im exchange/line-Stil
-    const line=slice[0]; const {prev,next}=getContextForLine(line,fullSeq,myRoleUC,sameSong);
-    const box=el('div',{class:'exchange'});
-    if(prev) box.appendChild(el('div',{class:'faded'},`${prev.speaker}: ${prev.text}`));
 
-    const content=el('div',{class:'line big'});
-    const masked=clozeHtmlLimitTwo(line.text||''); const full=escapeHtml(line.text||''); let revealed=false;
+    if(next) learnRoot.appendChild(el('div',{class:'fc-ctx fc-ctx--bottom'}, `${next.speaker}: ${next.text}`));
+  }
+  else { // cloze mit Aufdecken – Kontext nur bei globalem Block-Anfang/-Ende
+    const line = slice[0];
+    const box  = el('div',{class:'exchange'});
+
+    let showPrev=false, showNext=false, prev=null, next=null;
+    if(line.kind==='lyric'){
+      const info = prevAfterGlobalBlock(line);
+      prev = info.prev; next = info.next;
+      showPrev = isGlobalBlockStart(line);
+      showNext = isGlobalBlockEnd(line);
+    }else{
+      const ctx = getContextForLine(line, fullSeq, myRoleUC, sameSongSelected);
+      prev = ctx.prev; next = ctx.next;
+      showPrev = !!prev; showNext = !!next;
+    }
+
+    if(showPrev && prev && norm(prev.speaker)!==myRoleUC){
+      box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
+    }
+
+    const content = el('div',{class:'line big'});
+    const masked  = clozeHtmlLimitTwo(line.text||''); 
+    const full    = escapeHtml(line.text||'');
+    let revealed  = false;
     const renderText=()=>{ content.innerHTML = `${line.speaker}: ${revealed?full:masked}`; };
     renderText();
     box.appendChild(content);
 
-    const actions=el('div',{style:'margin-top:.5rem'}, el('button',{class:'btn secondary','data-sfx':''},'Aufdecken'));
-    const btn=actions.querySelector('button'); btn.onclick=()=>{ revealed=!revealed; btn.textContent=revealed?'Verbergen':'Aufdecken'; renderText(); };
+    const actions = el('div',{style:'margin-top:.5rem'}, 
+      el('button',{class:'btn secondary','data-sfx':''},'Aufdecken'));
+    const btn = actions.querySelector('button');
+    btn.onclick=()=>{ revealed=!revealed; btn.textContent=revealed?'Verbergen':'Aufdecken'; renderText(); };
     box.appendChild(actions);
 
-    if(next) box.appendChild(el('div',{class:'faded'},`${next.speaker}: ${next.text}`));
+    if(showNext && next && norm(next.speaker)!==myRoleUC){
+      box.appendChild(el('div',{class:'faded'}, `${next.speaker}: ${next.text}`));
+    }
     learnRoot.appendChild(box);
   }
 
   if(pager){
-    pager.hidden=pages<=1;
-    pagerInfo.textContent=`Seite ${state.pageIndex+1}/${pages}`;
-    prevPage.disabled=state.pageIndex===0; nextPage.disabled=state.pageIndex>=pages-1;
+    pager.hidden = pages<=1;
+    pagerInfo.textContent = `Seite ${state.pageIndex+1}/${pages}`;
+    prevPage.disabled = state.pageIndex===0; 
+    nextPage.disabled = state.pageIndex>=pages-1;
   }
-  if(learnCount) learnCount.textContent=`${total}/${state.items.length}`;
+  if(learnCount) learnCount.textContent = `${total}/${state.items.length}`;
   setProg(`${((state.pageIndex+1)/pages)*100}%`);
 }
 if(prevPage) prevPage.onclick=()=>{state.pageIndex--; renderLearnPage();};
