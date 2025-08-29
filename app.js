@@ -469,12 +469,10 @@ function renderViewerPage(){
 );
 viewerRoleSel.addEventListener('change',()=>{ state.viewerHighlightRole = viewerRoleSel.value||''; renderViewerPage(); });
 
-/* ---------------- Survival (chronologisch + ähnliche Länge) ---------------- */
-const survRoot = document.getElementById('survRoot');
-const roleSurv = document.getElementById('roleSurv');
+/* ---------------- Survival (chronologisch + ähnliche Länge; alles inkl. Lyrics) ---------------- */
 let survLives = 3, survScore = 0;
-let survPool = [];   // chronologische Liste der Zeilen für die gewählte Rolle
-let survIdx  = 0;    // aktueller Index in survPool
+let survPool  = [];   // chronologische Liste der Zeilen für die gewählte Rolle
+let survIdx   = 0;    // aktueller Index in survPool
 
 const hearts = () => {
   const pill = document.getElementById('heartPill');
@@ -486,7 +484,7 @@ const score  = () => {
 };
 
 function startSurv(){
-  // 1) chronologischer Pool: gefiltert nach Rolle, Reihenfolge = wie im Skript
+  // chronologisch + nach Rolle gefiltert; KEIN Ausschluss von Lyrics
   survPool = applyFilters(state.items, { byRole:true, roleOverride: roleSurv.value });
   if (!survPool.length) {
     survRoot.innerHTML = '<div class="card">Keine Zeilen für die aktuelle Auswahl.</div>';
@@ -497,25 +495,23 @@ function startSurv(){
   nextQ();
 }
 
-// Hilfsfunktion: wählt 2 Texte ähnlicher Länge zur "correct" Line
+// 2 Falschantworten ähnlicher Länge (aus allen Zeilen, inkl. Lyrics, egal von wem)
 function pickSimilarLengthWrongs(correctText){
-  const targetLen = (correctText||'').length;
-  // Alle Items (ohne Rollenfilter), nur Texte
+  const targetLen = (correctText || '').length;
+
   const all = applyFilters(state.items, { byRole:false })
     .map(x => x.text)
     .filter(t => t && t !== correctText);
 
-  // nach absoluten Längendifferenzen sortieren, dann die nächsten 2
-  const wrongs = [...new Set(all)] // uniq
+  const wrongs = [...new Set(all)]
     .map(t => ({ t, d: Math.abs(t.length - targetLen) }))
     .sort((a,b) => a.d - b.d)
-    .slice(0, 12)                // kleine Vorauswahl
+    .slice(0, 12)                      // Vorauswahl
     .sort(() => Math.random() - .5)
     .slice(0, 2)
     .map(o => o.t);
 
-  // Fallback: falls zu wenig gefunden, irgendeinen auffüllen
-  while (wrongs.length < 2) {
+  while (wrongs.length < 2 && all.length) {
     const extra = all[Math.floor(Math.random()*all.length)];
     if (extra && !wrongs.includes(extra) && extra !== correctText) wrongs.push(extra);
   }
@@ -544,11 +540,16 @@ function nextQ(){
     b.onclick = (ev) => {
       if (o === correct) {
         survScore++; score();
-        try { confetti({ particleCount: 24, spread: 60, origin: { x:(ev.clientX||innerWidth/2)/innerWidth, y:(ev.clientY||innerHeight*.6)/innerHeight } }); } catch {}
+        try {
+          confetti({
+            particleCount: 24, spread: 60,
+            origin: { x:(ev.clientX||innerWidth/2)/innerWidth, y:(ev.clientY||innerHeight*.6)/innerHeight }
+          });
+        } catch {}
       } else {
         survLives--; hearts();
       }
-      // Immer zur nächsten Zeile -> chronologisch vorwärts
+      // immer zur nächsten Zeile → chronologisch
       survIdx++;
       nextQ();
     };
@@ -562,10 +563,11 @@ function nextQ(){
 const over = () => {
   survRoot.innerHTML = '';
   survRoot.appendChild(el('div', { class: 'card big' }, `Game Over! Score: ${survScore}`));
-  saveScore(survScore);     // noop, wenn GUN nicht verfügbar
-  state.inExercise = false;
+  saveScore(survScore);      // noop wenn GUN nicht verfügbar
+  state.inExercise = false;  // Übung beendet
 };
 
+// Start-Button verdrahten (einmalig)
 const startBtn = document.getElementById('startSurv');
 if (startBtn) startBtn.onclick = startSurv;
 
