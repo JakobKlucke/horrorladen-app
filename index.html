@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Horrorladen – Lernapp</title>
+  <meta name="theme-color" content="#58CC02" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- Vendor -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@motionone/dom/dist/motion-one.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header id="hdr">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#8EE000"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <path d="M10 44C20 52 44 52 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="title">Horrorladen – Lernapp</div>
+          <div class="badge" id="subtitle">Willkommen</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="iconbtn" id="goSettings" title="Einstellungen" aria-label="Einstellungen" data-sfx>⚙️</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section data-view="home" class="active">
+    <div class="panel">
+      <div class="home-menu">
+        <button class="tile" data-nav="learn"   data-sfx>📖 Lernen</button>
+        <button class="tile" data-nav="viewer"  data-sfx>📜 Textviewer</button>
+        <button class="tile" data-nav="survival"data-sfx>🎮 Survival</button>
+        <button class="tile" data-nav="scores"  data-sfx>🏆 Highscores</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section data-view="learn">
+    <div class="panel">
+      <div class="filters">
+        <div><label for="actFilter">Akt</label><select id="actFilter"><option value="">Alle</option></select></div>
+        <div><label for="sceneFilter">Szene</label><select id="sceneFilter"><option value="">Alle</option></select></div>
+        <div><label for="songFilter">Song</label><select id="songFilter"><option value="">Alle</option></select></div>
+        <div>
+          <label>Lyrics-only</label>
+          <label class="checkbox-container">
+            <input id="lyricsOnly" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">nur Gesang</span>
+          </label>
+        </div>
+      </div>
+      <div class="controls">
+        <div><label for="roleSel">Rolle</label><select id="roleSel"></select></div>
+        <div><label for="modeSel">Modus</label>
+          <select id="modeSel">
+            <option value="classic">Classic</option>
+            <option value="flash">Flashcards</option>
+            <option value="cloze">Cloze</option>
+          </select>
+        </div>
+        <div class="cta"><button class="btn" id="startLearn" data-sfx>Start</button></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="progress"><i id="learnProg"></i></div>
+      <div class="faded" id="learnCount">0/0</div>
+    </div>
+
+    <div id="learnRoot"></div>
+
+    <div class="pager" id="learnPager" hidden>
+      <div class="info" id="pagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="prevPage" class="btn secondary" data-sfx>← Zurück</button>
+        <button id="nextPage" class="btn"   data-sfx>Weiter →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEWER -->
+  <section data-view="viewer">
+    <div class="panel">
+      <div class="filters">
+        <div><label for="actFilterV">Akt</label><select id="actFilterV"><option value="">Alle</option></select></div>
+        <div><label for="sceneFilterV">Szene</label><select id="sceneFilterV"><option value="">Alle</option></select></div>
+        <div><label for="songFilterV">Song</label><select id="songFilterV"><option value="">Alle</option></select></div>
+        <div>
+          <label>Lyrics-only</label>
+          <label class="checkbox-container">
+            <input id="lyricsOnlyV" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">nur Gesang</span>
+          </label>
+        </div>
+      </div>
+      <div class="controls" style="grid-template-columns:1fr">
+        <div><label for="viewerRoleSel">Hervorhebung (nur Anzeige)</label><select id="viewerRoleSel"></select></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="progress"><i id="viewerProg"></i></div>
+      <div class="faded" id="viewerCount">0/0</div>
+    </div>
+
+    <div id="viewerRoot"></div>
+
+    <div class="pager" id="viewerPager" hidden>
+      <div class="info" id="viewerPagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="viewerPrev" class="btn secondary" data-sfx>← Zurück</button>
+        <button id="viewerNext" class="btn"   data-sfx>Weiter →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURVIVAL -->
+  <section data-view="survival">
+    <div class="panel controls">
+      <div><label for="roleSurv">Rolle</label><select id="roleSurv"></select></div>
+      <div><label>Herzen</label><div id="heartPill" class="tile" style="min-height:auto;padding:.4rem .8rem">❤️❤️❤️</div></div>
+      <div><label>Score</label><div id="scorePill" class="tile" style="min-height:auto;padding:.4rem .8rem">0</div></div>
+      <div class="cta"><button class="btn" id="startSurv" data-sfx>Neu starten</button></div>
+    </div>
+    <div id="survRoot"></div>
+  </section>
+
+  <!-- SCORES -->
+  <section data-view="scores">
+    <div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap">
+      <div class="title" style="font-size:1.05rem;color:var(--ink)">Leaderboard</div>
+      <div class="faded" id="boardInfo">—</div>
+    </div>
+    <div id="board" class="list"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-view="settings">
+    <div class="panel" style="display:grid;gap:1rem">
+      <div class="controls" style="grid-template-columns:1fr auto">
+        <div><label for="playerName">Spielername</label><input id="playerName" type="text" placeholder="z.B. Alex"></div>
+        <div class="cta"><button class="btn" id="saveSettings" data-sfx>Speichern</button></div>
+      </div>
+
+      <div style="display:grid;gap:.6rem">
+        <label for="scriptSelect">JSON-Quelle (aus scripts.json)</label>
+        <select id="scriptSelect"></select>
+        <div class="script-row">
+          <label class="checkbox-container" style="padding-left:35px">
+            <input id="manualToggle" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">Manuell eingeben</span>
+          </label>
+          <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
+          <button class="btn" id="loadScriptBtn" data-sfx>Neu laden</button>
+        </div>
+        <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
+        <div class="faded" id="scriptsNote">Suche nach scripts.json …</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="bottom">
+  <div class="bottom-nav">
+    <button class="navbtn" data-nav="home" data-sfx>🏠</button>
+  </div>
+</div>
+
+<!-- App script -->
+<script defer src="./app.js"></script>
+</body>
+</html>
