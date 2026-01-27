@@ -50,7 +50,7 @@ const escapeHtml=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const norm=s=>(s||'').trim().toUpperCase();
 
 /* =================== Prefs/State =================== */
-const LS={ name:'hl_player_name', src:'hl_json_src', sfx:'hl_sfx_on', motion:'hl_reduce_motion', scriptChosen:'hl_script_chosen' };
+const LS={ name:'hl_player_name', src:'hl_json_src', sfx:'hl_sfx_on', motion:'hl_reduce_motion', scriptChosen:'hl_script_chosen', lastMode:'hl_last_mode' };
 
 let jsonSrc; {
   const rawSrc = localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json';
@@ -58,7 +58,13 @@ let jsonSrc; {
   localStorage.setItem(LS.src, jsonSrc);
 }
 
-let sfxOn = true;
+let sfxOn = localStorage.getItem(LS.sfx);
+if(sfxOn==null){ sfxOn=true; localStorage.setItem(LS.sfx,'1'); }
+else sfxOn = sfxOn==='1';
+
+let reduceMotion = localStorage.getItem(LS.motion);
+if(reduceMotion==null){ reduceMotion=false; localStorage.setItem(LS.motion,'0'); }
+else reduceMotion = reduceMotion==='1';
 
 const state={
   items:[], roles:[],
@@ -163,6 +169,11 @@ const manualToggle=document.getElementById('manualToggle');
 const scriptInput=document.getElementById('scriptInput');
 const loadScriptBtn=document.getElementById('loadScriptBtn');
 const currentScriptLabel=document.getElementById('currentScriptLabel');
+const playerNameInput=document.getElementById('playerName');
+const saveSettingsBtn=document.getElementById('saveSettings');
+const sfxToggle=document.getElementById('sfxToggle');
+const motionToggle=document.getElementById('motionToggle');
+const scriptStats=document.getElementById('scriptStats');
 
 const actSel=document.getElementById('actFilter'),
       sceneSel=document.getElementById('sceneFilter'),
@@ -233,6 +244,24 @@ function updateScriptLabels(){
   if(currentScriptLabel) currentScriptLabel.textContent = jsonSrc || '—';
 }
 
+function updateScriptStats(){
+  if(!scriptStats) return;
+  if(!state.items.length){
+    scriptStats.textContent = 'Skript: —';
+    return;
+  }
+  scriptStats.textContent = `Skript: ${state.items.length} Zeilen · ${state.roles.length} Rollen · ${state.actsList.length} Akte · ${state.songsSet.size} Songs`;
+}
+
+function applySfxSetting(){
+  if(sfxToggle) sfxToggle.checked = !!sfxOn;
+}
+
+function applyMotionSetting(){
+  document.body.classList.toggle('reduce-motion', !!reduceMotion);
+  if(motionToggle) motionToggle.checked = !!reduceMotion;
+}
+
 async function applyScriptSelection(src,{markChosen=false}={}){
   if(!src) return false;
   const chosen=normalizeScriptPath(src);
@@ -288,12 +317,14 @@ async function loadJSON(){
   }
 
   populateFilters();
+  updateScriptStats();
 }
 
 /* =================== Errorbox =================== */
 function showError(title,msg){
   const root=document.querySelector('[data-view].active')||document.body;
-  const box=el('div',{class:'card'},
+  root.querySelectorAll('[data-error]').forEach(n=>n.remove());
+  const box=el('div',{class:'card','data-error':'1'},
     el('div',{class:'big'},`❗ ${title}`),
     el('div',{class:'faded'},String(msg||'')),
     el('div',{class:'faded'},`Quelle: ${jsonSrc}`)
@@ -325,7 +356,9 @@ function switchViewImmediate(name){
   document.body.classList.toggle('show-home', name === 'home');
 
   // Nach oben scrollen
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+
+  if(typeof onViewChanged==='function') onViewChanged(name);
 }
 
 // Alle Buttons/Links mit data-nav: nur View wechseln (KEIN tone() hier)
@@ -339,6 +372,7 @@ document.querySelectorAll('[data-nav]').forEach(b=>{
 // Karten auf der Startseite klickbar machen
 document.querySelectorAll('.mode-card').forEach(card=>{
   card.addEventListener('click', (e)=>{
+    if(e.target.closest('button, [data-nav], [data-goto-learn]')) return;
     // wenn die Karte einen Button mit data-nav / data-goto-learn enthält, den bevorzugen
     const btn = card.querySelector('[data-nav], [data-goto-learn]');
     if (btn) btn.click();
@@ -351,6 +385,7 @@ document.querySelectorAll('[data-goto-learn]').forEach(el=>{
     const mode = el.dataset.mode || 'classic';
     const modeSel = document.getElementById('modeSel');
     if (modeSel) modeSel.value = mode;
+    localStorage.setItem(LS.lastMode, mode);
     switchViewImmediate('learn');
     // Hinweis: Render startet erst nach Klick auf "Start" – so gewollt
   });
@@ -391,6 +426,11 @@ function markLearnDirty(){
   startLearnBtn.classList.add('pulse');
 }
 [actSel,sceneSel,songSel,lyricsOnly,roleSel,modeSel].filter(Boolean).forEach(e=>e.addEventListener('change',()=>{ state.pageIndex=0; markLearnDirty(); }));
+if(modeSel){
+  const savedMode = localStorage.getItem(LS.lastMode);
+  if(savedMode) modeSel.value = savedMode;
+  modeSel.addEventListener('change', ()=> localStorage.setItem(LS.lastMode, modeSel.value));
+}
 
 function applyFilters(items,{byRole=true,useViewer=false,roleOverride=null}={}){
   const role = roleOverride || (byRole && roleSel ? roleSel.value : '');
@@ -767,6 +807,35 @@ async function renderBoard(){
 /* Achtung: deine View heißt "scores" → hier rendern */
 function onViewChanged(name){ if(name==='scores') renderBoard(); }
 
+/* =================== Settings =================== */
+if(playerNameInput){
+  playerNameInput.value = localStorage.getItem(LS.name)||'';
+}
+if(saveSettingsBtn){
+  saveSettingsBtn.addEventListener('click', ()=>{
+    const name=(playerNameInput && playerNameInput.value.trim())||'Anon';
+    localStorage.setItem(LS.name, name);
+    const old=saveSettingsBtn.textContent;
+    saveSettingsBtn.textContent='Gespeichert';
+    setTimeout(()=>{ saveSettingsBtn.textContent=old; }, 1200);
+  });
+}
+if(sfxToggle){
+  applySfxSetting();
+  sfxToggle.addEventListener('change', ()=>{
+    sfxOn = !!sfxToggle.checked;
+    localStorage.setItem(LS.sfx, sfxOn?'1':'0');
+  });
+}
+if(motionToggle){
+  applyMotionSetting();
+  motionToggle.addEventListener('change', ()=>{
+    reduceMotion = !!motionToggle.checked;
+    localStorage.setItem(LS.motion, reduceMotion?'1':'0');
+    applyMotionSetting();
+  });
+}
+
 /* =================== Scripts-Auswahl Events =================== */
 const getScriptFromUI=()=>{
   const manualOn=!!(manualToggle && manualToggle.checked);
@@ -810,6 +879,8 @@ if(scriptContinue){
 
 /* =================== Boot =================== */
 async function boot(){
+  applySfxSetting();
+  applyMotionSetting();
   await loadScriptsIndex();
   updateScriptLabels();
   const chosenFlag = localStorage.getItem(LS.scriptChosen)==='1';
