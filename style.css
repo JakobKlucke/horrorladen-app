@@ -21,7 +21,7 @@ main.wrap{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;overscrol
 .title{font-family:Nunito,Inter,sans-serif;font-weight:900;font-size:clamp(1.1rem,2.4vw,1.35rem);color:var(--ink)}
 .badge{font-size:.82rem;padding:.25rem .65rem;border-radius:999px;background:#8ee00029;color:#0D6A00;font-weight:800}
 .top-actions{display:flex;gap:.5rem}
-.iconbtn{min-width:44px;min-height:44px;border-radius:14px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:18px;display:grid;place-items:center;cursor:pointer;transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
+.iconbtn{min-width:44px;min-height:44px;border-radius:18px;border:2px solid #00000010;background:linear-gradient(180deg,#fff,#F5FFF0);box-shadow:var(--shadow);font-size:18px;display:grid;place-items:center;cursor:pointer;transition:transform .12s var(--ease), box-shadow .2s var(--ease)}
 .iconbtn:hover{transform:translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,.12)}
 .iconbtn:active{transform:translateY(0) scale(.98)}
 .compact .logo{width:36px;height:36px;border-radius:10px}
@@ -55,7 +55,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
   appearance: button;
   background-color: var(--green-dark);       /* Fläche */
   border: solid transparent;
-  border-radius: 16px;
+  border-radius: 18px;
   border-width: 0 0 4px;                /* behält Kompatibilität */
   color: #0b1220;
   cursor: pointer;
@@ -64,7 +64,8 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
   font-weight: 800;
   letter-spacing: .8px;
   line-height: 20px;
-  padding: 13px 19px;
+  padding: 12px 18px;
+  min-height: 44px;
   text-transform: uppercase;
   box-sizing: border-box;
   user-select: none;
@@ -79,7 +80,7 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
   background-clip: padding-box;
   background-color: var(--green);  /* Unterkante/Kante */
   border: solid transparent;
-  border-radius: 16px;
+  border-radius: 18px;
   border-width: 0 0 4px;                /* sichtbare 4px-Kante */
   content: "";
   position: absolute;
@@ -105,7 +106,8 @@ select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 6px var(--ri
 .btn.secondary{
   background:#fff; color:var(--ink);
   border:2px solid #00000014;
-  text-transform:none; letter-spacing:.2px;
+  text-transform:uppercase; letter-spacing:.8px;
+  font-weight:800;
 }
 .btn.secondary:after{ display:none; }
 .btn.secondary:hover{ transform:translateY(-1px); box-shadow:0 10px 20px rgba(0,0,0,.1); }
@@ -373,19 +375,31 @@ body::before{
 /* ---------- Karten ---------- */
 .mode-card{
   position:relative;
-  border-radius:16px;
+  border-radius:18px;
   padding:16px;
   color:#0b1220;
-  background: linear-gradient(180deg,#ffffff,#f7faf5);
-  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  background: linear-gradient(180deg,#ffffff 0%, #f7faf5 65%, #f2f8f1 100%);
+  border:2px solid rgba(0,0,0,.06);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.08),
+    inset 0 2px 0 rgba(255,255,255,.9);
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
   cursor:pointer;
   display:flex; flex-direction:column; align-items:flex-start; gap:.35rem;
 }
+.mode-card:before{
+  content:"";
+  position:absolute;
+  inset:2px 2px auto 2px;
+  height:18px;
+  border-radius:16px 16px 10px 10px;
+  background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,0));
+  pointer-events:none;
+}
 .mode-card .mode-icon{ font-size:28px; line-height:1; }
 .mode-card h3{ margin:.1rem 0; font-size:18px; font-weight:800; }
 .mode-card p{ margin:0 0 .2rem; color:#475467; }
-.mode-card .btn{ margin-top:auto; }
+.mode-card .btn{ margin-top:auto; width:100%; }
 
 /* Hover: leicht „heben“ */
 .mode-card:hover{
@@ -396,24 +410,24 @@ body::before{
 
 /* Farbverläufe pro Modus (Duolingo-Feeling) */
 .mode-card.classic{
-  background: linear-gradient(180deg, #EAFBE7 0%, #F7FFF4 100%);
-  border:1px solid #d7f5cf;
+  background: linear-gradient(180deg, #EBFBE7 0%, #F6FFF3 100%);
+  border-color:#d7f5cf;
 }
 .mode-card.flash{
-  background: linear-gradient(180deg, #EAF7FF 0%, #F6FBFF 100%);
-  border:1px solid #d6ecff;
+  background: linear-gradient(180deg, #EAF7FF 0%, #F4FBFF 100%);
+  border-color:#d6ecff;
 }
 .mode-card.cloze{
-  background: linear-gradient(180deg, #FFF4E6 0%, #FFF9F0 100%);
-  border:1px solid #ffe3c2;
+  background: linear-gradient(180deg, #FFF2E2 0%, #FFF9F0 100%);
+  border-color:#ffe3c2;
 }
 .mode-card.survival{
-  background: linear-gradient(180deg, #F2F4FF 0%, #F7F8FF 100%);
-  border:1px solid #e0e4ff;
+  background: linear-gradient(180deg, #F1F3FF 0%, #F7F8FF 100%);
+  border-color:#e0e4ff;
 }
 .mode-card.leaderboard{
-  background: linear-gradient(180deg, #F2FFF7 0%, #F8FFFB 100%);
-  border:1px solid #d2f5e2;
+  background: linear-gradient(180deg, #F1FFF6 0%, #F8FFFB 100%);
+  border-color:#d2f5e2;
 }
 
 .board-list .row{
