@@ -47,8 +47,38 @@
 </header>
 
 <main class="wrap">
+  <!-- SCRIPT SELECT -->
+  <section data-view="script" id="scriptView" class="active">
+    <section class="home-hero">
+      <h1>Skript auswählen</h1>
+      <p>Wähle das Musical-Skript, das du lernen möchtest.</p>
+    </section>
+
+    <div class="panel" style="display:grid;gap:1rem">
+      <div style="display:grid;gap:.6rem">
+        <label for="scriptSelect">Skript (aus scripts.json)</label>
+        <select id="scriptSelect"></select>
+        <div class="script-row">
+          <label class="checkbox-container" style="padding-left:35px">
+            <input id="manualToggle" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">Manuell eingeben</span>
+          </label>
+          <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
+          <button class="btn" id="loadScriptBtn" data-sfx>Neu laden</button>
+        </div>
+        <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
+        <div class="faded" id="scriptsNote">Suche nach scripts.json …</div>
+      </div>
+
+      <div class="controls" style="grid-template-columns:1fr auto">
+        <div class="faded">Du kannst später in den Einstellungen das Skript ändern.</div>
+        <div class="cta"><button class="btn" id="scriptContinue" data-sfx>Weiter</button></div>
+      </div>
+    </div>
+  </section>
+
   <!-- HOME (als Section, nicht div!) -->
-  <section data-view="home" class="active" id="homeView">
+  <section data-view="home" id="homeView">
 
     <section class="home-hero">
       <h1>Horrorladen – Lernapp</h1>
@@ -222,18 +252,11 @@
       </div>
 
       <div style="display:grid;gap:.6rem">
-        <label for="scriptSelect">JSON-Quelle (aus scripts.json)</label>
-        <select id="scriptSelect"></select>
+        <label>Aktuelles Skript</label>
+        <div class="faded">Aktuell: <code id="currentScriptLabel">—</code></div>
         <div class="script-row">
-          <label class="checkbox-container" style="padding-left:35px">
-            <input id="manualToggle" class="custom-checkbox" type="checkbox">
-            <span class="checkmark"></span><span class="label">Manuell eingeben</span>
-          </label>
-          <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
-          <button class="btn" id="loadScriptBtn" data-sfx>Neu laden</button>
+          <button class="btn secondary" data-nav="script">Skript ändern</button>
         </div>
-        <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
-        <div class="faded" id="scriptsNote">Suche nach scripts.json …</div>
       </div>
     </div>
   </section>

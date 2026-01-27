@@ -50,7 +50,7 @@ const escapeHtml=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const norm=s=>(s||'').trim().toUpperCase();
 
 /* =================== Prefs/State =================== */
-const LS={ name:'hl_player_name', src:'hl_json_src', sfx:'hl_sfx_on', motion:'hl_reduce_motion' };
+const LS={ name:'hl_player_name', src:'hl_json_src', sfx:'hl_sfx_on', motion:'hl_reduce_motion', scriptChosen:'hl_script_chosen' };
 
 let jsonSrc; {
   const rawSrc = localStorage.getItem(LS.src) || 'horrorladen_final_with_acts.json';
@@ -158,6 +158,11 @@ function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
 const scriptSelect=document.getElementById('scriptSelect');
 const scriptsNote =document.getElementById('scriptsNote');
 const jsonLabel   =document.getElementById('jsonSrcLabel');
+const scriptContinue=document.getElementById('scriptContinue');
+const manualToggle=document.getElementById('manualToggle');
+const scriptInput=document.getElementById('scriptInput');
+const loadScriptBtn=document.getElementById('loadScriptBtn');
+const currentScriptLabel=document.getElementById('currentScriptLabel');
 
 const actSel=document.getElementById('actFilter'),
       sceneSel=document.getElementById('sceneFilter'),
@@ -206,23 +211,47 @@ async function loadScriptsIndex(){
         jsonSrc = scriptSelect.value; localStorage.setItem(LS.src, jsonSrc);
       }
       if(scriptsNote) scriptsNote.textContent='Quelle: scripts.json';
+      updateScriptLabels();
+      if(scriptInput && !scriptInput.value) scriptInput.value=jsonSrc;
       return true;
     }else{
       if(scriptsNote) scriptsNote.textContent='scripts.json gefunden, aber leer.';
       if(scriptSelect) scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
+      updateScriptLabels();
       return false;
     }
   }catch{
     if(scriptsNote) scriptsNote.textContent='Keine scripts.json gefunden – Pfad kann manuell gesetzt werden.';
     if(scriptSelect) scriptSelect.innerHTML=`<option value="${jsonSrc}">${jsonSrc}</option>`;
+    updateScriptLabels();
     return false;
   }
+}
+
+function updateScriptLabels(){
+  if(jsonLabel) jsonLabel.textContent = jsonSrc || '—';
+  if(currentScriptLabel) currentScriptLabel.textContent = jsonSrc || '—';
+}
+
+async function applyScriptSelection(src,{markChosen=false}={}){
+  if(!src) return false;
+  const chosen=normalizeScriptPath(src);
+  jsonSrc=chosen; localStorage.setItem(LS.src, chosen);
+  if(markChosen) localStorage.setItem(LS.scriptChosen,'1');
+  updateScriptLabels();
+  if(scriptSelect){
+    const found=[...scriptSelect.options].find(o=>normalizeScriptPath(o.value)===chosen);
+    if(found) scriptSelect.value=found.value;
+  }
+  if(scriptInput) scriptInput.value = chosen;
+  await loadJSON();
+  return true;
 }
 
 /* =================== Content JSON laden =================== */
 async function loadJSON(){
   jsonSrc = normalizeScriptPath(jsonSrc);
-  if(jsonLabel) jsonLabel.textContent=jsonSrc;
+  updateScriptLabels();
   const tryPaths=[jsonSrc,'/'+jsonSrc.replace(/^\//,''),'./'+jsonSrc.replace(/^\//,'')];
 
   let data;
@@ -739,12 +768,40 @@ async function renderBoard(){
 function onViewChanged(name){ if(name==='scores') renderBoard(); }
 
 /* =================== Scripts-Auswahl Events =================== */
+const getScriptFromUI=()=>{
+  const manualOn=!!(manualToggle && manualToggle.checked);
+  const manualVal=scriptInput && scriptInput.value.trim();
+  if(manualOn && manualVal) return manualVal;
+  if(scriptSelect) return scriptSelect.value;
+  return '';
+};
+
+if(manualToggle && scriptInput){
+  const sync=()=>{ scriptInput.style.display = manualToggle.checked ? 'block' : 'none'; };
+  sync();
+  manualToggle.addEventListener('change', sync);
+}
+
 if(scriptSelect){
   scriptSelect.addEventListener('change', async e=>{
-    const chosen=normalizeScriptPath(e.target.value);
-    jsonSrc=chosen; localStorage.setItem(LS.src, chosen);
-    if(jsonLabel) jsonLabel.textContent=chosen;
-    await loadJSON();
+    await applyScriptSelection(e.target.value,{markChosen:true});
+  });
+}
+
+if(loadScriptBtn){
+  loadScriptBtn.addEventListener('click', async ()=>{
+    const src=getScriptFromUI();
+    if(!src){ showError('Keine Quelle', 'Bitte eine JSON-Datei wählen oder manuell eingeben.'); return; }
+    await applyScriptSelection(src,{markChosen:true});
+  });
+}
+
+if(scriptContinue){
+  scriptContinue.addEventListener('click', async ()=>{
+    const src=getScriptFromUI();
+    if(!src){ showError('Keine Quelle', 'Bitte eine JSON-Datei wählen oder manuell eingeben.'); return; }
+    await applyScriptSelection(src,{markChosen:true});
+    switchViewImmediate('home');
   });
 }
 
@@ -753,8 +810,12 @@ if(scriptSelect){
 
 /* =================== Boot =================== */
 async function boot(){
-  switchViewImmediate('home');
   await loadScriptsIndex();
+  updateScriptLabels();
+  const chosenFlag = localStorage.getItem(LS.scriptChosen)==='1';
+  const shouldPrompt = !chosenFlag && (state.indexFromScriptsJson.length>1 || !state.indexFromScriptsJson.length);
+  const startView = shouldPrompt ? 'script' : 'home';
+  switchViewImmediate(startView);
   await loadJSON();
   renderViewer(); // Learn erst nach Klick auf „Start“
 }
