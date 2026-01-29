@@ -8,6 +8,13 @@ const CURRENT_DIR = (() => {
 const IS_PEN   = /codepen|cdpn\.io/.test(location.host);
 const CDN_BASE = 'https://cdn.jsdelivr.net/gh/jakobklucke/horrorladen-app@main/';
 
+/* =================== Supabase =================== */
+const SUPABASE_URL = 'https://aaxogoaxwultqlsrgpvx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFheG9nb2F4d3VsdHFsc3JncHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2ODE0OTEsImV4cCI6MjA4NTI1NzQ5MX0.V82zIo-tyNk1BjaJKVFpGxypKvb_HKqHPAyDopsl1QQ';
+const supa = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
 function normalizeScriptPath(p){
   if (!p) return p;
   if (/^https?:\/\//i.test(p)) return p;                // absolute URLs lassen
@@ -747,6 +754,10 @@ function over(){
     survRoot.innerHTML='';
     survRoot.appendChild(el('div',{class:'card big'}, `Game Over! Score: ${survScore}`));
   }
+  if(!localStorage.getItem(LS.name)){
+    const entered = window.prompt('Dein Name für das Leaderboard:', '');
+    if(entered && entered.trim()) localStorage.setItem(LS.name, entered.trim());
+  }
   saveScore(survScore);
   state.inExercise=false;
 }
@@ -761,11 +772,31 @@ function addLocalScore(entry){
   const list=getLocalScores(); list.push(entry);
   localStorage.setItem('hl_local_scores', JSON.stringify(list).slice(0,100000));
 }
-function saveScore(score){
+async function saveScore(score){
   const entry={ name:getPlayerName(), role:(roleSurv&&roleSurv.value)||'', score:Number(score)||0, ts:new Date().toISOString() };
   addLocalScore(entry);
+  if(supa){
+    try{
+      await supa.from('scores').insert(entry);
+    }catch(e){
+      console.warn('Supabase-Insert fehlgeschlagen:', e);
+    }
+  }
 }
 async function fetchScoresJson(){
+  if(supa){
+    try{
+      const { data, error } = await supa
+        .from('scores')
+        .select('name,role,score,ts')
+        .order('score', { ascending: false })
+        .limit(50);
+      if(error) throw error;
+      return Array.isArray(data) ? data : [];
+    }catch(e){
+      console.warn('Supabase-Read fehlgeschlagen, fallback zu scores.json:', e);
+    }
+  }
   try{
     const r=await fetch(SCORES_URL+`?t=${Date.now()}`,{cache:'no-store'});
     if(!r.ok) throw new Error(r.statusText);
