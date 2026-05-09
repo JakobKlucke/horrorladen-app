@@ -764,6 +764,24 @@ body::before{
   padding-bottom:.85rem;
   white-space:nowrap;
 }
+.role-row__detail{
+  grid-column:1 / -1;
+  color:#667085;
+  font-size:.9rem;
+  line-height:1.35;
+}
+.pager-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+  margin:.45rem 0 .75rem;
+  color:#475467;
+}
+.pager-row strong{
+  min-width:8rem;
+  text-align:center;
+}
 .structure-row{
   display:grid;
   grid-template-columns:minmax(150px,.9fr) minmax(130px,.7fr) auto minmax(240px,1.6fr);

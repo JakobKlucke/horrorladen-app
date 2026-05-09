@@ -8,6 +8,7 @@
     ['stage_direction', 'Regie'],
     ['narration', 'Erzählung']
   ];
+  const PAGE_SIZE = 100;
 
   const state = {
     sourceName: '',
@@ -22,6 +23,10 @@
     reviewRows: [],
     activeStep: 0,
     backendStatus: null,
+    pagination: {
+      structurePage: 1,
+      cutPage: 1
+    },
     filters: {
       structureScene: '',
       structureSpeaker: '',
@@ -205,6 +210,10 @@
     return state.roles.filter(role => role.confirmed !== false && normalize(role.label));
   }
 
+  function hasRoleDraft(){
+    return !!state.sessionId || !!state.roles.length || !!state.entries.length;
+  }
+
   function songById(id){
     return state.songs.find(song => song.id === id);
   }
@@ -279,6 +288,50 @@
     state.runtime = ScriptModel.buildRuntimeModel(script);
   }
 
+  function resetEntryPagination(){
+    state.pagination.structurePage = 1;
+    state.pagination.cutPage = 1;
+  }
+
+  function pageSlice(items, page){
+    const total = items.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const currentPage = Math.min(Math.max(1, page), totalPages);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return {
+      items: items.slice(start, start + PAGE_SIZE),
+      currentPage,
+      totalPages,
+      start,
+      end: Math.min(start + PAGE_SIZE, total),
+      total
+    };
+  }
+
+  function renderPager(kind, pageInfo){
+    if(pageInfo.total <= PAGE_SIZE) return '';
+    return `
+      <div class="pager-row" data-pager="${kind}">
+        <button class="btn secondary" type="button" data-page-action="prev" ${pageInfo.currentPage <= 1 ? 'disabled' : ''}>Zurück</button>
+        <strong>${pageInfo.start + 1}-${pageInfo.end} von ${pageInfo.total}</strong>
+        <button class="btn secondary" type="button" data-page-action="next" ${pageInfo.currentPage >= pageInfo.totalPages ? 'disabled' : ''}>Weiter</button>
+      </div>
+    `;
+  }
+
+  function changePage(kind, direction){
+    const key = kind === 'cuts' ? 'cutPage' : 'structurePage';
+    state.pagination[key] = Math.max(1, state.pagination[key] + direction);
+    renderWizard();
+  }
+
+  function onPagerClick(event){
+    const action = event.target.dataset.pageAction;
+    const pager = event.target.closest('[data-pager]');
+    if(!action || !pager) return;
+    changePage(pager.dataset.pager, action === 'next' ? 1 : -1);
+  }
+
   function setSelectOptions(select, options, selectedValue, allLabel){
     if(!select) return;
     const current = selectedValue || '';
@@ -324,41 +377,46 @@
   }
 
   function updateSummary(){
-    syncRuntime();
-    if(!state.runtime){
+    if(!state.entries.length){
       refs.summaryTitle.textContent = '-';
       refs.summaryEntries.textContent = '0 Einträge';
       refs.summaryLearnable.textContent = '0 lernbar';
       refs.summaryIssues.textContent = '0 Hinweise';
-      setNote(refs.exportStatus, 'Noch kein Skript geladen.');
+      setNote(refs.exportStatus, state.roles.length ? 'Rollen sind vorbereitet. Das Skript muss noch strukturiert werden.' : 'Noch kein Skript geladen.');
       refs.downloadReviewBtn.disabled = true;
       refs.downloadJsonBtn.disabled = true;
       return;
     }
+    const learnableCount = state.entries.filter(entry => (entry.kind === 'dialogue' || entry.kind === 'lyric') && !entry.cut).length;
     const pending = ScriptModel.countPendingIssues(state.reviewRows);
-    refs.summaryTitle.textContent = state.runtime.canonical.title || 'Unbenanntes Skript';
-    refs.summaryEntries.textContent = `${state.runtime.entries.length} Einträge`;
-    refs.summaryLearnable.textContent = `${state.runtime.learnableEntries.length} lernbar`;
+    refs.summaryTitle.textContent = state.title || state.canonical?.title || 'Unbenanntes Skript';
+    refs.summaryEntries.textContent = `${state.entries.length} Einträge`;
+    refs.summaryLearnable.textContent = `${learnableCount} lernbar`;
     refs.summaryIssues.textContent = state.reviewRows.length ? `${pending}/${state.reviewRows.length} offen` : '0 Hinweise';
-    setNote(refs.exportStatus, `${state.runtime.learnableEntries.length} Zeilen gehen in die Lernfassung. ${state.entries.filter(entry => entry.cut).length} Zeilen sind gestrichen.`, true);
+    setNote(refs.exportStatus, `${learnableCount} Zeilen gehen in die Lernfassung. ${state.entries.filter(entry => entry.cut).length} Zeilen sind gestrichen.`, true);
     refs.downloadReviewBtn.disabled = false;
     refs.downloadJsonBtn.disabled = false;
   }
 
   function renderRoles(){
     if(!refs.rolesList) return;
-    if(!state.entries.length){
-      refs.rolesList.innerHTML = '<div class="faded">Noch kein Skript geladen.</div>';
+    if(!hasRoleDraft()){
+      refs.rolesList.innerHTML = '<div class="faded">Noch keine PDF oder JSON geladen.</div>';
       return;
     }
     if(!state.roles.length){
-      refs.rolesList.innerHTML = '<div class="faded">Keine Figuren erkannt.</div>';
+      refs.rolesList.innerHTML = '<div class="faded">Keine Figuren erkannt. Du kannst sie manuell hinzufügen.</div>';
       return;
     }
     const mergeTargets = confirmedRoles();
     refs.rolesList.innerHTML = state.roles.map(role => {
       const count = state.entries.filter(entry => entry.speakerId === role.id || normalize(entry.speaker).toUpperCase() === normalize(role.label).toUpperCase()).length;
       const aliasText = normalizeList(role.aliases).join(', ');
+      const detail = [
+        role.description,
+        role.page ? `Seite ${role.page}` : '',
+        role.source ? `Quelle: ${role.source}` : ''
+      ].filter(Boolean).join(' · ');
       const targetOptions = mergeTargets
         .filter(target => target.id !== role.id)
         .map(target => `<option value="${escapeHtml(target.id)}">${escapeHtml(target.label)}</option>`)
@@ -376,6 +434,7 @@
             <input type="text" data-role-field="aliases" value="${escapeHtml(aliasText)}" placeholder="Alias 1, Alias 2">
           </label>
           <div class="role-row__meta">${count} Zeilen</div>
+          <div class="role-row__detail">${escapeHtml(detail)}</div>
           <select data-role-field="mergeTarget">
             <option value="">Zusammenführen mit...</option>
             ${targetOptions}
@@ -389,14 +448,22 @@
 
   function renderStructure(){
     if(!refs.structureTable) return;
+    if(!state.entries.length){
+      refs.structureTable.innerHTML = '<div class="faded">Bestätige zuerst die Figuren und klicke auf Skript strukturieren.</div>';
+      return;
+    }
     setSelectOptions(refs.structureSceneFilter, sceneOptions(), state.filters.structureScene, 'Alle Szenen');
     setSelectOptions(refs.structureSpeakerFilter, speakerOptions(), state.filters.structureSpeaker, 'Alle Figuren');
     const entries = filteredEntries('structure');
+    const pageInfo = pageSlice(entries, state.pagination.structurePage);
+    state.pagination.structurePage = pageInfo.currentPage;
     const speakerSelect = current => [
       '<option value="">Ohne Sprecher</option>',
       ...speakerOptions().map(option => `<option value="${escapeHtml(option.value)}" ${option.value === current ? 'selected' : ''}>${escapeHtml(option.label)}</option>`)
     ].join('');
-    refs.structureTable.innerHTML = entries.length ? entries.map(entry => `
+    refs.structureTable.innerHTML = entries.length ? [
+      renderPager('structure', pageInfo),
+      ...pageInfo.items.map(entry => `
       <article class="structure-row" data-entry-id="${escapeHtml(entry.id)}">
         <div class="structure-row__meta">
           <span class="meta-chip">Seite ${escapeHtml(entry.page || '-')}</span>
@@ -413,7 +480,9 @@
         </label>
         <div class="structure-row__text">${escapeHtml(entry.text)}</div>
       </article>
-    `).join('') : '<div class="faded">Keine Einträge für diesen Filter.</div>';
+    `),
+      renderPager('structure', pageInfo)
+    ].join('') : '<div class="faded">Keine Einträge für diesen Filter.</div>';
   }
 
   function renderSongs(){
@@ -463,11 +532,18 @@
   }
 
   function renderCuts(){
+    if(!state.entries.length){
+      refs.originalColumn.innerHTML = '<div class="faded">Bestätige zuerst die Figuren und strukturiere das Skript.</div>';
+      refs.cutColumn.innerHTML = '<div class="faded">Noch keine Strichfassung verfügbar.</div>';
+      return;
+    }
     setSelectOptions(refs.cutSceneFilter, sceneOptions(), state.filters.cutScene, 'Alle Szenen');
     setSelectOptions(refs.cutSongFilter, songOptions(), state.filters.cutSong, 'Alle Songs');
     setSelectOptions(refs.cutSpeakerFilter, speakerOptions(), state.filters.cutSpeaker, 'Alle Figuren');
     const entries = filteredEntries('cuts');
-    const original = entries.map(entry => `
+    const pageInfo = pageSlice(entries, state.pagination.cutPage);
+    state.pagination.cutPage = pageInfo.currentPage;
+    const original = pageInfo.items.map(entry => `
       <article class="cut-line ${entry.cut ? 'is-cut' : ''}" data-entry-id="${escapeHtml(entry.id)}">
         <div>
           <strong>${escapeHtml(entry.speaker || entry.kind)}</strong>
@@ -476,7 +552,7 @@
         <button class="btn secondary" type="button" data-toggle-cut="${escapeHtml(entry.id)}">${entry.cut ? 'Wiederherstellen' : 'Streichen'}</button>
       </article>
     `).join('');
-    const finalEntries = entries.filter(entry => state.filters.showCutInFinal || !entry.cut);
+    const finalEntries = pageInfo.items.filter(entry => state.filters.showCutInFinal || !entry.cut);
     const finalVersion = finalEntries.map(entry => `
       <article class="cut-line ${entry.cut ? 'is-cut' : ''}">
         <div>
@@ -485,15 +561,16 @@
         </div>
       </article>
     `).join('');
-    refs.originalColumn.innerHTML = original || '<div class="faded">Keine Einträge für diesen Filter.</div>';
-    refs.cutColumn.innerHTML = finalVersion || '<div class="faded">Alle Einträge in diesem Filter sind gestrichen.</div>';
+    const pager = renderPager('cuts', pageInfo);
+    refs.originalColumn.innerHTML = entries.length ? `${pager}${original}${pager}` : '<div class="faded">Keine Einträge für diesen Filter.</div>';
+    refs.cutColumn.innerHTML = entries.length ? `${pager}${finalVersion || '<div class="faded">Alle Einträge auf dieser Seite sind gestrichen.</div>'}${pager}` : '<div class="faded">Keine Einträge für diesen Filter.</div>';
     if(refs.showCutInFinalToggle) refs.showCutInFinalToggle.checked = state.filters.showCutInFinal;
   }
 
   function renderWizard(){
     refs.steps.forEach((step, index) => {
       step.classList.toggle('active', index === state.activeStep);
-      step.disabled = index > 0 && !state.entries.length;
+      step.disabled = !canAccessStep(index);
     });
     refs.panels.forEach((panel, index) => {
       panel.classList.toggle('active', index === state.activeStep);
@@ -502,19 +579,36 @@
       refs.wizardProgress.style.width = `${((state.activeStep + 1) / refs.steps.length) * 100}%`;
     }
     refs.prevStepBtn.disabled = state.activeStep === 0;
-    refs.nextStepBtn.disabled = state.activeStep > 0 && !state.entries.length;
-    refs.nextStepBtn.textContent = state.activeStep === refs.steps.length - 1 ? 'Fertig' : 'Weiter';
+    refs.nextStepBtn.disabled = !canProceedNext();
+    refs.nextStepBtn.textContent = state.activeStep === 1 && !state.entries.length && state.sessionId ? 'Skript strukturieren' : (state.activeStep === refs.steps.length - 1 ? 'Fertig' : 'Weiter');
     refs.nextStepBtn.disabled = refs.nextStepBtn.disabled || state.activeStep === refs.steps.length - 1;
-    renderRoles();
-    renderStructure();
-    renderSongs();
-    renderCuts();
+    if(refs.restructureBtn){
+      refs.restructureBtn.textContent = state.entries.length ? 'Neu aufteilen' : 'Skript strukturieren';
+      refs.restructureBtn.disabled = !state.sessionId || !confirmedRoles().length;
+    }
+    if(state.activeStep === 1) renderRoles();
+    if(state.activeStep === 2) renderStructure();
+    if(state.activeStep === 3) renderSongs();
+    if(state.activeStep === 4) renderCuts();
     updateSummary();
+  }
+
+  function canAccessStep(index){
+    if(index === 0) return true;
+    if(index === 1) return hasRoleDraft();
+    return !!state.entries.length;
+  }
+
+  function canProceedNext(){
+    if(state.activeStep >= refs.steps.length - 1) return false;
+    if(state.activeStep === 0) return hasRoleDraft();
+    if(state.activeStep === 1) return !!state.entries.length || (!!state.sessionId && !!confirmedRoles().length);
+    return !!state.entries.length;
   }
 
   function goToStep(index){
     if(index < 0 || index >= refs.panels.length) return;
-    if(index > 0 && !state.entries.length) return;
+    if(!canAccessStep(index)) return;
     state.activeStep = index;
     renderWizard();
   }
@@ -543,7 +637,11 @@
         id,
         label,
         aliases: normalizeList(raw.aliases),
-        confirmed: raw.confirmed !== false
+        confirmed: raw.confirmed !== false,
+        description: normalize(raw.description),
+        page: raw.page || '',
+        confidence: normalize(raw.confidence),
+        source: normalize(raw.source)
       });
     });
     return roles;
@@ -580,8 +678,25 @@
     state.reviewRows = Array.isArray(options.reviewRows)
       ? options.reviewRows.map(row => Object.assign({}, row))
       : runtime.issues.map(row => Object.assign({}, row));
+    resetEntryPagination();
     setNote(refs.globalStatus, `Skript geladen: ${state.title}`, true);
     goToStep(options.nextStep == null ? 1 : options.nextStep);
+  }
+
+  function loadRolePreviewFromImport(payload, sourceName){
+    state.sourceName = sourceName || payload.filenameBase || 'skript';
+    state.title = normalize(refs.pdfTitleInput?.value) || payload.filenameBase || 'Unbenanntes Skript';
+    state.sessionId = payload.sessionId || '';
+    state.pages = Array.isArray(payload.previewPages) ? clone(payload.previewPages) : [];
+    state.canonical = null;
+    state.runtime = null;
+    state.entries = [];
+    state.roles = normalizeRoles(payload.roleCandidates || []);
+    state.songs = normalizeSongs(payload.songCandidates || []);
+    state.reviewRows = Array.isArray(payload.reviewRows) ? payload.reviewRows.map(row => Object.assign({}, row)) : [];
+    resetEntryPagination();
+    setNote(refs.globalStatus, `Rollenvorschau geladen: ${state.roles.length} Vorschläge aus ${state.pages.length} Seiten.`, true);
+    goToStep(1);
   }
 
   async function refreshBackendHealth(){
@@ -630,15 +745,8 @@
       });
       const payload = await response.json();
       if(!response.ok || !payload.ok) throw new Error(payload.error || response.statusText || 'Import fehlgeschlagen');
-      loadRuntimeFromData(payload.script, payload.filenameBase || file.name.replace(/\.pdf$/i, ''), {
-        sessionId: payload.sessionId,
-        pages: payload.pages,
-        roleCandidates: payload.roleCandidates,
-        songCandidates: payload.songCandidates,
-        reviewRows: payload.reviewRows,
-        nextStep: 1
-      });
-      setNote(refs.backendStatus, `Importiert: ${payload.summary?.pages || 0} Seiten, ${payload.summary?.entries || 0} Einträge.`, true);
+      loadRolePreviewFromImport(payload, payload.filenameBase || file.name.replace(/\.pdf$/i, ''));
+      setNote(refs.backendStatus, `Rollenvorschau: ${payload.summary?.previewPages || 0} Seiten, ${payload.summary?.roleCandidates || 0} Figuren-Vorschläge.`, true);
     }catch(error){
       setNote(refs.backendStatus, `PDF-Import fehlgeschlagen: ${error.message || error}`);
     }finally{
@@ -647,7 +755,7 @@
     }
   }
 
-  async function restructureFromServer(){
+  async function restructureFromServer(nextStep){
     if(!state.sessionId){
       setNote(refs.globalStatus, 'Neuaufteilung ist nur nach PDF-Import verfügbar.');
       return;
@@ -678,7 +786,7 @@
         roleCandidates: payload.roleCandidates,
         songCandidates: payload.songCandidates,
         reviewRows: payload.reviewRows,
-        nextStep: state.activeStep
+        nextStep: nextStep == null ? state.activeStep : nextStep
       });
       setNote(refs.globalStatus, 'Textaufteilung aktualisiert.', true);
     }catch(error){
@@ -726,6 +834,10 @@
       });
     }
     if(field === 'aliases') role.aliases = normalizeList(event.target.value);
+    if(event.type === 'input' && (field === 'label' || field === 'aliases')){
+      updateSummary();
+      return;
+    }
     renderWizard();
   }
 
@@ -834,10 +946,16 @@
   function bindEvents(){
     refs.steps.forEach((step, index) => step.addEventListener('click', () => goToStep(index)));
     refs.prevStepBtn.addEventListener('click', () => goToStep(state.activeStep - 1));
-    refs.nextStepBtn.addEventListener('click', () => goToStep(Math.min(state.activeStep + 1, refs.panels.length - 1)));
+    refs.nextStepBtn.addEventListener('click', async () => {
+      if(state.activeStep === 1 && !state.entries.length && state.sessionId){
+        await restructureFromServer(2);
+        return;
+      }
+      goToStep(Math.min(state.activeStep + 1, refs.panels.length - 1));
+    });
     refs.refreshBackendBtn.addEventListener('click', refreshBackendHealth);
     refs.runPdfImportBtn.addEventListener('click', runPdfImport);
-    refs.restructureBtn.addEventListener('click', restructureFromServer);
+    refs.restructureBtn.addEventListener('click', () => restructureFromServer(state.entries.length ? state.activeStep : 2));
     refs.addRoleBtn.addEventListener('click', addRole);
     refs.newRoleInput.addEventListener('keydown', event => {
       if(event.key === 'Enter') addRole();
@@ -847,15 +965,20 @@
     refs.rolesList.addEventListener('click', onRoleClick);
     refs.structureTable.addEventListener('input', onStructureInput);
     refs.structureTable.addEventListener('change', onStructureInput);
+    refs.structureTable.addEventListener('click', onPagerClick);
     refs.songsList.addEventListener('input', onSongInput);
     refs.songsList.addEventListener('change', onSongInput);
     refs.originalColumn.addEventListener('click', onToggleCut);
+    refs.originalColumn.addEventListener('click', onPagerClick);
+    refs.cutColumn.addEventListener('click', onPagerClick);
     refs.structureSceneFilter.addEventListener('change', event => {
       state.filters.structureScene = event.target.value;
+      state.pagination.structurePage = 1;
       renderWizard();
     });
     refs.structureSpeakerFilter.addEventListener('change', event => {
       state.filters.structureSpeaker = event.target.value;
+      state.pagination.structurePage = 1;
       renderWizard();
     });
     refs.songSceneFilter.addEventListener('change', event => {
@@ -864,14 +987,17 @@
     });
     refs.cutSceneFilter.addEventListener('change', event => {
       state.filters.cutScene = event.target.value;
+      state.pagination.cutPage = 1;
       renderWizard();
     });
     refs.cutSongFilter.addEventListener('change', event => {
       state.filters.cutSong = event.target.value;
+      state.pagination.cutPage = 1;
       renderWizard();
     });
     refs.cutSpeakerFilter.addEventListener('change', event => {
       state.filters.cutSpeaker = event.target.value;
+      state.pagination.cutPage = 1;
       renderWizard();
     });
     refs.showCutInFinalToggle.addEventListener('change', event => {
