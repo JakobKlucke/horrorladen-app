@@ -22,6 +22,8 @@
     roles: [],
     songs: [],
     reviewRows: [],
+    speakerDiagnostics: null,
+    speakerAssignmentDirty: false,
     activeStep: 0,
     backendStatus: null,
     pagination: {
@@ -54,13 +56,15 @@
     extractionDiagnostics: document.getElementById('extractionDiagnostics'),
     jsonFileInput: document.getElementById('jsonFileInput'),
     reviewFileInput: document.getElementById('reviewFileInput'),
-    restructureBtn: document.getElementById('restructureBtn'),
+    assignRulesBtn: document.getElementById('assignRulesBtn'),
+    assignLlmBtn: document.getElementById('assignLlmBtn'),
     analyzeLocalRolesBtn: document.getElementById('analyzeLocalRolesBtn'),
     analyzeLlmRolesBtn: document.getElementById('analyzeLlmRolesBtn'),
     newRoleInput: document.getElementById('newRoleInput'),
     addRoleBtn: document.getElementById('addRoleBtn'),
     rolesList: document.getElementById('rolesList'),
     roleDiagnostics: document.getElementById('roleDiagnostics'),
+    speakerDiagnostics: document.getElementById('speakerDiagnostics'),
     structureSceneFilter: document.getElementById('structureSceneFilter'),
     structureSpeakerFilter: document.getElementById('structureSpeakerFilter'),
     structureTable: document.getElementById('structureTable'),
@@ -220,6 +224,10 @@
 
   function hasRoleDraft(){
     return !!state.sessionId || !!state.roles.length || !!state.entries.length;
+  }
+
+  function hasStructuredScript(){
+    return !!state.entries.length && !state.speakerAssignmentDirty;
   }
 
   function songById(id){
@@ -398,6 +406,10 @@
     return confirmedRoles().map(role => ({ value:role.id, label:role.label }));
   }
 
+  function structureSpeakerOptions(){
+    return [{ value:'__missing', label:'Ohne Sprecher' }, ...speakerOptions()];
+  }
+
   function songOptions(){
     return state.songs.map(song => ({ value:song.id, label:songLabel(song) || song.id }));
   }
@@ -406,7 +418,9 @@
     return state.entries.filter(entry => {
       if(kind === 'structure'){
         if(state.filters.structureScene && (entry.sceneId || entry.sceneLabel) !== state.filters.structureScene) return false;
-        if(state.filters.structureSpeaker && entry.speakerId !== state.filters.structureSpeaker) return false;
+        if(state.filters.structureSpeaker === '__missing'){
+          if(entry.speakerId) return false;
+        }else if(state.filters.structureSpeaker && entry.speakerId !== state.filters.structureSpeaker) return false;
       }
       if(kind === 'cuts'){
         if(state.filters.cutScene && (entry.sceneId || entry.sceneLabel) !== state.filters.cutScene) return false;
@@ -434,6 +448,12 @@
     refs.summaryEntries.textContent = `${state.entries.length} Einträge`;
     refs.summaryLearnable.textContent = `${learnableCount} lernbar`;
     refs.summaryIssues.textContent = state.reviewRows.length ? `${pending}/${state.reviewRows.length} offen` : '0 Hinweise';
+    if(state.speakerAssignmentDirty){
+      setNote(refs.exportStatus, 'Sprecherzuordnung neu ausführen, bevor Striche oder Export verwendet werden.');
+      refs.downloadReviewBtn.disabled = true;
+      refs.downloadJsonBtn.disabled = true;
+      return;
+    }
     setNote(refs.exportStatus, `${learnableCount} Zeilen gehen in die Lernfassung. ${state.entries.filter(entry => entry.cut).length} Zeilen sind gestrichen.`, true);
     refs.downloadReviewBtn.disabled = false;
     refs.downloadJsonBtn.disabled = false;
@@ -494,7 +514,7 @@
       return;
     }
     setSelectOptions(refs.structureSceneFilter, sceneOptions(), state.filters.structureScene, 'Alle Szenen');
-    setSelectOptions(refs.structureSpeakerFilter, speakerOptions(), state.filters.structureSpeaker, 'Alle Figuren');
+    setSelectOptions(refs.structureSpeakerFilter, structureSpeakerOptions(), state.filters.structureSpeaker, 'Alle Figuren');
     const entries = filteredEntries('structure');
     const pageInfo = pageSlice(entries, state.pagination.structurePage);
     state.pagination.structurePage = pageInfo.currentPage;
@@ -505,11 +525,12 @@
     refs.structureTable.innerHTML = entries.length ? [
       renderPager('structure', pageInfo),
       ...pageInfo.items.map(entry => `
-      <article class="structure-row" data-entry-id="${escapeHtml(entry.id)}">
+      <article class="structure-row ${!entry.speakerId && (entry.kind === 'dialogue' || entry.kind === 'lyric') ? 'missing-speaker' : ''}" data-entry-id="${escapeHtml(entry.id)}">
         <div class="structure-row__meta">
           <span class="meta-chip">Seite ${escapeHtml(entry.page || '-')}</span>
           <span class="meta-chip">${escapeHtml(entrySceneLabel(entry))}</span>
           <span class="meta-chip">${escapeHtml(entrySongLabel(entry))}</span>
+          ${!entry.speakerId && (entry.kind === 'dialogue' || entry.kind === 'lyric') ? '<span class="meta-chip meta-chip--warn">Sprecher fehlt</span>' : ''}
         </div>
         <select data-entry-field="speakerId">${speakerSelect(entry.speakerId)}</select>
         <select data-entry-field="kind">
@@ -573,8 +594,8 @@
   }
 
   function renderCuts(){
-    if(!state.entries.length){
-      refs.originalColumn.innerHTML = '<div class="faded">Bestätige zuerst die Figuren und strukturiere das Skript.</div>';
+    if(!hasStructuredScript()){
+      refs.originalColumn.innerHTML = '<div class="faded">Ordne zuerst die Sprecher zu. Bei geänderten Rollen muss die Sprecherzuordnung neu ausgeführt werden.</div>';
       refs.cutColumn.innerHTML = '<div class="faded">Noch keine Strichfassung verfügbar.</div>';
       return;
     }
@@ -608,6 +629,54 @@
     if(refs.showCutInFinalToggle) refs.showCutInFinalToggle.checked = state.filters.showCutInFinal;
   }
 
+  function renderSpeakerDiagnostics(){
+    if(!refs.speakerDiagnostics) return;
+    if(!state.entries.length){
+      refs.speakerDiagnostics.innerHTML = `
+        <div class="review-note">Bestätige die Figuren und starte danach die Sprecherzuordnung mit Regeln oder LLM.</div>
+      `;
+      return;
+    }
+    const diagnostics = state.speakerDiagnostics || buildClientSpeakerDiagnostics();
+    const recognized = diagnostics.recognizedSpeakers || [];
+    const recognizedHtml = recognized.length
+      ? recognized.map(item => `<span class="meta-chip">${escapeHtml(item.label || item.roleId)}: ${escapeHtml(item.entries || 0)}</span>`).join('')
+      : '<span class="faded">Noch keine Sprecher erkannt.</span>';
+    const dirty = state.speakerAssignmentDirty
+      ? '<div class="diagnostics-warnings"><div>Sprecherzuordnung neu ausführen: Rollen wurden nach der letzten Zuordnung geändert.</div></div>'
+      : '';
+    refs.speakerDiagnostics.innerHTML = `
+      ${dirty}
+      <div class="speaker-stats">
+        <article class="tile"><strong>${escapeHtml(diagnostics.learnableEntries || 0)}</strong><span>lernbar</span></article>
+        <article class="tile"><strong>${escapeHtml(diagnostics.assignedLearnable || 0)}</strong><span>zugeordnet</span></article>
+        <article class="tile"><strong>${escapeHtml(diagnostics.unassignedLearnable || 0)}</strong><span>ohne Sprecher</span></article>
+        <article class="tile"><strong>${escapeHtml(diagnostics.speakerMode || 'nicht ausgeführt')}</strong><span>Modus</span></article>
+      </div>
+      <div class="speaker-recognized">${recognizedHtml}</div>
+      <p class="faded">Mit Regeln ist schnell und deterministisch. LLM nutzt nur bestätigte Rollen und verwirft unbekannte Rollen-Vorschläge.</p>
+    `;
+  }
+
+  function buildClientSpeakerDiagnostics(){
+    const learnable = state.entries.filter(entry => entry.kind === 'dialogue' || entry.kind === 'lyric');
+    const assigned = learnable.filter(entry => entry.speakerId || entry.speaker);
+    const counts = new Map();
+    assigned.forEach(entry => {
+      const key = entry.speakerId || entry.speaker;
+      const current = counts.get(key) || { roleId:key, label:entry.speaker || key, entries:0 };
+      current.entries += 1;
+      counts.set(key, current);
+    });
+    return {
+      speakerMode: 'vorhanden',
+      learnableEntries: learnable.length,
+      assignedLearnable: assigned.length,
+      unassignedLearnable: learnable.length - assigned.length,
+      recognizedSpeakers: Array.from(counts.values())
+    };
+  }
+
   function renderWizard(){
     refs.steps.forEach((step, index) => {
       step.classList.toggle('active', index === state.activeStep);
@@ -621,11 +690,14 @@
     }
     refs.prevStepBtn.disabled = state.activeStep === 0;
     refs.nextStepBtn.disabled = !canProceedNext();
-    refs.nextStepBtn.textContent = state.activeStep === 1 && !state.entries.length && state.sessionId ? 'Skript strukturieren' : (state.activeStep === refs.steps.length - 1 ? 'Fertig' : 'Weiter');
+    refs.nextStepBtn.textContent = state.activeStep === 2 && (!state.entries.length || state.speakerAssignmentDirty) ? 'Mit Regeln zuordnen' : (state.activeStep === refs.steps.length - 1 ? 'Fertig' : 'Weiter');
     refs.nextStepBtn.disabled = refs.nextStepBtn.disabled || state.activeStep === refs.steps.length - 1;
-    if(refs.restructureBtn){
-      refs.restructureBtn.textContent = state.entries.length ? 'Neu aufteilen' : 'Skript strukturieren';
-      refs.restructureBtn.disabled = !state.sessionId || !confirmedRoles().length;
+    if(refs.assignRulesBtn){
+      refs.assignRulesBtn.disabled = !state.sessionId || !confirmedRoles().length;
+    }
+    if(refs.assignLlmBtn){
+      refs.assignLlmBtn.disabled = !state.sessionId || !confirmedRoles().length || !(state.backendStatus?.dependencies?.openai?.available);
+      refs.assignLlmBtn.title = state.backendStatus?.dependencies?.openai?.available ? '' : 'OPENAI_API_KEY ist serverseitig nicht gesetzt.';
     }
     if(refs.analyzeLocalRolesBtn){
       refs.analyzeLocalRolesBtn.disabled = !state.sessionId;
@@ -637,23 +709,30 @@
     renderDiagnostics(refs.extractionDiagnostics);
     renderDiagnostics(refs.roleDiagnostics);
     if(state.activeStep === 1) renderRoles();
-    if(state.activeStep === 2) renderStructure();
-    if(state.activeStep === 3) renderSongs();
-    if(state.activeStep === 4) renderCuts();
+    if(state.activeStep === 2) renderSpeakerDiagnostics();
+    if(state.activeStep === 3) renderStructure();
+    if(state.activeStep === 4) renderSongs();
+    if(state.activeStep === 5) renderCuts();
     updateSummary();
   }
 
   function canAccessStep(index){
     if(index === 0) return true;
     if(index === 1) return hasRoleDraft();
-    return !!state.entries.length;
+    if(index === 2) return hasRoleDraft() && !!confirmedRoles().length;
+    if(index === 3 || index === 4) return !!state.entries.length;
+    if(index === 5 || index === 6) return hasStructuredScript();
+    return false;
   }
 
   function canProceedNext(){
     if(state.activeStep >= refs.steps.length - 1) return false;
     if(state.activeStep === 0) return hasRoleDraft();
-    if(state.activeStep === 1) return !!state.entries.length || (!!state.sessionId && !!confirmedRoles().length);
-    return !!state.entries.length;
+    if(state.activeStep === 1) return !!confirmedRoles().length;
+    if(state.activeStep === 2) return !!state.entries.length || (!!state.sessionId && !!confirmedRoles().length);
+    if(state.activeStep === 3 || state.activeStep === 4) return !!state.entries.length;
+    if(state.activeStep === 5) return hasStructuredScript();
+    return false;
   }
 
   function goToStep(index){
@@ -661,6 +740,13 @@
     if(!canAccessStep(index)) return;
     state.activeStep = index;
     renderWizard();
+  }
+
+  function markSpeakerAssignmentDirty(){
+    if(state.entries.length){
+      state.speakerAssignmentDirty = true;
+      setNote(refs.globalStatus, 'Sprecherzuordnung neu ausführen: Rollen wurden geändert.');
+    }
   }
 
   function buildRoleFromLabel(label){
@@ -726,6 +812,8 @@
     state.entries = runtime.entries.map(entry => Object.assign({}, entry));
     state.roles = normalizeRoles(options.roleCandidates || runtime.roles);
     state.songs = normalizeSongs(options.songCandidates || runtime.songs);
+    state.speakerDiagnostics = options.speakerDiagnostics || data.speakerDiagnostics || null;
+    state.speakerAssignmentDirty = false;
     state.reviewRows = Array.isArray(options.reviewRows)
       ? options.reviewRows.map(row => Object.assign({}, row))
       : runtime.issues.map(row => Object.assign({}, row));
@@ -745,6 +833,8 @@
     state.entries = [];
     state.roles = normalizeRoles(payload.roleCandidates || []);
     state.songs = normalizeSongs(payload.songCandidates || []);
+    state.speakerDiagnostics = null;
+    state.speakerAssignmentDirty = false;
     state.reviewRows = Array.isArray(payload.reviewRows) ? payload.reviewRows.map(row => Object.assign({}, row)) : [];
     resetEntryPagination();
     setNote(refs.globalStatus, `Rollenvorschau geladen: ${state.roles.length} Vorschläge aus ${state.pages.length} Seiten.`, true);
@@ -783,7 +873,7 @@
       title,
       ocrMode: refs.ocrModeSelect?.value || 'auto',
       sourceName: file.name,
-      rolePages: normalize(refs.rolePagesInput?.value) || '1-5'
+      rolePages: normalize(refs.rolePagesInput?.value) || '1-10'
     });
     const originalLabel = refs.runPdfImportBtn.textContent;
     refs.runPdfImportBtn.disabled = true;
@@ -827,7 +917,7 @@
         body: JSON.stringify({
           sessionId: state.sessionId,
           mode,
-          pageRange: normalize(refs.rolePagesInput?.value) || '1-5',
+          pageRange: normalize(refs.rolePagesInput?.value) || '1-10',
           seedRoles: state.roles
         })
       });
@@ -849,18 +939,19 @@
     }
   }
 
-  async function restructureFromServer(nextStep){
+  async function restructureFromServer(nextStep, speakerMode = 'rules'){
     if(!state.sessionId){
       setNote(refs.globalStatus, 'Neuaufteilung ist nur nach PDF-Import verfügbar.');
       return;
     }
-    setNote(refs.globalStatus, 'Text wird mit bestätigten Figuren neu aufgeteilt.');
+    setNote(refs.globalStatus, speakerMode === 'llm-assisted' ? 'Sprecher werden mit LLM zugeordnet.' : 'Sprecher werden mit bestätigten Figuren regelbasiert zugeordnet.');
     try{
       const response = await fetch('./api/structure', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({
           sessionId: state.sessionId,
+          speakerMode,
           roles: state.roles,
           songs: state.songs,
           entries: state.entries.map(entry => ({
@@ -880,11 +971,13 @@
         roleCandidates: payload.roleCandidates,
         songCandidates: payload.songCandidates,
         reviewRows: payload.reviewRows,
+        speakerDiagnostics: payload.speakerDiagnostics || payload.script?.speakerDiagnostics,
         nextStep: nextStep == null ? state.activeStep : nextStep
       });
-      setNote(refs.globalStatus, 'Textaufteilung aktualisiert.', true);
+      state.speakerAssignmentDirty = false;
+      setNote(refs.globalStatus, 'Sprecherzuordnung aktualisiert.', true);
     }catch(error){
-      setNote(refs.globalStatus, `Neuaufteilung fehlgeschlagen: ${error.message || error}`);
+      setNote(refs.globalStatus, `Sprecherzuordnung fehlgeschlagen: ${error.message || error}`);
     }
   }
 
@@ -928,6 +1021,7 @@
       });
     }
     if(field === 'aliases') role.aliases = normalizeList(event.target.value);
+    if(field === 'confirmed' || field === 'label' || field === 'aliases') markSpeakerAssignmentDirty();
     if(event.type === 'input' && (field === 'label' || field === 'aliases')){
       updateSummary();
       return;
@@ -943,6 +1037,7 @@
     if(!role) return;
     if(action === 'remove'){
       state.roles = state.roles.filter(item => item.id !== role.id);
+      markSpeakerAssignmentDirty();
       state.entries.forEach(entry => {
         if(entry.speakerId === role.id){
           entry.speakerId = '';
@@ -962,6 +1057,7 @@
           }
         });
         state.roles = state.roles.filter(item => item.id !== role.id);
+        markSpeakerAssignmentDirty();
       }
     }
     renderWizard();
@@ -979,6 +1075,7 @@
     }
     role.id = id;
     state.roles.push(role);
+    markSpeakerAssignmentDirty();
     refs.newRoleInput.value = '';
     renderWizard();
   }
@@ -1041,15 +1138,16 @@
     refs.steps.forEach((step, index) => step.addEventListener('click', () => goToStep(index)));
     refs.prevStepBtn.addEventListener('click', () => goToStep(state.activeStep - 1));
     refs.nextStepBtn.addEventListener('click', async () => {
-      if(state.activeStep === 1 && !state.entries.length && state.sessionId){
-        await restructureFromServer(2);
+      if(state.activeStep === 2 && (!state.entries.length || state.speakerAssignmentDirty) && state.sessionId){
+        await restructureFromServer(3, 'rules');
         return;
       }
       goToStep(Math.min(state.activeStep + 1, refs.panels.length - 1));
     });
     refs.refreshBackendBtn.addEventListener('click', refreshBackendHealth);
     refs.runPdfImportBtn.addEventListener('click', runPdfImport);
-    refs.restructureBtn.addEventListener('click', () => restructureFromServer(state.entries.length ? state.activeStep : 2));
+    refs.assignRulesBtn.addEventListener('click', () => restructureFromServer(3, 'rules'));
+    refs.assignLlmBtn.addEventListener('click', () => restructureFromServer(3, 'llm-assisted'));
     refs.analyzeLocalRolesBtn.addEventListener('click', () => analyzeRoles('local'));
     refs.analyzeLlmRolesBtn.addEventListener('click', () => analyzeRoles('openai'));
     refs.addRoleBtn.addEventListener('click', addRole);

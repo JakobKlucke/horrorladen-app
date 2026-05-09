@@ -38,10 +38,11 @@
     <aside class="wizard-rail" aria-label="Import-Schritte">
       <button class="wizard-step active" type="button" data-step="0"><span>1</span>PDF</button>
       <button class="wizard-step" type="button" data-step="1"><span>2</span>Figuren</button>
-      <button class="wizard-step" type="button" data-step="2"><span>3</span>Text</button>
-      <button class="wizard-step" type="button" data-step="3"><span>4</span>Songs</button>
-      <button class="wizard-step" type="button" data-step="4"><span>5</span>Striche</button>
-      <button class="wizard-step" type="button" data-step="5"><span>6</span>Export</button>
+      <button class="wizard-step" type="button" data-step="2"><span>3</span>Sprecher</button>
+      <button class="wizard-step" type="button" data-step="3"><span>4</span>Text</button>
+      <button class="wizard-step" type="button" data-step="4"><span>5</span>Songs</button>
+      <button class="wizard-step" type="button" data-step="5"><span>6</span>Striche</button>
+      <button class="wizard-step" type="button" data-step="6"><span>7</span>Export</button>
     </aside>
 
     <section class="wizard-workspace">
@@ -76,7 +77,7 @@
             </div>
             <div>
               <label for="rolePagesInput">Figuren-Seiten</label>
-              <input id="rolePagesInput" type="text" value="1-5" placeholder="z. B. 1-5 oder 2,4">
+              <input id="rolePagesInput" type="text" value="1-10" placeholder="z. B. 1-10 oder 2,4">
             </div>
             <div class="cta">
               <button class="btn" id="runPdfImportBtn" type="button">PDF importieren</button>
@@ -108,7 +109,6 @@
           <div class="script-row">
             <button class="btn secondary" id="analyzeLocalRolesBtn" type="button">Rollen lokal erkennen</button>
             <button class="btn secondary" id="analyzeLlmRolesBtn" type="button">Rollen mit LLM erkennen</button>
-            <button class="btn secondary" id="restructureBtn" type="button">Neu aufteilen</button>
           </div>
         </div>
         <div class="panel wizard-card">
@@ -124,6 +124,22 @@
       <section class="wizard-panel" data-panel="2">
         <div class="wizard-panel__head">
           <div>
+            <h1>Sprecher zuordnen</h1>
+            <p class="faded">Das vollständige Textbuch wird den bestätigten Figuren zugeordnet.</p>
+          </div>
+          <div class="script-row">
+            <button class="btn secondary" id="assignRulesBtn" type="button">Mit Regeln zuordnen</button>
+            <button class="btn secondary" id="assignLlmBtn" type="button">Mit LLM zuordnen</button>
+          </div>
+        </div>
+        <div class="panel wizard-card">
+          <div class="speaker-summary" id="speakerDiagnostics"></div>
+        </div>
+      </section>
+
+      <section class="wizard-panel" data-panel="3">
+        <div class="wizard-panel__head">
+          <div>
             <h1>Textaufteilung prüfen</h1>
             <p class="faded">Sprecher und Zeilentypen pro Eintrag korrigieren.</p>
           </div>
@@ -137,7 +153,7 @@
         </div>
       </section>
 
-      <section class="wizard-panel" data-panel="3">
+      <section class="wizard-panel" data-panel="4">
         <div class="wizard-panel__head">
           <div>
             <h1>Songs pflegen</h1>
@@ -150,7 +166,7 @@
         <div class="song-grid" id="songsList"></div>
       </section>
 
-      <section class="wizard-panel" data-panel="4">
+      <section class="wizard-panel" data-panel="5">
         <div class="wizard-panel__head">
           <div>
             <h1>Striche setzen</h1>
@@ -178,7 +194,7 @@
         </div>
       </section>
 
-      <section class="wizard-panel" data-panel="5">
+      <section class="wizard-panel" data-panel="6">
         <div class="wizard-panel__head">
           <div>
             <h1>Export</h1>
