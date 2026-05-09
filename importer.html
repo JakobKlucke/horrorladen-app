@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Horrorladen – Import Studio</title>
+  <title>Horrorladen - Import Studio</title>
   <meta name="theme-color" content="#58CC02" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
@@ -23,7 +23,7 @@
         </div>
         <div>
           <div class="title">Import Studio</div>
-          <div class="badge">Review und Export für Skriptimporte</div>
+          <div class="badge">Skripterstellung</div>
         </div>
       </div>
       <div class="top-actions">
@@ -34,84 +34,167 @@
 </header>
 
 <main class="wrap importer-main">
-  <section class="home-hero">
-    <h1>Skript importieren und reviewen</h1>
-    <p>Diese Oberfläche kann PDF-Dateien direkt importieren, wenn der lokale Import-Server läuft. Alternativ kannst du bestehendes Skript-JSON und Review-CSV laden, offene Hinweise prüfen und aktualisierte Dateien exportieren.</p>
-  </section>
+  <section class="wizard-shell">
+    <aside class="wizard-rail" aria-label="Import-Schritte">
+      <button class="wizard-step active" type="button" data-step="0"><span>1</span>PDF</button>
+      <button class="wizard-step" type="button" data-step="1"><span>2</span>Figuren</button>
+      <button class="wizard-step" type="button" data-step="2"><span>3</span>Text</button>
+      <button class="wizard-step" type="button" data-step="3"><span>4</span>Songs</button>
+      <button class="wizard-step" type="button" data-step="4"><span>5</span>Striche</button>
+      <button class="wizard-step" type="button" data-step="5"><span>6</span>Export</button>
+    </aside>
 
-  <section class="panel importer-panel" style="display:grid;gap:1rem">
-    <div class="importer-panel__head">
-      <div>
-        <h2>PDF-Import</h2>
-        <p class="faded importer-panel__copy">Starte lokal <code>python3 tools/import_studio_server.py</code>, dann kannst du hier direkt eine PDF auswählen und den Import ohne Terminal-Wizard ausführen.</p>
-      </div>
-      <button class="btn secondary" id="refreshBackendBtn" type="button">Status prüfen</button>
-    </div>
-    <div class="controls importer-load importer-load--pdf">
-      <div>
-        <label for="pdfFileInput">PDF-Datei</label>
-        <input id="pdfFileInput" type="file" accept=".pdf,application/pdf">
-      </div>
-      <div>
-        <label for="pdfTitleInput">Titel</label>
-        <input id="pdfTitleInput" type="text" placeholder="Wird aus dem Dateinamen vorgeschlagen">
-      </div>
-      <div>
-        <label for="ocrModeSelect">OCR-Modus</label>
-        <select id="ocrModeSelect">
-          <option value="auto">Automatisch</option>
-          <option value="force">Für jede Seite erzwingen</option>
-          <option value="off">Nur eingebetteten PDF-Text nutzen</option>
-        </select>
-      </div>
-      <div class="cta">
-        <button class="btn" id="runPdfImportBtn" type="button">PDF importieren</button>
-      </div>
-    </div>
-    <div class="review-note" id="backendStatus">Backend noch nicht geprüft.</div>
-  </section>
+    <section class="wizard-workspace">
+      <div class="wizard-progress" aria-hidden="true"><i id="wizardProgress"></i></div>
+      <div class="review-note" id="globalStatus">Import Studio wird geladen.</div>
 
-  <section class="panel" style="display:grid;gap:1rem">
-    <div class="controls importer-load">
-      <div>
-        <label for="jsonFileInput">Skript-JSON</label>
-        <input id="jsonFileInput" type="file" accept=".json,application/json">
-      </div>
-      <div>
-        <label for="reviewFileInput">Review-CSV</label>
-        <input id="reviewFileInput" type="file" accept=".csv,text/csv">
-      </div>
-    </div>
-    <div class="script-row">
-      <button class="btn secondary" id="useEmbeddedIssuesBtn" disabled>JSON-Review verwenden</button>
-      <button class="btn secondary" id="downloadReviewBtn" disabled>Review CSV herunterladen</button>
-      <button class="btn" id="downloadJsonBtn" disabled>Finales JSON herunterladen</button>
-    </div>
-    <div class="review-note" id="studioStatus">Lade ein vorhandenes Skript-JSON oder öffne das Studio über die Haupt-App.</div>
-  </section>
-
-  <section class="home-section">
-    <h2>Übersicht</h2>
-    <div class="card-grid studio-grid" id="summaryGrid">
-      <article class="tile"><strong id="summaryTitle">—</strong></article>
-      <article class="tile"><strong id="summaryEntries">0 Einträge</strong></article>
-      <article class="tile"><strong id="summaryLearnable">0 lernbar</strong></article>
-      <article class="tile"><strong id="summaryIssues">0 Hinweise</strong></article>
-    </div>
-  </section>
-
-  <section class="home-section">
-    <h2>Review</h2>
-    <div class="review-shell">
-      <section class="panel review-list" id="reviewList"></section>
-      <section class="panel review-preview">
-        <div class="review-preview__head">
-          <h3 id="previewTitle">Keine Auswahl</h3>
-          <div class="faded" id="previewMeta">—</div>
+      <section class="wizard-panel active" data-panel="0">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>PDF laden</h1>
+            <p class="faded">Textbuch importieren und ersten Skriptentwurf erzeugen.</p>
+          </div>
+          <button class="btn secondary" id="refreshBackendBtn" type="button">Status prüfen</button>
         </div>
-        <div id="previewEntries" class="review-preview__entries"></div>
+        <div class="panel wizard-card">
+          <div class="controls importer-load importer-load--pdf">
+            <div>
+              <label for="pdfFileInput">PDF-Datei</label>
+              <input id="pdfFileInput" type="file" accept=".pdf,application/pdf">
+            </div>
+            <div>
+              <label for="pdfTitleInput">Titel</label>
+              <input id="pdfTitleInput" type="text" placeholder="Titel">
+            </div>
+            <div>
+              <label for="ocrModeSelect">OCR-Modus</label>
+              <select id="ocrModeSelect">
+                <option value="auto">Automatisch</option>
+                <option value="force">Für jede Seite erzwingen</option>
+                <option value="off">Nur PDF-Text</option>
+              </select>
+            </div>
+            <div class="cta">
+              <button class="btn" id="runPdfImportBtn" type="button">PDF importieren</button>
+            </div>
+          </div>
+          <div class="review-note" id="backendStatus">Backend noch nicht geprüft.</div>
+        </div>
+        <div class="panel wizard-card">
+          <div class="controls importer-load">
+            <div>
+              <label for="jsonFileInput">Vorhandenes Skript-JSON</label>
+              <input id="jsonFileInput" type="file" accept=".json,application/json">
+            </div>
+            <div>
+              <label for="reviewFileInput">Review-CSV</label>
+              <input id="reviewFileInput" type="file" accept=".csv,text/csv">
+            </div>
+          </div>
+        </div>
       </section>
-    </div>
+
+      <section class="wizard-panel" data-panel="1">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>Figuren bestätigen</h1>
+            <p class="faded">Bestätigte Figuren steuern die Sprechererkennung.</p>
+          </div>
+          <button class="btn secondary" id="restructureBtn" type="button">Neu aufteilen</button>
+        </div>
+        <div class="panel wizard-card">
+          <div class="script-row">
+            <input id="newRoleInput" type="text" placeholder="Neue Figur">
+            <button class="btn secondary" id="addRoleBtn" type="button">Hinzufügen</button>
+          </div>
+          <div class="role-table" id="rolesList"></div>
+        </div>
+      </section>
+
+      <section class="wizard-panel" data-panel="2">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>Textaufteilung prüfen</h1>
+            <p class="faded">Sprecher und Zeilentypen pro Eintrag korrigieren.</p>
+          </div>
+          <div class="script-row">
+            <select id="structureSceneFilter"></select>
+            <select id="structureSpeakerFilter"></select>
+          </div>
+        </div>
+        <div class="panel wizard-card">
+          <div class="structure-table" id="structureTable"></div>
+        </div>
+      </section>
+
+      <section class="wizard-panel" data-panel="3">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>Songs pflegen</h1>
+            <p class="faded">Nummer, Titel und Sänger pro Song festlegen.</p>
+          </div>
+          <div class="script-row">
+            <select id="songSceneFilter"></select>
+          </div>
+        </div>
+        <div class="song-grid" id="songsList"></div>
+      </section>
+
+      <section class="wizard-panel" data-panel="4">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>Striche setzen</h1>
+            <p class="faded">Original bleibt erhalten; die Strichfassung blendet gestrichene Zeilen aus.</p>
+          </div>
+          <div class="script-row">
+            <select id="cutSceneFilter"></select>
+            <select id="cutSongFilter"></select>
+            <select id="cutSpeakerFilter"></select>
+          </div>
+        </div>
+        <div class="cut-compare">
+          <section class="panel cut-column">
+            <h2>Original</h2>
+            <div id="originalColumn"></div>
+          </section>
+          <section class="panel cut-column">
+            <h2>Strichfassung</h2>
+            <label class="checkbox-container cut-toggle">
+              <input id="showCutInFinalToggle" class="custom-checkbox" type="checkbox">
+              <span>Gestrichene Zeilen anzeigen</span>
+            </label>
+            <div id="cutColumn"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="wizard-panel" data-panel="5">
+        <div class="wizard-panel__head">
+          <div>
+            <h1>Export</h1>
+            <p class="faded">Finales Lernskript und technische Review-Datei herunterladen.</p>
+          </div>
+        </div>
+        <div class="card-grid studio-grid" id="summaryGrid">
+          <article class="tile"><strong id="summaryTitle">-</strong></article>
+          <article class="tile"><strong id="summaryEntries">0 Einträge</strong></article>
+          <article class="tile"><strong id="summaryLearnable">0 lernbar</strong></article>
+          <article class="tile"><strong id="summaryIssues">0 Hinweise</strong></article>
+        </div>
+        <div class="panel wizard-card">
+          <div class="script-row">
+            <button class="btn secondary" id="downloadReviewBtn" disabled>Review CSV herunterladen</button>
+            <button class="btn" id="downloadJsonBtn" disabled>Finales JSON herunterladen</button>
+          </div>
+          <div class="review-note" id="exportStatus">Noch kein Skript geladen.</div>
+        </div>
+      </section>
+
+      <nav class="wizard-nav">
+        <button class="btn secondary" id="prevStepBtn" type="button">Zurück</button>
+        <button class="btn" id="nextStepBtn" type="button">Weiter</button>
+      </nav>
+    </section>
   </section>
 </main>
 

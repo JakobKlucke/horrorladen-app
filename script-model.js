@@ -39,6 +39,20 @@
       .trim();
   }
 
+  function normalizeStringList(value){
+    const values = Array.isArray(value) ? value : String(value || '').split(',');
+    const seen = new Set();
+    const out = [];
+    values.forEach(item => {
+      const clean = normalizeWhitespace(item);
+      const key = clean.toUpperCase();
+      if(!clean || seen.has(key)) return;
+      seen.add(key);
+      out.push(clean);
+    });
+    return out;
+  }
+
   function lowerType(value){
     return String((value && value.type) || '').trim().toLowerCase();
   }
@@ -163,7 +177,8 @@
       if(!cleanLabel && !requestedId) return { id:'', label:'' };
       const item = {
         id: requestedId || roleIdFactory(cleanLabel || 'role'),
-        label: cleanLabel || requestedId
+        label: cleanLabel || requestedId,
+        aliases: []
       };
       roles.push(item);
       rolesById.set(item.id, item);
@@ -273,7 +288,7 @@
 
     function snapshot(){
       return {
-        roles: roles.map(item => ({ id:item.id, label:item.label })),
+        roles: roles.map(item => ({ id:item.id, label:item.label, aliases:normalizeStringList(item.aliases) })),
         acts: acts.map(item => ({ id:item.id, label:item.label })),
         scenes: scenes.map(item => ({ id:item.id, label:item.label, actId:item.actId || '' })),
         songs: songs.map(item => ({
@@ -282,7 +297,8 @@
           number:item.number || '',
           title:item.title || '',
           actId:item.actId || '',
-          sceneId:item.sceneId || ''
+          sceneId:item.sceneId || '',
+          singerIds: normalizeStringList(item.singerIds)
         }))
       };
     }
@@ -308,7 +324,8 @@
           id:song.id,
           label:song.label,
           number:song.number || '',
-          title:song.title || ''
+          title:song.title || '',
+          singerIds: normalizeStringList(song.singerIds)
         });
       }
     });
@@ -376,11 +393,13 @@
     });
 
     entries.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-    const snapshot = builder.snapshot();
+    const snapshot = mergeCatalogMetadata(builder.snapshot(), data);
     return {
       schemaVersion: CANONICAL_VERSION,
       title: firstString([data && data.title, data && data.name, 'Unbenanntes Skript']),
       sourceFormat: firstString([data && data.sourceFormat, 'canonical']),
+      sourceFile: firstString([data && data.sourceFile]),
+      pages: asArray(data && data.pages).map(page => Object.assign({}, page)),
       entries,
       roles: snapshot.roles,
       acts: buildActsTree(snapshot.acts, snapshot.scenes, snapshot.songs),
@@ -388,6 +407,65 @@
       songs: snapshot.songs,
       issues: asArray(data && data.issues).map(issue => Object.assign({}, issue))
     };
+  }
+
+  function mergeCatalogMetadata(snapshot, data){
+    const sourceRoles = asArray(data && data.roles);
+    const sourceSongs = asArray(data && data.songs);
+    const rolesById = new Map(snapshot.roles.map(role => [role.id, role]));
+    const rolesByLabel = new Map(snapshot.roles.map(role => [String(role.label || '').toUpperCase(), role]));
+    sourceRoles.forEach(raw => {
+      if(!isObject(raw)) return;
+      const id = firstString([raw.id, raw.roleId]);
+      const label = firstString([raw.label, raw.name, raw.speaker]);
+      const aliases = normalizeStringList(raw.aliases);
+      let role = (id && rolesById.get(id)) || (label && rolesByLabel.get(label.toUpperCase()));
+      if(!role && (id || label)){
+        role = { id:id || `role-${slugify(label)}`, label:label || id, aliases:[] };
+        snapshot.roles.push(role);
+      }
+      if(!role) return;
+      if(id) role.id = id;
+      if(label) role.label = label;
+      role.aliases = normalizeStringList([...(role.aliases || []), ...aliases]);
+      rolesById.set(role.id, role);
+      rolesByLabel.set(String(role.label || '').toUpperCase(), role);
+    });
+
+    const songsById = new Map(snapshot.songs.map(song => [song.id, song]));
+    const songsByKey = new Map(snapshot.songs.map(song => [`${song.number || ''}::${song.title || song.label || ''}`.toUpperCase(), song]));
+    sourceSongs.forEach(raw => {
+      if(!isObject(raw)) return;
+      const id = firstString([raw.id, raw.songId]);
+      const number = firstString([raw.number, raw.songNumber]);
+      const title = firstString([raw.title, raw.songTitle, raw.name]);
+      const label = firstString([raw.label, raw.songLabel, formatSongLabel({ songNumber:number, songTitle:title })]);
+      const key = `${number || ''}::${title || label || ''}`.toUpperCase();
+      let song = (id && songsById.get(id)) || (key && songsByKey.get(key));
+      if(!song && (id || number || title || label)){
+        song = {
+          id:id || `song-${slugify(number || title || label)}`,
+          label:label || title || id,
+          number,
+          title:title || label,
+          actId:firstString([raw.actId]),
+          sceneId:firstString([raw.sceneId]),
+          singerIds:[]
+        };
+        snapshot.songs.push(song);
+      }
+      if(!song) return;
+      if(id) song.id = id;
+      if(number) song.number = number;
+      if(title) song.title = title;
+      if(label) song.label = label;
+      if(firstString([raw.actId])) song.actId = firstString([raw.actId]);
+      if(firstString([raw.sceneId])) song.sceneId = firstString([raw.sceneId]);
+      song.singerIds = normalizeStringList(raw.singerIds);
+      songsById.set(song.id, song);
+      songsByKey.set(`${song.number || ''}::${song.title || song.label || ''}`.toUpperCase(), song);
+    });
+    return snapshot;
   }
 
   function normalizeLegacyScript(data){
@@ -507,6 +585,8 @@
       schemaVersion: CANONICAL_VERSION,
       title: firstString([data && data.title, data && data.name, 'Unbenanntes Skript']),
       sourceFormat: 'legacy',
+      sourceFile: firstString([data && data.sourceFile]),
+      pages: asArray(data && data.pages).map(page => Object.assign({}, page)),
       entries,
       roles: snapshot.roles,
       acts: buildActsTree(snapshot.acts, snapshot.scenes, snapshot.songs),
@@ -542,7 +622,8 @@
           id: song.id,
           label: song.label,
           number: song.number || '',
-          title: song.title || ''
+          title: song.title || '',
+          singerIds: normalizeStringList(song.singerIds)
         }))
       }))
     }));
@@ -744,6 +825,10 @@
       schemaVersion: CANONICAL_VERSION,
       title: base.title,
       sourceFormat: base.sourceFormat || 'canonical',
+      sourceFile: base.sourceFile || '',
+      pages: asArray(base.pages).map(page => Object.assign({}, page)),
+      roles: base.roles,
+      songs: base.songs,
       entries: nextEntries,
       issues: nextRows
     });
@@ -763,6 +848,7 @@
     getLyricBlockContext,
     sameLyricBlock,
     normalizeIssueStatus,
+    normalizeStringList,
     isPendingIssue,
     countPendingIssues,
     applyReviewRows
