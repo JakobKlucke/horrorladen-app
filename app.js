@@ -14,6 +14,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supa = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
+const ScriptModel = window.ScriptModel;
 
 function normalizeScriptPath(p){
   if (!p) return p;
@@ -74,9 +75,9 @@ if(reduceMotion==null){ reduceMotion=false; localStorage.setItem(LS.motion,'0');
 else reduceMotion = reduceMotion==='1';
 
 const state={
-  items:[], roles:[],
-  actsList:[], scenesByAct:{},
-  songsSet:new Set(),
+  canonical:null, runtime:null,
+  entries:[], items:[], roles:[],
+  acts:[], scenes:[], songs:[],
   // Learn
   pageIndex:0, pageSizeClassic:8, pageSizeSingle:1, lastFiltered:[],
   // Viewer
@@ -114,13 +115,15 @@ document.addEventListener('pointerdown', (e)=>{
 });
 
 /* =================== Parser =================== */
-const scanTitleLike=o=>{ if(!o||typeof o!=='object') return null; for(const k of ['title','name','label','id']) if(typeof o[k]==='string'&&o[k].trim()) return o[k].trim(); return null; };
-const normalizeTitle=v=> typeof v==='string'?v:(typeof v==='number'?String(v):(v&&typeof v==='object'?(scanTitleLike(v)||''):''));
-
-function isFullScript(data){
+function looksLikeScriptData(data){
   if(!data) return false;
-  if(Array.isArray(data)) return data.some(n=>typeof n==='object' && (n.type||'')==='speaker_block') || data.some(n=>n&&n.acts) || data.some(n=>n.children||n.segments||n.items);
-  if(typeof data==='object') return !!(data.acts || data.segments || data.children || data.items);
+  if(ScriptModel && ScriptModel.isCanonicalScript(data)) return true;
+  if(Array.isArray(data)){
+    return data.some(node=>node&&typeof node==='object'&&(node.type||node.speaker||node.act||node.scene||node.song||node.content));
+  }
+  if(typeof data==='object'){
+    return !!(data.entries || data.acts || data.segments || data.children || data.items);
+  }
   return false;
 }
 
@@ -146,25 +149,46 @@ function parseScriptsJson(data){
   return out;
 }
 
-function flattenAny(node,ctx={act:null,scene:null,song:null},out=[],meta){
-  if(!node||typeof node!=='object') return;
-  const t=(node.type||'').toLowerCase();
-  if(t==='act' || 'act' in node){ const a=normalizeTitle('act' in node?node.act:node); if(a) ctx={...ctx,act:a}; }
-  if(t==='scene' || 'scene' in node){ const s=normalizeTitle('scene' in node?node.scene:node); if(s) ctx={...ctx,scene:s}; }
-  if(t==='song' || 'song' in node){ const sg=normalizeTitle('song' in node?node.song:node); if(sg) ctx={...ctx,song:sg}; }
-  if(t==='speaker_block' && node.speaker){
-    const content=Array.isArray(node.content)?node.content:[];
-    content.forEach(c=>{
-      if(!c||!c.type) return; const ty=String(c.type).toLowerCase();
-      if(ty==='line' || ty==='lyric'){
-        const text=(c.text||'').trim(); if(!text) return;
-        out.push({type:'dialogue', speaker:node.speaker, text, kind:ty, meta:{...ctx}});
-        meta.roles.add(norm(node.speaker)); if(ctx.song) meta.songs.add(ctx.song);
-      }
-    });
-  }
-  const kids=[].concat(node.segments||[], node.children||[], node.parts||[], node.items||[], Array.isArray(node)?node:[]);
-  kids.forEach(ch=>flattenAny(ch,ctx,out,meta));
+function setSelectOptions(sel,options,{placeholder='Alle',preserveValue=''}={}){
+  if(!sel) return '';
+  const safeOptions=Array.isArray(options)?options:[];
+  const currentValue=preserveValue || sel.value || '';
+  sel.innerHTML=[`<option value="">${placeholder}</option>`]
+    .concat(safeOptions.map(item=>`<option value="${item.value}">${item.label}</option>`))
+    .join('');
+  const found=safeOptions.find(item=>item.value===currentValue);
+  sel.value = found ? found.value : '';
+  return sel.value;
+}
+
+function getFilterState(useViewer=false){
+  return {
+    role: useViewer ? '' : (roleSel?.value||''),
+    actId: useViewer ? (actSelV?.value||'') : (actSel?.value||''),
+    sceneId: useViewer ? (sceneSelV?.value||'') : (sceneSel?.value||''),
+    songId: useViewer ? (songSelV?.value||'') : (songSel?.value||''),
+    lyricsOnly: useViewer ? !!(lyricsOnlyV&&lyricsOnlyV.checked) : !!(lyricsOnly&&lyricsOnly.checked)
+  };
+}
+
+function syncScopedFilters(useViewer=false){
+  if(!state.runtime) return;
+  const actSelect = useViewer ? actSelV : actSel;
+  const sceneSelect = useViewer ? sceneSelV : sceneSel;
+  const songSelect = useViewer ? songSelV : songSel;
+  const actId = actSelect?.value || '';
+  const prevScene = sceneSelect?.value || '';
+  const prevSong = songSelect?.value || '';
+  const scenes = ScriptModel.getScenesForAct(state.runtime, actId).map(scene=>({
+    value: scene.id,
+    label: scene.label
+  }));
+  const sceneId = setSelectOptions(sceneSelect, scenes, { preserveValue: prevScene });
+  const songs = ScriptModel.getSongsForFilters(state.runtime, { actId, sceneId }).map(song=>({
+    value: song.id,
+    label: ScriptModel.formatSongLabel(song) || song.label
+  }));
+  setSelectOptions(songSelect, songs, { preserveValue: prevSong });
 }
 
 /* =================== DOM Refs =================== */
@@ -176,6 +200,10 @@ const manualToggle=document.getElementById('manualToggle');
 const scriptInput=document.getElementById('scriptInput');
 const loadScriptBtn=document.getElementById('loadScriptBtn');
 const currentScriptLabel=document.getElementById('currentScriptLabel');
+const reviewNotice=document.getElementById('reviewNotice');
+const reviewSettingsNote=document.getElementById('reviewSettingsNote');
+const importStudioLinkHome=document.getElementById('importStudioLinkHome');
+const importStudioLinkSettings=document.getElementById('importStudioLinkSettings');
 const playerNameInput=document.getElementById('playerName');
 const saveSettingsBtn=document.getElementById('saveSettings');
 const sfxToggle=document.getElementById('sfxToggle');
@@ -249,15 +277,36 @@ async function loadScriptsIndex(){
 function updateScriptLabels(){
   if(jsonLabel) jsonLabel.textContent = jsonSrc || '—';
   if(currentScriptLabel) currentScriptLabel.textContent = jsonSrc || '—';
+  const target = `./importer.html?src=${encodeURIComponent(jsonSrc || '')}`;
+  if(importStudioLinkHome) importStudioLinkHome.href = target;
+  if(importStudioLinkSettings) importStudioLinkSettings.href = target;
+}
+
+function updateReviewNotes(){
+  const issues = state.runtime?.issues || [];
+  const pending = ScriptModel.countPendingIssues(issues);
+  const total = Array.isArray(issues) ? issues.length : 0;
+  const hasReviewData = total > 0;
+  const message = !hasReviewData
+    ? ''
+    : pending > 0
+      ? `Dieses Skript hat ${pending} offene Review-Hinweise. Prüfe sie im Import Studio.`
+      : `Dieses Skript hat ${total} Review-Einträge und aktuell keine offenen Hinweise.`;
+  [reviewNotice, reviewSettingsNote].forEach(node=>{
+    if(!node) return;
+    node.hidden = !hasReviewData;
+    node.textContent = message;
+    node.classList.toggle('review-note--ok', hasReviewData && pending === 0);
+  });
 }
 
 function updateScriptStats(){
   if(!scriptStats) return;
-  if(!state.items.length){
+  if(!state.runtime){
     scriptStats.textContent = 'Skript: —';
     return;
   }
-  scriptStats.textContent = `Skript: ${state.items.length} Zeilen · ${state.roles.length} Rollen · ${state.actsList.length} Akte · ${state.songsSet.size} Songs`;
+  scriptStats.textContent = `Skript: ${state.items.length} Zeilen · ${state.roles.length} Rollen · ${state.acts.length} Akte · ${state.songs.length} Songs`;
 }
 
 function applySfxSetting(){
@@ -299,32 +348,25 @@ async function loadJSON(){
   }
 
   const maybeIndex=parseScriptsJson(data);
-  if(maybeIndex.length && !isFullScript(data)){
+  if(maybeIndex.length && !looksLikeScriptData(data)){
     jsonSrc=normalizeScriptPath(maybeIndex[0].value);
     localStorage.setItem(LS.src,jsonSrc);
     return loadJSON();
   }
 
-  const out=[]; const meta={roles:new Set(), songs:new Set()};
-  Array.isArray(data) ? flattenAny({segments:data},{},out,meta)
-                      : flattenAny(data,{},out,meta);
-
-  state.items=out;
-  state.roles=[...meta.roles];
-  state.songsSet=new Set([...meta.songs].map(normalizeTitle).filter(Boolean).sort((a,b)=>a.localeCompare(b)));
-
-  state.actsList=[]; state.scenesByAct={};
-  if(data && Array.isArray(data.acts)){
-    data.acts.forEach(act=>{
-      const a=normalizeTitle(act); if(!a) return;
-      state.actsList.push(a);
-      state.scenesByAct[a]=(Array.isArray(act.scenes)?act.scenes:[])
-        .map(s=>normalizeTitle(s)).filter(Boolean);
-    });
-  }
+  const runtime = ScriptModel.buildRuntimeModel(data);
+  state.canonical = runtime.canonical;
+  state.runtime = runtime;
+  state.entries = runtime.entries.slice();
+  state.items = runtime.learnableEntries.slice();
+  state.roles = runtime.roles.map(role=>role.label).filter(Boolean);
+  state.acts = runtime.acts.map(act=>({ id:act.id, label:act.label }));
+  state.scenes = runtime.scenes.slice();
+  state.songs = runtime.songs.slice();
 
   populateFilters();
   updateScriptStats();
+  updateReviewNotes();
 }
 
 /* =================== Errorbox =================== */
@@ -407,21 +449,28 @@ if (brand){
 
 
 /* =================== Filter & Learn =================== */
-function fillSongs(sel){ if(!sel) return; sel.innerHTML='<option value="">Alle</option>'+[...state.songsSet].map(s=>`<option>${s}</option>`).join(''); }
-
 function populateFilters(){
-  const roleOpts=state.roles.map(r=>`<option>${r}</option>`).join('');
-  if(roleSel) roleSel.innerHTML=roleOpts;
-  if(viewerRoleSel){ viewerRoleSel.innerHTML=roleOpts; state.viewerHighlightRole=viewerRoleSel.value||''; }
-  if(roleSurv) roleSurv.innerHTML=roleOpts;
+  const roleOptions = state.roles.map(role=>({ value:role, label:role }));
+  if(roleSel){
+    const previous = roleSel.value;
+    roleSel.innerHTML = roleOptions.map(role=>`<option value="${role.value}">${role.label}</option>`).join('');
+    roleSel.value = roleOptions.some(role=>role.value===previous) ? previous : (roleOptions[0]?.value || '');
+  }
+  if(viewerRoleSel){
+    setSelectOptions(viewerRoleSel, roleOptions, { placeholder:'Keine Hervorhebung', preserveValue: viewerRoleSel.value });
+    state.viewerHighlightRole = viewerRoleSel.value || '';
+  }
+  if(roleSurv){
+    const previous = roleSurv.value;
+    roleSurv.innerHTML = roleOptions.map(role=>`<option value="${role.value}">${role.label}</option>`).join('');
+    roleSurv.value = roleOptions.some(role=>role.value===previous) ? previous : (roleOptions[0]?.value || '');
+  }
 
-  const fillActs=sel=>{ if(!sel) return; sel.innerHTML='<option value="">Alle</option>'+state.actsList.map(a=>`<option>${a}</option>`).join(''); };
-  fillActs(actSel); fillActs(actSelV);
-
-  const refreshScenes=(act,sel)=>{ if(!sel) return; const list=act?(state.scenesByAct[act]||[]):Object.values(state.scenesByAct).flat(); sel.innerHTML='<option value="">Alle</option>'+list.map(s=>`<option>${s}</option>`).join(''); };
-  refreshScenes('',sceneSel); refreshScenes('',sceneSelV);
-
-  fillSongs(songSel); fillSongs(songSelV);
+  const actOptions = state.acts.map(act=>({ value:act.id, label:act.label }));
+  setSelectOptions(actSel, actOptions, { preserveValue: actSel?.value || '' });
+  setSelectOptions(actSelV, actOptions, { preserveValue: actSelV?.value || '' });
+  syncScopedFilters(false);
+  syncScopedFilters(true);
 
   renderViewer();
   markLearnDirty();
@@ -433,6 +482,8 @@ function markLearnDirty(){
   startLearnBtn.classList.add('pulse');
 }
 [actSel,sceneSel,songSel,lyricsOnly,roleSel,modeSel].filter(Boolean).forEach(e=>e.addEventListener('change',()=>{ state.pageIndex=0; markLearnDirty(); }));
+if(actSel) actSel.addEventListener('change', ()=>{ syncScopedFilters(false); markLearnDirty(); });
+if(sceneSel) sceneSel.addEventListener('change', ()=>{ syncScopedFilters(false); markLearnDirty(); });
 if(modeSel){
   const savedMode = localStorage.getItem(LS.lastMode);
   if(savedMode) modeSel.value = savedMode;
@@ -440,32 +491,29 @@ if(modeSel){
 }
 
 function applyFilters(items,{byRole=true,useViewer=false,roleOverride=null}={}){
-  const role = roleOverride || (byRole && roleSel ? roleSel.value : '');
-  const act  = useViewer?(actSelV?.value||''):(actSel?.value||'');
-  const scene= useViewer?(sceneSelV?.value||''):(sceneSel?.value||'');
-  const song = useViewer?(songSelV?.value||''):(songSel?.value||'');
-  const lyr  = useViewer?!!(lyricsOnlyV&&lyricsOnlyV.checked):!!(lyricsOnly&&lyricsOnly.checked);
-
-  return items.filter(it=>{
-    if(byRole){
-      const sp=treatSpeaker(it.speaker);
-      if(!sp || sp==='__IGNORE__') return false;
-      if(sp!=='ALLE' && sp!==norm(role)) return false;
-    }
-    if(act  && (it.meta?.act||'')   !== act)   return false;
-    if(scene&& (it.meta?.scene||'') !== scene) return false;
-    if(song && (it.meta?.song||'')  !== song)  return false;
-    if(lyr  && it.kind!=='lyric')             return false;
-    return true;
+  const filters = getFilterState(useViewer);
+  const role = roleOverride || (byRole ? filters.role : '');
+  return ScriptModel.filterLearnableEntries(items, {
+    role,
+    actId: filters.actId,
+    sceneId: filters.sceneId,
+    songId: filters.songId,
+    lyricsOnly: filters.lyricsOnly,
+    normalizeSpeaker: treatSpeaker
+  }).filter(line=>{
+    if(!byRole) return true;
+    const speaker=treatSpeaker(line.speaker);
+    return !!speaker && speaker!=='__IGNORE__';
   });
 }
 
 function getContextForLine(line,fullSeq,myRoleUC,onlySameSong){
-  const idx=fullSeq.findIndex(x=>norm(x.speaker)===norm(line.speaker)&&x.text===line.text&&(x.meta?.act||'')===(line.meta?.act||'')&&(x.meta?.scene||'')===(line.meta?.scene||'')&&(x.meta?.song||'')===(line.meta?.song||'')); 
-  if(idx<0) return {prev:null,next:null};
-  let prev=null; for(let i=idx-1;i>=0;i--){ const okRole=norm(fullSeq[i].speaker)!==myRoleUC; const okSong=!onlySameSong||(fullSeq[i].meta?.song||'')===(line.meta?.song||''); if(okRole&&okSong){ prev=fullSeq[i]; break; } }
-  let next=null; for(let i=idx+1;i<fullSeq.length;i++){ const okRole=norm(fullSeq[i].speaker)!==myRoleUC; const okSong=!onlySameSong||(fullSeq[i].meta?.song||'')===(line.meta?.song||''); if(okRole&&okSong){ next=fullSeq[i]; break; } }
-  return {prev,next};
+  const role = myRoleUC === 'ALLE' ? 'DIE ANDEREN' : (myRoleUC||'');
+  return ScriptModel.getContextForEntry(fullSeq, line.id, {
+    role,
+    onlySameSong,
+    normalizeSpeaker: treatSpeaker
+  });
 }
 
 /* Cloze Helper: max. 2 Lücken */
@@ -512,38 +560,6 @@ function renderLearnPage(){
   const fullSeq   = applyFilters(state.items,{byRole:false}); // gesamte gefilterte Abfolge
   const sameSongSelected = !!(songSel && songSel.value);
 
-  // --- helpers ---
-  const sameSongLyric = (a,b)=>{
-    if(!a||!b) return false;
-    return (a.kind==='lyric' && b.kind==='lyric' &&
-      (a.meta?.song||'')  === (b.meta?.song||'') &&
-      (a.meta?.scene||'') === (b.meta?.scene||'') &&
-      (a.meta?.act||'')   === (b.meta?.act||''));
-  };
-  const eqLine = (a,b)=> a && b &&
-    norm(a.speaker)===norm(b.speaker) &&
-    a.text===b.text &&
-    (a.meta?.song||'')===(b.meta?.song||'') &&
-    (a.meta?.scene||'')===(b.meta?.scene||'') &&
-    (a.meta?.act||'')===(b.meta?.act||'');
-
-  const idxInFull = (line)=> fullSeq.findIndex(x=> x===line || eqLine(x,line));
-
-  const isGlobalBlockStart = (line)=>{
-    const i = idxInFull(line);
-    return (i<=0) || !sameSongLyric(fullSeq[i-1], line);
-  };
-  const isGlobalBlockEnd = (line)=>{
-    const i = idxInFull(line);
-    return (i>=fullSeq.length-1) || !sameSongLyric(fullSeq[i+1], line);
-  };
-  const prevAfterGlobalBlock = (line)=>{
-    const i = idxInFull(line);
-    let s=i; while(s>0 && sameSongLyric(fullSeq[s-1], line)) s--;
-    let e=i; while(e+1<fullSeq.length && sameSongLyric(fullSeq[e+1], line)) e++;
-    return { prev: fullSeq[s-1] || null, next: fullSeq[e+1] || null, startIdx:s, endIdx:e };
-  };
-
   if(mode==='classic'){
     // wir iterieren manuell, um Lyrics-Blocks am Stück zu rendern
     for(let k=0; k<slice.length; k++){
@@ -552,14 +568,17 @@ function renderLearnPage(){
       if(line.kind==='lyric'){
         // block im aktuellen Slice (zusammenhängende lyrics mit gleichem song)
         let blockStart = k, blockEnd = k;
-        while(blockEnd+1<slice.length && sameSongLyric(slice[blockEnd+1], line)) blockEnd++;
+        while(blockEnd+1<slice.length && ScriptModel.sameLyricBlock(slice[blockEnd+1], line)) blockEnd++;
 
         const box = el('div',{class:'exchange'});
 
         // Kontext nur am echten Block-Anfang/Ende der GLOBALEN Sequenz
-        const {prev, next} = prevAfterGlobalBlock(line);
-        const showPrev = isGlobalBlockStart(line);
-        const showNext = isGlobalBlockEnd(slice[blockEnd]);
+        const blockInfo = ScriptModel.getLyricBlockContext(fullSeq, line.id);
+        const blockEndInfo = ScriptModel.getLyricBlockContext(fullSeq, slice[blockEnd].id);
+        const showPrev = blockInfo.startIndex >= 0 && blockInfo.startIndex === blockInfo.index;
+        const showNext = blockEndInfo.endIndex >= 0 && blockEndInfo.endIndex === blockEndInfo.index;
+        const prev = blockInfo.prev;
+        const next = blockEndInfo.next;
 
         if(showPrev && prev && norm(prev.speaker)!==myRoleUC){
           box.appendChild(el('div',{class:'faded'}, `${prev.speaker}: ${prev.text}`));
@@ -615,10 +634,10 @@ function renderLearnPage(){
 
     let showPrev=false, showNext=false, prev=null, next=null;
     if(line.kind==='lyric'){
-      const info = prevAfterGlobalBlock(line);
+      const info = ScriptModel.getLyricBlockContext(fullSeq, line.id);
       prev = info.prev; next = info.next;
-      showPrev = isGlobalBlockStart(line);
-      showNext = isGlobalBlockEnd(line);
+      showPrev = info.startIndex >= 0 && info.startIndex === info.index;
+      showNext = info.endIndex >= 0 && info.endIndex === info.index;
     }else{
       const ctx = getContextForLine(line, fullSeq, myRoleUC, sameSongSelected);
       prev = ctx.prev; next = ctx.next;
@@ -693,6 +712,8 @@ function renderViewerPage(){
   if(viewerProg) viewerProg.style.width=`${((state.viewerIndex+1)/pages)*100}%`;
 }
 [actSelV,sceneSelV,songSelV,lyricsOnlyV].filter(Boolean).forEach(e=>e.addEventListener('change',()=>{ state.viewerIndex=0; renderViewer(); }));
+if(actSelV) actSelV.addEventListener('change', ()=>{ syncScopedFilters(true); state.viewerIndex=0; renderViewer(); });
+if(sceneSelV) sceneSelV.addEventListener('change', ()=>{ syncScopedFilters(true); state.viewerIndex=0; renderViewer(); });
 if(viewerRoleSel) viewerRoleSel.addEventListener('change',()=>{ state.viewerHighlightRole=viewerRoleSel.value||''; renderViewerPage(); });
 if(viewerPrev) viewerPrev.onclick=()=>{ state.viewerIndex--; renderViewerPage(); };
 if(viewerNext) viewerNext.onclick=()=>{ state.viewerIndex++; renderViewerPage(); };
@@ -910,6 +931,10 @@ if(scriptContinue){
 
 /* =================== Boot =================== */
 async function boot(){
+  if(!ScriptModel){
+    showError('Script-Modul fehlt', 'script-model.js konnte nicht geladen werden.');
+    return;
+  }
   applySfxSetting();
   applyMotionSetting();
   await loadScriptsIndex();

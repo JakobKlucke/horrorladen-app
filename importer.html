@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Horrorladen – Import Studio</title>
+  <meta name="theme-color" content="#58CC02" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="show-home">
+<header id="hdr">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#8EE000"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <path d="M10 44C20 52 44 52 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="title">Import Studio</div>
+          <div class="badge">Review und Export für Skriptimporte</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a class="btn secondary" href="./index.html">Zur Lernapp</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap importer-main">
+  <section class="home-hero">
+    <h1>Skript importieren und reviewen</h1>
+    <p>PDF-Rohimport läuft weiter über <code>tools/import_script.py</code>. Diese Oberfläche lädt Skript-JSON und Review-CSV, zeigt offene Hinweise und exportiert aktualisierte Dateien.</p>
+  </section>
+
+  <section class="panel" style="display:grid;gap:1rem">
+    <div class="controls importer-load">
+      <div>
+        <label for="jsonFileInput">Skript-JSON</label>
+        <input id="jsonFileInput" type="file" accept=".json,application/json">
+      </div>
+      <div>
+        <label for="reviewFileInput">Review-CSV</label>
+        <input id="reviewFileInput" type="file" accept=".csv,text/csv">
+      </div>
+    </div>
+    <div class="script-row">
+      <button class="btn secondary" id="useEmbeddedIssuesBtn" disabled>JSON-Review verwenden</button>
+      <button class="btn secondary" id="downloadReviewBtn" disabled>Review CSV herunterladen</button>
+      <button class="btn" id="downloadJsonBtn" disabled>Finales JSON herunterladen</button>
+    </div>
+    <div class="review-note" id="studioStatus">Lade ein vorhandenes Skript-JSON oder öffne das Studio über die Haupt-App.</div>
+  </section>
+
+  <section class="home-section">
+    <h2>Übersicht</h2>
+    <div class="card-grid studio-grid" id="summaryGrid">
+      <article class="tile"><strong id="summaryTitle">—</strong></article>
+      <article class="tile"><strong id="summaryEntries">0 Einträge</strong></article>
+      <article class="tile"><strong id="summaryLearnable">0 lernbar</strong></article>
+      <article class="tile"><strong id="summaryIssues">0 Hinweise</strong></article>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <h2>Review</h2>
+    <div class="review-shell">
+      <section class="panel review-list" id="reviewList"></section>
+      <section class="panel review-preview">
+        <div class="review-preview__head">
+          <h3 id="previewTitle">Keine Auswahl</h3>
+          <div class="faded" id="previewMeta">—</div>
+        </div>
+        <div id="previewEntries" class="review-preview__entries"></div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<script defer src="./script-model.js"></script>
+<script defer src="./importer.js"></script>
+</body>
+</html>

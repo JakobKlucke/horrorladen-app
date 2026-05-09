@@ -86,7 +86,9 @@
       <p>Wähle einen Modus und leg los.</p>
       <div class="script-row" style="margin-top:.6rem">
         <button class="btn secondary" data-nav="script">Skript ändern</button>
+        <a class="btn secondary" id="importStudioLinkHome" href="./importer.html" target="_blank" rel="noopener">Import Studio</a>
       </div>
+      <div class="review-note" id="reviewNotice" hidden></div>
     </section>
 
     <!-- Lernen -->
@@ -271,8 +273,10 @@
       <div style="display:grid;gap:.6rem">
         <label>Aktuelles Skript</label>
         <div class="faded">Aktuell: <code id="currentScriptLabel">—</code></div>
+        <div class="review-note" id="reviewSettingsNote" hidden></div>
         <div class="script-row">
           <button class="btn secondary" data-nav="script">Skript ändern</button>
+          <a class="btn secondary" id="importStudioLinkSettings" href="./importer.html" target="_blank" rel="noopener">Import Studio</a>
         </div>
       </div>
     </div>
@@ -285,7 +289,8 @@
   </div>
 </div>
 
-<!-- App script -->
+<!-- App scripts -->
+<script defer src="./script-model.js"></script>
 <script defer src="./app.js"></script>
 </body>
 </html>

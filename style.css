@@ -531,6 +531,113 @@ body::before{
   transition:none!important;
 }
 
+.review-note{
+  margin-top:.8rem;
+  padding:.8rem 1rem;
+  border-radius:16px;
+  border:2px solid #f4d6a0;
+  background:linear-gradient(180deg,#fff9ef,#fff4de);
+  color:#7a4d0b;
+  line-height:1.45;
+}
+.review-note--ok{
+  border-color:#bfe7aa;
+  background:linear-gradient(180deg,#f4fff1,#ebffe4);
+  color:#245d19;
+}
+
+.importer-main{ padding-bottom:40px; }
+.importer-load{ grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+.studio-grid{ grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
+.review-shell{
+  display:grid;
+  gap:1rem;
+  grid-template-columns:minmax(280px,380px) minmax(0,1fr);
+}
+.review-list{
+  display:grid;
+  gap:.9rem;
+  align-content:start;
+  max-height:70vh;
+  overflow:auto;
+}
+.review-item{
+  border:2px solid #00000012;
+  border-radius:18px;
+  padding:.9rem;
+  background:linear-gradient(180deg,#fff,#f9fbf7);
+  cursor:pointer;
+  display:grid;
+  gap:.6rem;
+}
+.review-item.active{
+  border-color:#58CC02;
+  box-shadow:0 10px 28px rgba(88,204,2,.18);
+}
+.review-item--pending{ background:linear-gradient(180deg,#fffaf1,#fff4df); }
+.review-item--done{ background:linear-gradient(180deg,#f5fff2,#eefde8); }
+.review-item__top{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  flex-wrap:wrap;
+}
+.review-item label{
+  display:grid;
+  gap:.35rem;
+  font-size:.92rem;
+  color:#344054;
+}
+.review-preview{
+  display:grid;
+  gap:1rem;
+  align-content:start;
+}
+.review-preview__head h3{
+  margin:0 0 .25rem;
+  font-size:1.1rem;
+}
+.review-preview__entries{
+  display:grid;
+  gap:.8rem;
+}
+.review-entry-card{
+  border-radius:18px;
+  border:2px solid #00000010;
+  background:linear-gradient(180deg,#fff,#f7faf5);
+  padding:.9rem;
+}
+.review-entry-card__meta{
+  display:flex;
+  gap:.45rem;
+  flex-wrap:wrap;
+  margin-bottom:.5rem;
+}
+.meta-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:.2rem .55rem;
+  border-radius:999px;
+  background:#eef2e9;
+  color:#475467;
+  font-size:.78rem;
+  font-weight:700;
+}
+.review-entry-card__speaker{
+  font-weight:900;
+  color:#1d2939;
+  margin-bottom:.25rem;
+}
+.review-entry-card__text{
+  line-height:1.5;
+  color:#344054;
+}
+
+@media (max-width: 920px){
+  .review-shell{ grid-template-columns:1fr; }
+  .review-list{ max-height:none; }
+}
+
 /* nur die aktive View anzeigen */
 [data-view] { display: none; }
 [data-view].active { display: block; }
