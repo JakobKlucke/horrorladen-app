@@ -74,11 +74,16 @@
                 <option value="off">Nur PDF-Text</option>
               </select>
             </div>
+            <div>
+              <label for="rolePagesInput">Figuren-Seiten</label>
+              <input id="rolePagesInput" type="text" value="1-5" placeholder="z. B. 1-5 oder 2,4">
+            </div>
             <div class="cta">
               <button class="btn" id="runPdfImportBtn" type="button">PDF importieren</button>
             </div>
           </div>
           <div class="review-note" id="backendStatus">Backend noch nicht geprüft.</div>
+          <div class="diagnostics-panel" id="extractionDiagnostics"></div>
         </div>
         <div class="panel wizard-card">
           <div class="controls importer-load">
@@ -100,9 +105,14 @@
             <h1>Figuren bestätigen</h1>
             <p class="faded">Bestätigte Figuren steuern die Sprechererkennung.</p>
           </div>
-          <button class="btn secondary" id="restructureBtn" type="button">Neu aufteilen</button>
+          <div class="script-row">
+            <button class="btn secondary" id="analyzeLocalRolesBtn" type="button">Rollen lokal erkennen</button>
+            <button class="btn secondary" id="analyzeLlmRolesBtn" type="button">Rollen mit LLM erkennen</button>
+            <button class="btn secondary" id="restructureBtn" type="button">Neu aufteilen</button>
+          </div>
         </div>
         <div class="panel wizard-card">
+          <div class="diagnostics-panel" id="roleDiagnostics"></div>
           <div class="script-row">
             <input id="newRoleInput" type="text" placeholder="Neue Figur">
             <button class="btn secondary" id="addRoleBtn" type="button">Hinzufügen</button>

@@ -770,6 +770,54 @@ body::before{
   font-size:.9rem;
   line-height:1.35;
 }
+.diagnostics-panel{
+  display:grid;
+  gap:.65rem;
+}
+.diagnostics-summary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.45rem;
+}
+.diagnostics-warnings{
+  display:grid;
+  gap:.35rem;
+  padding:.75rem .9rem;
+  border-radius:14px;
+  border:2px solid #f4d6a0;
+  background:#fff7e8;
+  color:#7a4d0b;
+  line-height:1.4;
+}
+.diagnostics-pages{
+  display:grid;
+  gap:.45rem;
+}
+.diagnostics-page{
+  border:2px solid #00000010;
+  border-radius:14px;
+  background:#fff;
+  padding:.65rem .8rem;
+}
+.diagnostics-page summary{
+  cursor:pointer;
+  font-weight:800;
+  color:#344054;
+}
+.diagnostics-page pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  max-height:220px;
+  overflow:auto;
+  margin:.65rem 0 0;
+  padding:.75rem;
+  border-radius:12px;
+  background:#f6f7fb;
+  color:#344054;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  font-size:.86rem;
+  line-height:1.45;
+}
 .pager-row{
   display:flex;
   align-items:center;

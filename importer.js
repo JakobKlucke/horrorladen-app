@@ -15,6 +15,7 @@
     title: '',
     sessionId: '',
     pages: [],
+    diagnostics: null,
     canonical: null,
     runtime: null,
     entries: [],
@@ -46,15 +47,20 @@
     pdfFileInput: document.getElementById('pdfFileInput'),
     pdfTitleInput: document.getElementById('pdfTitleInput'),
     ocrModeSelect: document.getElementById('ocrModeSelect'),
+    rolePagesInput: document.getElementById('rolePagesInput'),
     runPdfImportBtn: document.getElementById('runPdfImportBtn'),
     refreshBackendBtn: document.getElementById('refreshBackendBtn'),
     backendStatus: document.getElementById('backendStatus'),
+    extractionDiagnostics: document.getElementById('extractionDiagnostics'),
     jsonFileInput: document.getElementById('jsonFileInput'),
     reviewFileInput: document.getElementById('reviewFileInput'),
     restructureBtn: document.getElementById('restructureBtn'),
+    analyzeLocalRolesBtn: document.getElementById('analyzeLocalRolesBtn'),
+    analyzeLlmRolesBtn: document.getElementById('analyzeLlmRolesBtn'),
     newRoleInput: document.getElementById('newRoleInput'),
     addRoleBtn: document.getElementById('addRoleBtn'),
     rolesList: document.getElementById('rolesList'),
+    roleDiagnostics: document.getElementById('roleDiagnostics'),
     structureSceneFilter: document.getElementById('structureSceneFilter'),
     structureSpeakerFilter: document.getElementById('structureSpeakerFilter'),
     structureTable: document.getElementById('structureTable'),
@@ -192,9 +198,11 @@
     const deps = payload && payload.dependencies ? payload.dependencies : {};
     const pypdfReady = !!(deps.pypdf && deps.pypdf.available);
     const ocrReady = !!(deps.ocr && deps.ocr.available);
+    const openaiReady = !!(deps.openai && deps.openai.available);
     const parts = [
       pypdfReady ? 'PDF-Import bereit.' : `pypdf fehlt: ${deps.pypdf?.installHint || 'python3 -m pip install pypdf'}`,
-      ocrReady ? 'OCR bereit.' : 'OCR nicht vollständig verfügbar.'
+      ocrReady ? 'OCR bereit.' : 'OCR nicht vollständig verfügbar.',
+      openaiReady ? `LLM bereit (${deps.openai?.model || 'OpenAI'}).` : 'LLM aus: OPENAI_API_KEY fehlt.'
     ];
     if(deps.ocr && Array.isArray(deps.ocr.languages) && deps.ocr.languages.length){
       parts.push(`Sprachen: ${deps.ocr.languages.join(', ')}`);
@@ -316,6 +324,39 @@
         <strong>${pageInfo.start + 1}-${pageInfo.end} von ${pageInfo.total}</strong>
         <button class="btn secondary" type="button" data-page-action="next" ${pageInfo.currentPage >= pageInfo.totalPages ? 'disabled' : ''}>Weiter</button>
       </div>
+    `;
+  }
+
+  function renderDiagnostics(node){
+    if(!node) return;
+    const diagnostics = state.diagnostics;
+    if(!diagnostics){
+      node.innerHTML = '<div class="faded">Noch keine Extraktionsdiagnose.</div>';
+      return;
+    }
+    const pages = diagnostics.pages || [];
+    const warnings = diagnostics.warnings || [];
+    const sourceText = Object.entries(diagnostics.sources || {})
+      .map(([source, count]) => `${source}: ${count}`)
+      .join(', ') || '-';
+    const warningHtml = warnings.length
+      ? `<div class="diagnostics-warnings">${warnings.map(warning => `<div>${escapeHtml(warning)}</div>`).join('')}</div>`
+      : '<div class="review-note review-note--ok">Keine kritischen Hinweise in den Rollen-Seiten.</div>';
+    const pageHtml = pages.map(page => `
+      <details class="diagnostics-page">
+        <summary>Seite ${escapeHtml(page.pageNumber)} · ${escapeHtml(page.characters)} Zeichen · ${escapeHtml(page.source || '-')}</summary>
+        <pre>${escapeHtml(page.textPreview || 'Kein Text erkannt.')}</pre>
+      </details>
+    `).join('');
+    node.innerHTML = `
+      <div class="diagnostics-summary">
+        <span class="meta-chip">Seiten ${escapeHtml(diagnostics.pageRange || '-')}</span>
+        <span class="meta-chip">${escapeHtml(diagnostics.totalCharacters || 0)} Zeichen</span>
+        <span class="meta-chip">Quellen: ${escapeHtml(sourceText)}</span>
+        <span class="meta-chip">OCR: ${escapeHtml((diagnostics.ocrLanguages || []).join(', ') || '-')}</span>
+      </div>
+      ${warningHtml}
+      <div class="diagnostics-pages">${pageHtml}</div>
     `;
   }
 
@@ -586,6 +627,15 @@
       refs.restructureBtn.textContent = state.entries.length ? 'Neu aufteilen' : 'Skript strukturieren';
       refs.restructureBtn.disabled = !state.sessionId || !confirmedRoles().length;
     }
+    if(refs.analyzeLocalRolesBtn){
+      refs.analyzeLocalRolesBtn.disabled = !state.sessionId;
+    }
+    if(refs.analyzeLlmRolesBtn){
+      refs.analyzeLlmRolesBtn.disabled = !state.sessionId || !(state.backendStatus?.dependencies?.openai?.available);
+      refs.analyzeLlmRolesBtn.title = state.backendStatus?.dependencies?.openai?.available ? '' : 'OPENAI_API_KEY ist serverseitig nicht gesetzt.';
+    }
+    renderDiagnostics(refs.extractionDiagnostics);
+    renderDiagnostics(refs.roleDiagnostics);
     if(state.activeStep === 1) renderRoles();
     if(state.activeStep === 2) renderStructure();
     if(state.activeStep === 3) renderSongs();
@@ -670,6 +720,7 @@
     state.title = runtime.canonical.title || sourceName || 'Unbenanntes Skript';
     state.sessionId = options.sessionId || state.sessionId || '';
     state.pages = Array.isArray(options.pages) ? clone(options.pages) : clone(data.pages || runtime.canonical.pages || []);
+    state.diagnostics = null;
     state.canonical = runtime.canonical;
     state.runtime = runtime;
     state.entries = runtime.entries.map(entry => Object.assign({}, entry));
@@ -688,6 +739,7 @@
     state.title = normalize(refs.pdfTitleInput?.value) || payload.filenameBase || 'Unbenanntes Skript';
     state.sessionId = payload.sessionId || '';
     state.pages = Array.isArray(payload.previewPages) ? clone(payload.previewPages) : [];
+    state.diagnostics = payload.diagnostics || null;
     state.canonical = null;
     state.runtime = null;
     state.entries = [];
@@ -730,7 +782,8 @@
     const params = new URLSearchParams({
       title,
       ocrMode: refs.ocrModeSelect?.value || 'auto',
-      sourceName: file.name
+      sourceName: file.name,
+      rolePages: normalize(refs.rolePagesInput?.value) || '1-5'
     });
     const originalLabel = refs.runPdfImportBtn.textContent;
     refs.runPdfImportBtn.disabled = true;
@@ -752,6 +805,47 @@
     }finally{
       refs.runPdfImportBtn.textContent = originalLabel;
       refs.runPdfImportBtn.disabled = !(state.backendStatus?.dependencies?.pypdf?.available);
+    }
+  }
+
+  async function analyzeRoles(mode){
+    if(!state.sessionId){
+      setNote(refs.globalStatus, 'Rollenanalyse ist nur nach PDF-Import verfügbar.');
+      return;
+    }
+    const button = mode === 'openai' ? refs.analyzeLlmRolesBtn : refs.analyzeLocalRolesBtn;
+    const originalLabel = button?.textContent || '';
+    if(button){
+      button.disabled = true;
+      button.textContent = mode === 'openai' ? 'LLM analysiert...' : 'Analyse läuft...';
+    }
+    setNote(refs.globalStatus, mode === 'openai' ? 'Rollen werden mit OpenAI aus dem extrahierten Text analysiert.' : 'Rollen werden lokal aus dem extrahierten Text analysiert.');
+    try{
+      const response = await fetch('./api/roles/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          sessionId: state.sessionId,
+          mode,
+          pageRange: normalize(refs.rolePagesInput?.value) || '1-5',
+          seedRoles: state.roles
+        })
+      });
+      const payload = await response.json();
+      if(!response.ok || !payload.ok) throw new Error(payload.error || response.statusText || 'Rollenanalyse fehlgeschlagen');
+      state.roles = normalizeRoles(payload.roleCandidates || []);
+      state.diagnostics = payload.diagnostics || state.diagnostics;
+      setNote(refs.globalStatus, `Rollenanalyse aktualisiert: ${state.roles.length} Figuren-Vorschläge.`, true);
+      renderWizard();
+    }catch(error){
+      setNote(refs.globalStatus, `Rollenanalyse fehlgeschlagen: ${error.message || error}`);
+      if(error?.status) state.backendStatus = error.status;
+      renderWizard();
+    }finally{
+      if(button){
+        button.textContent = originalLabel;
+      }
+      renderWizard();
     }
   }
 
@@ -956,6 +1050,8 @@
     refs.refreshBackendBtn.addEventListener('click', refreshBackendHealth);
     refs.runPdfImportBtn.addEventListener('click', runPdfImport);
     refs.restructureBtn.addEventListener('click', () => restructureFromServer(state.entries.length ? state.activeStep : 2));
+    refs.analyzeLocalRolesBtn.addEventListener('click', () => analyzeRoles('local'));
+    refs.analyzeLlmRolesBtn.addEventListener('click', () => analyzeRoles('openai'));
     refs.addRoleBtn.addEventListener('click', addRole);
     refs.newRoleInput.addEventListener('keydown', event => {
       if(event.key === 'Enter') addRole();
