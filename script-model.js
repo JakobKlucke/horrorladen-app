@@ -787,6 +787,47 @@
     return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'ja' || normalized === 'y' || normalized === 'cut';
   }
 
+  function cloneJson(value){
+    return value == null ? value : JSON.parse(JSON.stringify(value));
+  }
+
+  function applyCutToEntryIds(entries, entryIds, cut){
+    const ids = new Set(asArray(entryIds).map(id => firstString([id])).filter(Boolean));
+    return asArray(entries).map(entry => {
+      if(!isObject(entry)) return entry;
+      const next = Object.assign({}, entry);
+      if(ids.has(firstString([entry.id]))) next.cut = !!cut;
+      return next;
+    });
+  }
+
+  function splitEntryForCut(entry, startOffset, endOffset){
+    if(!isObject(entry)) return [];
+    const text = normalizeWhitespace(entry.text || '');
+    const start = Math.max(0, Math.min(Number(startOffset) || 0, text.length));
+    const end = Math.max(start, Math.min(Number(endOffset) || 0, text.length));
+    if(start === end) return [Object.assign({}, entry)];
+
+    const baseId = firstString([entry.id]) || 'entry';
+    const baseOrder = Number.isFinite(entry.order) ? Number(entry.order) : 0;
+    const source = cloneJson(entry.source);
+    const chunks = [
+      { suffix:'', text:text.slice(0, start), cut:false },
+      { suffix:'cut-1', text:text.slice(start, end), cut:true },
+      { suffix:'after-1', text:text.slice(end), cut:false }
+    ].filter(chunk => normalizeWhitespace(chunk.text));
+
+    return chunks.map((chunk, index) => {
+      const next = Object.assign({}, entry);
+      next.id = chunk.suffix ? `${baseId}-${chunk.suffix}` : baseId;
+      next.order = baseOrder + (index * 0.001);
+      next.text = normalizeWhitespace(chunk.text);
+      next.cut = chunk.cut;
+      next.source = cloneJson(source);
+      return next;
+    });
+  }
+
   function applyReviewRows(data, rows){
     const base = isCanonicalScript(data) ? normalizeCanonicalScript(data) : normalizeScriptData(data);
     const nextEntries = base.entries.map(entry => Object.assign({}, entry));
@@ -851,6 +892,8 @@
     normalizeStringList,
     isPendingIssue,
     countPendingIssues,
+    applyCutToEntryIds,
+    splitEntryForCut,
     applyReviewRows
   };
 });

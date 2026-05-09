@@ -24,6 +24,9 @@
     reviewRows: [],
     speakerDiagnostics: null,
     speakerAssignmentDirty: false,
+    selectedCutEntryIds: new Set(),
+    lastCutSelectionId: '',
+    llmDialog: null,
     activeStep: 0,
     backendStatus: null,
     pagination: {
@@ -84,7 +87,15 @@
     downloadReviewBtn: document.getElementById('downloadReviewBtn'),
     downloadJsonBtn: document.getElementById('downloadJsonBtn'),
     prevStepBtn: document.getElementById('prevStepBtn'),
-    nextStepBtn: document.getElementById('nextStepBtn')
+    nextStepBtn: document.getElementById('nextStepBtn'),
+    llmModal: document.getElementById('llmModal'),
+    llmModalTitle: document.getElementById('llmModalTitle'),
+    llmModalDescription: document.getElementById('llmModalDescription'),
+    llmModalDetails: document.getElementById('llmModalDetails'),
+    llmModalStatus: document.getElementById('llmModalStatus'),
+    llmCancelBtn: document.getElementById('llmCancelBtn'),
+    llmConfirmBtn: document.getElementById('llmConfirmBtn'),
+    llmCloseBtn: document.getElementById('llmCloseBtn')
   };
 
   function escapeHtml(value){
@@ -194,6 +205,45 @@
     node.classList.toggle('review-note--ok', !!ok);
   }
 
+  function renderLlmDialog(phase, statusText){
+    const dialog = state.llmDialog;
+    if(!refs.llmModal || !dialog) return;
+    refs.llmModal.hidden = false;
+    refs.llmModalTitle.textContent = dialog.title || 'LLM-Aktion bestätigen';
+    refs.llmModalDescription.textContent = dialog.description || '';
+    refs.llmModalDetails.innerHTML = (dialog.details || [])
+      .map(item => `<span class="meta-chip">${escapeHtml(item)}</span>`)
+      .join('');
+    setNote(refs.llmModalStatus, statusText || dialog.status || 'Bereit.', phase === 'done');
+    refs.llmConfirmBtn.hidden = phase !== 'confirm';
+    refs.llmCancelBtn.hidden = phase !== 'confirm';
+    refs.llmCloseBtn.hidden = phase === 'confirm' || phase === 'running';
+    refs.llmConfirmBtn.disabled = phase !== 'confirm';
+    refs.llmCancelBtn.disabled = phase === 'running';
+    state.llmDialog.phase = phase;
+  }
+
+  function closeLlmDialog(resolveValue = false){
+    if(state.llmDialog?.resolve) state.llmDialog.resolve(resolveValue);
+    state.llmDialog = null;
+    if(refs.llmModal) refs.llmModal.hidden = true;
+  }
+
+  function confirmLlmDialogStart(){
+    if(state.llmDialog?.resolve){
+      const resolve = state.llmDialog.resolve;
+      state.llmDialog.resolve = null;
+      resolve(true);
+    }
+  }
+
+  function confirmLlmAction(options){
+    return new Promise(resolve => {
+      state.llmDialog = Object.assign({}, options, { resolve, phase:'confirm' });
+      renderLlmDialog('confirm', options.status || 'OpenAI wird erst nach deiner Bestätigung gestartet.');
+    });
+  }
+
   function defaultLaunchCommand(){
     return 'python3 tools/import_studio_server.py';
   }
@@ -267,8 +317,9 @@
       sceneId: song.sceneId || '',
       singerIds: normalizeList(song.singerIds)
     }));
-    const entries = state.entries.map(entry => {
+    const entries = state.entries.map((entry, index) => {
       const next = Object.assign({}, entry);
+      next.order = index + 1;
       const role = roleById(next.speakerId);
       if(role){
         next.speaker = role.label;
@@ -347,6 +398,9 @@
     const sourceText = Object.entries(diagnostics.sources || {})
       .map(([source, count]) => `${source}: ${count}`)
       .join(', ') || '-';
+    const styleText = diagnostics.style
+      ? `${diagnostics.style.pagesWithLines || 0}/${pages.length} Seiten mit Formatdaten`
+      : 'keine Formatdaten';
     const warningHtml = warnings.length
       ? `<div class="diagnostics-warnings">${warnings.map(warning => `<div>${escapeHtml(warning)}</div>`).join('')}</div>`
       : '<div class="review-note review-note--ok">Keine kritischen Hinweise in den Rollen-Seiten.</div>';
@@ -361,6 +415,7 @@
         <span class="meta-chip">Seiten ${escapeHtml(diagnostics.pageRange || '-')}</span>
         <span class="meta-chip">${escapeHtml(diagnostics.totalCharacters || 0)} Zeichen</span>
         <span class="meta-chip">Quellen: ${escapeHtml(sourceText)}</span>
+        <span class="meta-chip">Format: ${escapeHtml(styleText)}</span>
         <span class="meta-chip">OCR: ${escapeHtml((diagnostics.ocrLanguages || []).join(', ') || '-')}</span>
       </div>
       ${warningHtml}
@@ -593,6 +648,20 @@
     }).join('');
   }
 
+  function currentCutEntries(){
+    return filteredEntries('cuts');
+  }
+
+  function reindexEntries(){
+    state.entries.forEach((entry, index) => {
+      entry.order = index + 1;
+    });
+  }
+
+  function selectedCutCount(){
+    return Array.from(state.selectedCutEntryIds).filter(id => state.entries.some(entry => entry.id === id)).length;
+  }
+
   function renderCuts(){
     if(!hasStructuredScript()){
       refs.originalColumn.innerHTML = '<div class="faded">Ordne zuerst die Sprecher zu. Bei geänderten Rollen muss die Sprecherzuordnung neu ausgeführt werden.</div>';
@@ -605,13 +674,28 @@
     const entries = filteredEntries('cuts');
     const pageInfo = pageSlice(entries, state.pagination.cutPage);
     state.pagination.cutPage = pageInfo.currentPage;
+    const selectedCount = selectedCutCount();
+    const toolbar = `
+      <div class="cut-toolbar">
+        <strong>${escapeHtml(selectedCount)} ausgewählt</strong>
+        <button class="btn secondary" type="button" data-cut-bulk="cut" ${selectedCount ? '' : 'disabled'}>Auswahl streichen</button>
+        <button class="btn secondary" type="button" data-cut-bulk="restore" ${selectedCount ? '' : 'disabled'}>Auswahl wiederherstellen</button>
+        <button class="btn secondary" type="button" data-cut-bulk="clear" ${selectedCount ? '' : 'disabled'}>Auswahl leeren</button>
+      </div>
+    `;
     const original = pageInfo.items.map(entry => `
-      <article class="cut-line ${entry.cut ? 'is-cut' : ''}" data-entry-id="${escapeHtml(entry.id)}">
+      <article class="cut-line ${entry.cut ? 'is-cut' : ''} ${state.selectedCutEntryIds.has(entry.id) ? 'is-selected' : ''}" data-entry-id="${escapeHtml(entry.id)}">
+        <label class="checkbox-container cut-select">
+          <input class="custom-checkbox" type="checkbox" data-select-cut="${escapeHtml(entry.id)}" ${state.selectedCutEntryIds.has(entry.id) ? 'checked' : ''}>
+        </label>
         <div>
           <strong>${escapeHtml(entry.speaker || entry.kind)}</strong>
           <p>${escapeHtml(entry.text)}</p>
         </div>
-        <button class="btn secondary" type="button" data-toggle-cut="${escapeHtml(entry.id)}">${entry.cut ? 'Wiederherstellen' : 'Streichen'}</button>
+        <div class="cut-line__actions">
+          <button class="btn secondary" type="button" data-cut-passage="${escapeHtml(entry.id)}">Passage streichen</button>
+          <button class="btn secondary" type="button" data-toggle-cut="${escapeHtml(entry.id)}">${entry.cut ? 'Wiederherstellen' : 'Streichen'}</button>
+        </div>
       </article>
     `).join('');
     const finalEntries = pageInfo.items.filter(entry => state.filters.showCutInFinal || !entry.cut);
@@ -624,7 +708,7 @@
       </article>
     `).join('');
     const pager = renderPager('cuts', pageInfo);
-    refs.originalColumn.innerHTML = entries.length ? `${pager}${original}${pager}` : '<div class="faded">Keine Einträge für diesen Filter.</div>';
+    refs.originalColumn.innerHTML = entries.length ? `${toolbar}${pager}${original}${pager}` : '<div class="faded">Keine Einträge für diesen Filter.</div>';
     refs.cutColumn.innerHTML = entries.length ? `${pager}${finalVersion || '<div class="faded">Alle Einträge auf dieser Seite sind gestrichen.</div>'}${pager}` : '<div class="faded">Keine Einträge für diesen Filter.</div>';
     if(refs.showCutInFinalToggle) refs.showCutInFinalToggle.checked = state.filters.showCutInFinal;
   }
@@ -903,6 +987,24 @@
       setNote(refs.globalStatus, 'Rollenanalyse ist nur nach PDF-Import verfügbar.');
       return;
     }
+    if(mode === 'openai'){
+      if(!(state.backendStatus?.dependencies?.openai?.available)){
+        setNote(refs.globalStatus, 'OPENAI_API_KEY ist serverseitig nicht gesetzt. LLM-Analyse kann nicht gestartet werden.');
+        return;
+      }
+      const confirmed = await confirmLlmAction({
+        title: 'Rollen mit LLM erkennen',
+        description: 'OpenAI analysiert nur den extrahierten Text der gewählten Figuren-Seiten und schlägt Rollen, Aliase und Beschreibungen vor.',
+        details: [
+          `Seiten ${normalize(refs.rolePagesInput?.value) || '1-10'}`,
+          `${state.roles.length} Seed-Rollen`,
+          state.backendStatus?.dependencies?.openai?.model || 'OpenAI-Modell'
+        ],
+        status: 'Es wird keine PDF-Datei gesendet, nur der extrahierte Text.'
+      });
+      if(!confirmed) return;
+      renderLlmDialog('running', 'Text wird vorbereitet und an OpenAI gesendet.');
+    }
     const button = mode === 'openai' ? refs.analyzeLlmRolesBtn : refs.analyzeLocalRolesBtn;
     const originalLabel = button?.textContent || '';
     if(button){
@@ -926,9 +1028,11 @@
       state.roles = normalizeRoles(payload.roleCandidates || []);
       state.diagnostics = payload.diagnostics || state.diagnostics;
       setNote(refs.globalStatus, `Rollenanalyse aktualisiert: ${state.roles.length} Figuren-Vorschläge.`, true);
+      if(mode === 'openai') renderLlmDialog('done', `LLM-Analyse abgeschlossen: ${state.roles.length} Figuren-Vorschläge übernommen.`);
       renderWizard();
     }catch(error){
       setNote(refs.globalStatus, `Rollenanalyse fehlgeschlagen: ${error.message || error}`);
+      if(mode === 'openai') renderLlmDialog('error', `LLM-Analyse fehlgeschlagen: ${error.message || error}`);
       if(error?.status) state.backendStatus = error.status;
       renderWizard();
     }finally{
@@ -943,6 +1047,24 @@
     if(!state.sessionId){
       setNote(refs.globalStatus, 'Neuaufteilung ist nur nach PDF-Import verfügbar.');
       return;
+    }
+    if(speakerMode === 'llm-assisted'){
+      if(!(state.backendStatus?.dependencies?.openai?.available)){
+        setNote(refs.globalStatus, 'OPENAI_API_KEY ist serverseitig nicht gesetzt. LLM-Zuordnung kann nicht gestartet werden.');
+        return;
+      }
+      const confirmed = await confirmLlmAction({
+        title: 'Sprecher mit LLM zuordnen',
+        description: 'OpenAI bekommt den strukturierten Text und darf Zeilen ausschließlich den bestätigten Rollen oder Aliasen zuordnen.',
+        details: [
+          `${confirmedRoles().length} bestätigte Rollen`,
+          `${state.entries.length || 'vollständiges'} Skript wird geprüft`,
+          state.backendStatus?.dependencies?.openai?.model || 'OpenAI-Modell'
+        ],
+        status: 'Diese Aktion kann bei einem kompletten Textbuch länger dauern und API-Kosten verursachen.'
+      });
+      if(!confirmed) return;
+      renderLlmDialog('running', 'Skript wird strukturiert, an OpenAI gesendet und anschließend validiert.');
     }
     setNote(refs.globalStatus, speakerMode === 'llm-assisted' ? 'Sprecher werden mit LLM zugeordnet.' : 'Sprecher werden mit bestätigten Figuren regelbasiert zugeordnet.');
     try{
@@ -976,8 +1098,13 @@
       });
       state.speakerAssignmentDirty = false;
       setNote(refs.globalStatus, 'Sprecherzuordnung aktualisiert.', true);
+      if(speakerMode === 'llm-assisted'){
+        const stats = payload.speakerDiagnostics || payload.script?.speakerDiagnostics || {};
+        renderLlmDialog('done', `LLM-Zuordnung abgeschlossen: ${stats.llmAssignmentsApplied || 0} Zuordnungen übernommen.`);
+      }
     }catch(error){
       setNote(refs.globalStatus, `Sprecherzuordnung fehlgeschlagen: ${error.message || error}`);
+      if(speakerMode === 'llm-assisted') renderLlmDialog('error', `LLM-Zuordnung fehlgeschlagen: ${error.message || error}`);
     }
   }
 
@@ -1124,6 +1251,95 @@
     renderWizard();
   }
 
+  function toggleCutSelection(entryId, checked, useRange){
+    const entries = currentCutEntries();
+    if(useRange && state.lastCutSelectionId){
+      const start = entries.findIndex(entry => entry.id === state.lastCutSelectionId);
+      const end = entries.findIndex(entry => entry.id === entryId);
+      if(start >= 0 && end >= 0){
+        const from = Math.min(start, end);
+        const to = Math.max(start, end);
+        entries.slice(from, to + 1).forEach(entry => {
+          if(checked) state.selectedCutEntryIds.add(entry.id);
+          else state.selectedCutEntryIds.delete(entry.id);
+        });
+        state.lastCutSelectionId = entryId;
+        return;
+      }
+    }
+    if(checked) state.selectedCutEntryIds.add(entryId);
+    else state.selectedCutEntryIds.delete(entryId);
+    state.lastCutSelectionId = entryId;
+  }
+
+  function applyBulkCut(action){
+    if(action === 'clear'){
+      state.selectedCutEntryIds.clear();
+      state.lastCutSelectionId = '';
+      renderWizard();
+      return;
+    }
+    const selected = Array.from(state.selectedCutEntryIds);
+    state.entries = ScriptModel.applyCutToEntryIds(state.entries, selected, action === 'cut');
+    renderWizard();
+  }
+
+  function selectedTextForEntry(entryId){
+    const selection = window.getSelection ? window.getSelection() : null;
+    const text = normalize(selection ? selection.toString() : '');
+    if(!text) return '';
+    const safeId = window.CSS && CSS.escape ? CSS.escape(entryId) : String(entryId).replace(/"/g, '\\"');
+    const article = document.querySelector(`[data-entry-id="${safeId}"]`);
+    if(article && selection.anchorNode && article.contains(selection.anchorNode)) return text;
+    return '';
+  }
+
+  function cutTextPassage(entryId){
+    const entryIndex = state.entries.findIndex(item => item.id === entryId);
+    if(entryIndex < 0) return;
+    const entry = state.entries[entryIndex];
+    const selectedText = selectedTextForEntry(entryId);
+    const passage = selectedText || normalize(window.prompt('Welche Textpassage soll gestrichen werden?', ''));
+    if(!passage) return;
+    const start = entry.text.indexOf(passage);
+    if(start < 0){
+      setNote(refs.globalStatus, 'Passage wurde in dieser Zeile nicht gefunden. Markiere den Text exakt oder kopiere ihn vollständig.');
+      return;
+    }
+    const parts = ScriptModel.splitEntryForCut(entry, start, start + passage.length);
+    state.entries.splice(entryIndex, 1, ...parts);
+    reindexEntries();
+    state.selectedCutEntryIds.clear();
+    parts.filter(part => part.cut).forEach(part => state.selectedCutEntryIds.add(part.id));
+    syncRuntime();
+    setNote(refs.globalStatus, 'Passage wurde als eigener gestrichener Eintrag abgetrennt.', true);
+    renderWizard();
+  }
+
+  function onCutClick(event){
+    if(event.target.dataset.pageAction){
+      onPagerClick(event);
+      return;
+    }
+    const selectId = event.target.dataset.selectCut;
+    if(selectId){
+      toggleCutSelection(selectId, event.target.checked, event.shiftKey);
+      renderWizard();
+      return;
+    }
+    const bulkAction = event.target.dataset.cutBulk;
+    if(bulkAction){
+      applyBulkCut(bulkAction);
+      return;
+    }
+    const passageId = event.target.dataset.cutPassage;
+    if(passageId){
+      cutTextPassage(passageId);
+      return;
+    }
+    onToggleCut(event);
+  }
+
   function onDownloadReview(){
     const rows = state.reviewRows.length ? state.reviewRows : (state.runtime?.issues || []);
     downloadBlob(`${state.sourceName || 'skript'}_review.csv`, stringifyCsv(rows), 'text/csv;charset=utf-8');
@@ -1162,9 +1378,14 @@
     refs.structureTable.addEventListener('click', onPagerClick);
     refs.songsList.addEventListener('input', onSongInput);
     refs.songsList.addEventListener('change', onSongInput);
-    refs.originalColumn.addEventListener('click', onToggleCut);
-    refs.originalColumn.addEventListener('click', onPagerClick);
+    refs.originalColumn.addEventListener('click', onCutClick);
     refs.cutColumn.addEventListener('click', onPagerClick);
+    refs.llmConfirmBtn.addEventListener('click', confirmLlmDialogStart);
+    refs.llmCancelBtn.addEventListener('click', () => closeLlmDialog(false));
+    refs.llmCloseBtn.addEventListener('click', () => closeLlmDialog(false));
+    refs.llmModal.addEventListener('click', event => {
+      if(event.target.dataset.llmClose && state.llmDialog?.phase !== 'running') closeLlmDialog(false);
+    });
     refs.structureSceneFilter.addEventListener('change', event => {
       state.filters.structureScene = event.target.value;
       state.pagination.structurePage = 1;

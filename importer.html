@@ -224,6 +224,27 @@
   </section>
 </main>
 
+<div class="llm-modal" id="llmModal" hidden>
+  <div class="llm-modal__backdrop" data-llm-close="cancel"></div>
+  <section class="llm-modal__card" role="dialog" aria-modal="true" aria-labelledby="llmModalTitle">
+    <div class="llm-modal__head">
+      <div>
+        <p class="badge">OpenAI</p>
+        <h2 id="llmModalTitle">LLM-Aktion bestätigen</h2>
+      </div>
+      <button class="iconbtn" type="button" data-llm-close="cancel" aria-label="Dialog schließen">×</button>
+    </div>
+    <p id="llmModalDescription" class="llm-modal__description"></p>
+    <div id="llmModalDetails" class="llm-modal__details"></div>
+    <div id="llmModalStatus" class="review-note">Bereit.</div>
+    <div class="llm-modal__actions">
+      <button class="btn secondary" id="llmCancelBtn" type="button">Abbrechen</button>
+      <button class="btn" id="llmConfirmBtn" type="button">LLM starten</button>
+      <button class="btn secondary" id="llmCloseBtn" type="button" hidden>Schließen</button>
+    </div>
+  </section>
+</div>
+
 <script defer src="./script-model.js"></script>
 <script defer src="./importer.js"></script>
 </body>
