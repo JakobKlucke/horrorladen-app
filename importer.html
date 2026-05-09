@@ -36,7 +36,39 @@
 <main class="wrap importer-main">
   <section class="home-hero">
     <h1>Skript importieren und reviewen</h1>
-    <p>PDF-Rohimport läuft weiter über <code>tools/import_script.py</code>. Diese Oberfläche lädt Skript-JSON und Review-CSV, zeigt offene Hinweise und exportiert aktualisierte Dateien.</p>
+    <p>Diese Oberfläche kann PDF-Dateien direkt importieren, wenn der lokale Import-Server läuft. Alternativ kannst du bestehendes Skript-JSON und Review-CSV laden, offene Hinweise prüfen und aktualisierte Dateien exportieren.</p>
+  </section>
+
+  <section class="panel importer-panel" style="display:grid;gap:1rem">
+    <div class="importer-panel__head">
+      <div>
+        <h2>PDF-Import</h2>
+        <p class="faded importer-panel__copy">Starte lokal <code>python3 tools/import_studio_server.py</code>, dann kannst du hier direkt eine PDF auswählen und den Import ohne Terminal-Wizard ausführen.</p>
+      </div>
+      <button class="btn secondary" id="refreshBackendBtn" type="button">Status prüfen</button>
+    </div>
+    <div class="controls importer-load importer-load--pdf">
+      <div>
+        <label for="pdfFileInput">PDF-Datei</label>
+        <input id="pdfFileInput" type="file" accept=".pdf,application/pdf">
+      </div>
+      <div>
+        <label for="pdfTitleInput">Titel</label>
+        <input id="pdfTitleInput" type="text" placeholder="Wird aus dem Dateinamen vorgeschlagen">
+      </div>
+      <div>
+        <label for="ocrModeSelect">OCR-Modus</label>
+        <select id="ocrModeSelect">
+          <option value="auto">Automatisch</option>
+          <option value="force">Für jede Seite erzwingen</option>
+          <option value="off">Nur eingebetteten PDF-Text nutzen</option>
+        </select>
+      </div>
+      <div class="cta">
+        <button class="btn" id="runPdfImportBtn" type="button">PDF importieren</button>
+      </div>
+    </div>
+    <div class="review-note" id="backendStatus">Backend noch nicht geprüft.</div>
   </section>
 
   <section class="panel" style="display:grid;gap:1rem">

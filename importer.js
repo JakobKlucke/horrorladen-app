@@ -7,9 +7,16 @@
     canonical: null,
     runtime: null,
     reviewRows: [],
-    selectedRowIndex: -1
+    selectedRowIndex: -1,
+    backendStatus: null
   };
 
+  const pdfFileInput = document.getElementById('pdfFileInput');
+  const pdfTitleInput = document.getElementById('pdfTitleInput');
+  const ocrModeSelect = document.getElementById('ocrModeSelect');
+  const runPdfImportBtn = document.getElementById('runPdfImportBtn');
+  const refreshBackendBtn = document.getElementById('refreshBackendBtn');
+  const backendStatus = document.getElementById('backendStatus');
   const jsonFileInput = document.getElementById('jsonFileInput');
   const reviewFileInput = document.getElementById('reviewFileInput');
   const useEmbeddedIssuesBtn = document.getElementById('useEmbeddedIssuesBtn');
@@ -121,6 +128,28 @@
     if(!studioStatus) return;
     studioStatus.textContent = message;
     studioStatus.classList.toggle('review-note--ok', !!ok);
+  }
+
+  function setBackendStatus(message,{ok=false}={}){
+    if(!backendStatus) return;
+    backendStatus.textContent = message;
+    backendStatus.classList.toggle('review-note--ok', !!ok);
+  }
+
+  function defaultLaunchCommand(){
+    return 'python3 tools/import_studio_server.py';
+  }
+
+  function formatBackendStatus(payload){
+    const deps = payload?.dependencies || {};
+    const pypdfReady = !!deps?.pypdf?.available;
+    const ocrReady = !!deps?.ocr?.available;
+    const parts = [];
+    parts.push(pypdfReady ? 'PDF-Import bereit.' : `pypdf fehlt. Installiere es mit: ${deps?.pypdf?.installHint || 'python3 -m pip install pypdf'}`);
+    parts.push(ocrReady ? 'OCR verfügbar.' : 'OCR nicht komplett verfügbar, eingebetteter PDF-Text funktioniert trotzdem.');
+    const langs = Array.isArray(deps?.ocr?.languages) && deps.ocr.languages.length ? `Tesseract-Sprachen: ${deps.ocr.languages.join(', ')}` : '';
+    if(langs) parts.push(langs);
+    return parts.join(' ');
   }
 
   function ensureReviewRows(){
@@ -268,14 +297,15 @@
     renderReviewList();
   }
 
-  function loadRuntimeFromData(data, sourceName){
+  function loadRuntimeFromData(data, sourceName, options = {}){
     const runtime = ScriptModel.buildRuntimeModel(data);
     state.sourceName = sourceName || 'skript';
     state.canonical = runtime.canonical;
     state.runtime = runtime;
-    state.reviewRows = state.reviewRows.length
-      ? state.reviewRows.map(row => Object.assign({}, row))
-      : (Array.isArray(runtime.issues) ? runtime.issues.map(row => Object.assign({}, row)) : []);
+    const reviewRows = Array.isArray(options.reviewRows)
+      ? options.reviewRows
+      : (Array.isArray(runtime.issues) ? runtime.issues : []);
+    state.reviewRows = reviewRows.map(row => Object.assign({}, row));
     state.selectedRowIndex = state.reviewRows.length ? 0 : -1;
     refreshUi();
     updateStatus(`Skript geladen: ${runtime.canonical.title || state.sourceName}`, { ok:true });
@@ -315,6 +345,79 @@
     }
   }
 
+  async function refreshBackendHealth(){
+    try{
+      const response = await fetch('./api/status', { cache:'no-store' });
+      if(!response.ok) throw new Error(response.statusText || `HTTP ${response.status}`);
+      const payload = await response.json();
+      state.backendStatus = payload;
+      const pypdfReady = !!payload?.dependencies?.pypdf?.available;
+      if(runPdfImportBtn) runPdfImportBtn.disabled = !pypdfReady;
+      setBackendStatus(formatBackendStatus(payload), { ok:pypdfReady });
+      return payload;
+    }catch(error){
+      state.backendStatus = null;
+      if(runPdfImportBtn) runPdfImportBtn.disabled = true;
+      setBackendStatus(
+        `Kein lokaler Import-Server erreichbar. Starte im Projektordner: ${defaultLaunchCommand()}`,
+        { ok:false }
+      );
+      return null;
+    }
+  }
+
+  async function runPdfImport(){
+    const file = pdfFileInput?.files && pdfFileInput.files[0];
+    if(!file){
+      setBackendStatus('Bitte zuerst eine PDF-Datei auswählen.');
+      return;
+    }
+    const backend = state.backendStatus || await refreshBackendHealth();
+    if(!backend || !backend?.dependencies?.pypdf?.available){
+      return;
+    }
+
+    const title = (pdfTitleInput?.value || '').trim() || file.name.replace(/\.pdf$/i, '');
+    const ocrMode = ocrModeSelect?.value || 'auto';
+    const params = new URLSearchParams({
+      title,
+      ocrMode,
+      sourceName: file.name
+    });
+
+    const originalLabel = runPdfImportBtn.textContent;
+    runPdfImportBtn.disabled = true;
+    runPdfImportBtn.textContent = 'Import läuft...';
+    setBackendStatus(`Importiere ${file.name} ...`);
+
+    try{
+      const response = await fetch(`./api/import?${params.toString()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/pdf' },
+        body: file
+      });
+      const payload = await response.json();
+      if(!response.ok || !payload?.ok){
+        const errorMessage = payload?.error || response.statusText || 'Unbekannter Fehler';
+        const statusMessage = payload?.status ? formatBackendStatus(payload.status) : '';
+        throw new Error(statusMessage ? `${errorMessage} ${statusMessage}` : errorMessage);
+      }
+
+      loadRuntimeFromData(payload.script, payload.filenameBase || file.name.replace(/\.pdf$/i, ''), {
+        reviewRows: Array.isArray(payload.reviewRows) ? payload.reviewRows : []
+      });
+      setBackendStatus(
+        `PDF importiert: ${payload.summary?.pages || 0} Seiten, ${payload.summary?.entries || 0} Einträge, ${payload.summary?.issues || 0} Hinweise.`,
+        { ok:true }
+      );
+    }catch(error){
+      setBackendStatus(`PDF-Import fehlgeschlagen: ${error.message || error}`);
+    }finally{
+      runPdfImportBtn.textContent = originalLabel;
+      runPdfImportBtn.disabled = !(state.backendStatus?.dependencies?.pypdf?.available);
+    }
+  }
+
   function onUseEmbeddedIssues(){
     ensureReviewRows();
     state.reviewRows = Array.isArray(state.runtime?.issues) ? state.runtime.issues.map(row => Object.assign({}, row)) : [];
@@ -345,6 +448,14 @@
     });
   }
 
+  if(pdfFileInput){
+    pdfFileInput.addEventListener('change', event => {
+      const file = event.target.files && event.target.files[0];
+      if(!file || !pdfTitleInput || pdfTitleInput.value.trim()) return;
+      pdfTitleInput.value = file.name.replace(/\.pdf$/i, '');
+    });
+  }
+
   if(reviewFileInput){
     reviewFileInput.addEventListener('change', async event => {
       const file = event.target.files && event.target.files[0];
@@ -360,6 +471,8 @@
   if(useEmbeddedIssuesBtn) useEmbeddedIssuesBtn.addEventListener('click', onUseEmbeddedIssues);
   if(downloadReviewBtn) downloadReviewBtn.addEventListener('click', onDownloadReview);
   if(downloadJsonBtn) downloadJsonBtn.addEventListener('click', onDownloadJson);
+  if(runPdfImportBtn) runPdfImportBtn.addEventListener('click', runPdfImport);
+  if(refreshBackendBtn) refreshBackendBtn.addEventListener('click', refreshBackendHealth);
 
   if(!ScriptModel){
     updateStatus('script-model.js fehlt. Das Studio kann ohne dieses Modul nicht starten.');
@@ -367,5 +480,6 @@
   }
 
   refreshUi();
+  refreshBackendHealth();
   loadJsonFromUrl();
 })();

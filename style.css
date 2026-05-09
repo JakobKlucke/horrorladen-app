@@ -548,6 +548,21 @@ body::before{
 
 .importer-main{ padding-bottom:40px; }
 .importer-load{ grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+.importer-load--pdf{ align-items:end; }
+.importer-panel__head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+.importer-panel__head h2{
+  margin:0 0 .35rem;
+}
+.importer-panel__copy{
+  margin:0;
+  max-width:48rem;
+}
 .studio-grid{ grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
 .review-shell{
   display:grid;
