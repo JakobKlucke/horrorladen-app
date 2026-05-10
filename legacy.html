@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Horrorladen – Lernapp</title>
+  <meta name="theme-color" content="#58CC02" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- Vendor -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@motionone/dom/dist/motion-one.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="./style.css?v=roadmap-beta-1">
+
+  <!-- View-Guard: nur aktive View anzeigen -->
+  <style>
+    [data-view]{display:none}
+    [data-view].active{display:block}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+<header id="hdr">
+  <div class="wrap">
+    <div class="topbar">
+      <div id="brand" class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#8EE000"/>
+            <circle cx="22" cy="28" r="10" fill="#fff"/><circle cx="42" cy="28" r="10" fill="#fff"/>
+            <circle cx="22" cy="28" r="5" fill="#2B2B2B"/><circle cx="42" cy="28" r="5" fill="#2B2B2B"/>
+            <path d="M10 44C20 52 44 52 54 44" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="title">Musical Skript Lernapp</div>
+          <div class="badge" id="subtitle">made by Jakob with ❤️</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="iconbtn" id="goSettings" title="Einstellungen" aria-label="Einstellungen" data-nav="settings">⚙️</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- MAIN MENU -->
+  <section data-view="mainmenu" id="mainMenuView">
+    <section class="app-gate">
+      <div class="app-gate__copy">
+        <p class="roadmap-kicker">Musical Skript Lernapp</p>
+        <h1>Waehle deinen Lernmodus</h1>
+        <p>Nutze die bewaehrten Legacy-Modi oder starte die neue Game Roadmap mit Profil, Missionen, XP, Streaks und lokalen Rewards.</p>
+      </div>
+      <div class="app-gate__grid">
+        <article class="app-choice app-choice--legacy" data-nav="home">
+          <div class="mode-icon">📖</div>
+          <h2>Legacy Lernapp</h2>
+          <p>Classic, Flashcards, Cloze, Viewer, Survival und Leaderboard wie bisher.</p>
+          <button class="btn" type="button" data-nav="home">Legacy starten</button>
+        </article>
+        <article class="app-choice app-choice--roadmap" data-nav="roadmap">
+          <div class="mode-icon">🗺️</div>
+          <h2>Game Roadmap</h2>
+          <p>Personalisierte Rollenreise mit Missionen, Boss-Szenen, XP, Streak und Daily Review.</p>
+          <button class="btn" type="button" data-nav="roadmap">Roadmap starten</button>
+        </article>
+      </div>
+      <div class="script-row app-gate__actions">
+        <button class="btn secondary" type="button" data-nav="script">Skript wechseln</button>
+        <a class="btn secondary" id="importStudioLinkGate" href="./importer.html" target="_blank" rel="noopener">Import Studio</a>
+      </div>
+    </section>
+  </section>
+
+  <!-- SCRIPT SELECT -->
+  <section data-view="script" id="scriptView" class="active">
+    <section class="home-hero">
+      <h1>Skript auswählen</h1>
+      <p>Wähle das Musical-Skript, das du lernen möchtest.</p>
+    </section>
+
+    <div class="panel" style="display:grid;gap:1rem">
+      <div style="display:grid;gap:.6rem">
+        <label for="scriptSelect">Skript (aus scripts.json)</label>
+        <select id="scriptSelect"></select>
+        <div class="script-row">
+          <label class="checkbox-container" style="padding-left:35px">
+            <input id="manualToggle" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">Manuell eingeben</span>
+          </label>
+          <input id="scriptInput" type="text" placeholder="/pfad/datei.json" style="display:none;flex:1 1 260px">
+          <button class="btn" id="loadScriptBtn" data-sfx>Neu laden</button>
+        </div>
+        <div class="faded">Aktuell: <code id="jsonSrcLabel">—</code></div>
+        <div class="faded" id="scriptsNote">Suche nach scripts.json …</div>
+      </div>
+
+      <div class="controls" style="grid-template-columns:1fr auto">
+        <div class="faded">Du kannst später in den Einstellungen das Skript ändern.</div>
+        <div class="cta"><button class="btn" id="scriptContinue" data-sfx>Weiter</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME (als Section, nicht div!) -->
+  <section data-view="home" id="homeView">
+
+    <section class="home-hero">
+      <h1>Horrorladen – Lernapp</h1>
+      <p>Wähle einen Modus und leg los.</p>
+      <div class="script-row" style="margin-top:.6rem">
+        <button class="btn secondary" data-nav="script">Skript ändern</button>
+        <a class="btn secondary" id="importStudioLinkHome" href="./importer.html" target="_blank" rel="noopener">Import Studio</a>
+      </div>
+      <div class="review-note" id="reviewNotice" hidden></div>
+    </section>
+
+    <!-- Lernen -->
+    <section class="home-section">
+      <h2>Lernen</h2>
+      <div class="card-grid">
+        <article class="mode-card classic" data-goto-learn data-mode="classic">
+          <div class="mode-icon">📖</div>
+          <h3>Classic</h3>
+          <p>Zeilen mit Kontext üben</p>
+          <button class="btn" data-goto-learn data-mode="classic">Start</button>
+        </article>
+
+        <article class="mode-card flash" data-goto-learn data-mode="flash">
+          <div class="mode-icon">🃏</div>
+          <h3>Flashcards</h3>
+          <p>Teste dich mit Karteikarten</p>
+          <button class="btn" data-goto-learn data-mode="flash">Start</button>
+        </article>
+
+        <article class="mode-card cloze" data-goto-learn data-mode="cloze">
+          <div class="mode-icon">✏️</div>
+          <h3>Lücken</h3>
+          <p>Fülle die fehlenden Wörter</p>
+          <button class="btn" data-goto-learn data-mode="cloze">Start</button>
+        </article>
+
+        <!-- Viewer-Karte gehört zur HOME-View -->
+        <article class="mode-card viewer" data-nav="viewer">
+          <div class="mode-icon">👁️</div>
+          <h3>Viewer</h3>
+          <p>Alle Zeilen chronologisch ansehen</p>
+          <button class="btn" data-nav="viewer">Öffnen</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Competitive -->
+    <section class="home-section">
+      <h2>Competitive</h2>
+      <div class="card-grid">
+        <article class="mode-card survival" data-nav="survival">
+          <div class="mode-icon">🕹️</div>
+          <h3>Survival</h3>
+          <p>Wisse deinen Text so lange wie möglich</p>
+          <button class="btn" data-nav="survival">Play</button>
+        </article>
+
+        <article class="mode-card leaderboard" data-nav="scores">
+          <div class="mode-icon">🏆</div>
+          <h3>Leaderboard</h3>
+          <p>Leaderboard der Top Text-Kenner</p>
+          <button class="btn" data-nav="scores">Ansehen</button>
+        </article>
+      </div>
+    </section>
+
+  </section>
+  <!-- /HOME -->
+
+  <!-- LEARN -->
+  <section data-view="learn">
+    <div class="panel">
+      <div class="filters">
+        <div><label for="actFilter">Akt</label><select id="actFilter"><option value="">Alle</option></select></div>
+        <div><label for="sceneFilter">Szene</label><select id="sceneFilter"><option value="">Alle</option></select></div>
+        <div><label for="songFilter">Song</label><select id="songFilter"><option value="">Alle</option></select></div>
+        <div>
+          <label>Lyrics-only</label>
+          <label class="checkbox-container">
+            <input id="lyricsOnly" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">nur Gesang</span>
+          </label>
+        </div>
+      </div>
+      <div class="controls">
+        <div><label for="roleSel">Rolle</label><select id="roleSel"></select></div>
+        <div><label for="modeSel">Modus</label>
+          <select id="modeSel">
+            <option value="classic">Classic</option>
+            <option value="flash">Flashcards</option>
+            <option value="cloze">Cloze</option>
+          </select>
+        </div>
+        <div class="cta"><button class="btn" id="startLearn" data-sfx>Start</button></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="progress"><i id="learnProg"></i></div>
+      <div class="faded" id="learnCount">0/0</div>
+    </div>
+
+    <div id="learnRoot"></div>
+
+    <div class="pager" id="learnPager" hidden>
+      <div class="info" id="pagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="prevPage" class="btn secondary" data-sfx>← Zurück</button>
+        <button id="nextPage" class="btn"   data-sfx>Weiter →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEWER -->
+  <section data-view="viewer">
+    <div class="panel">
+      <div class="filters">
+        <div><label for="actFilterV">Akt</label><select id="actFilterV"><option value="">Alle</option></select></div>
+        <div><label for="sceneFilterV">Szene</label><select id="sceneFilterV"><option value="">Alle</option></select></div>
+        <div><label for="songFilterV">Song</label><select id="songFilterV"><option value="">Alle</option></select></div>
+        <div>
+          <label>Lyrics-only</label>
+          <label class="checkbox-container">
+            <input id="lyricsOnlyV" class="custom-checkbox" type="checkbox">
+            <span class="checkmark"></span><span class="label">nur Gesang</span>
+          </label>
+        </div>
+      </div>
+      <div class="controls" style="grid-template-columns:1fr">
+        <div><label for="viewerRoleSel">Hervorhebung (nur Anzeige)</label><select id="viewerRoleSel"></select></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="progress"><i id="viewerProg"></i></div>
+      <div class="faded" id="viewerCount">0/0</div>
+    </div>
+
+    <div id="viewerRoot"></div>
+
+    <div class="pager" id="viewerPager" hidden>
+      <div class="info" id="viewerPagerInfo">Seite 1/1</div>
+      <div class="group">
+        <button id="viewerPrev" class="btn secondary" data-sfx>← Zurück</button>
+        <button id="viewerNext" class="btn"   data-sfx>Weiter →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURVIVAL -->
+  <section data-view="survival">
+    <div class="panel controls">
+      <div><label for="roleSurv">Rolle</label><select id="roleSurv"></select></div>
+      <div><label>Herzen</label><div id="heartPill" class="tile" style="min-height:auto;padding:.4rem .8rem">❤️❤️❤️</div></div>
+      <div><label>Score</label><div id="scorePill" class="tile" style="min-height:auto;padding:.4rem .8rem">0</div></div>
+      <div class="cta"><button class="btn" id="startSurv" data-sfx>Neu starten</button></div>
+    </div>
+    <div id="survRoot"></div>
+  </section>
+
+  <!-- SCORES -->
+  <section data-view="scores">
+    <div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap">
+      <div class="title" style="font-size:1.05rem;color:var(--ink)">Leaderboard</div>
+      <div class="faded" id="boardInfo">—</div>
+    </div>
+    <div id="board" class="list"></div>
+  </section>
+
+  <!-- GAME ROADMAP -->
+  <section data-view="roadmap" id="roadmapView">
+    <section class="home-hero roadmap-header">
+      <div>
+        <p class="roadmap-kicker">Beta</p>
+        <h1>Game Roadmap</h1>
+        <p>Lokale Profile, Missionen, XP, Streaks und Daily Review. OpenAI und Supabase sind optional und fuer diese Beta nicht erforderlich.</p>
+      </div>
+      <div class="script-row">
+        <button class="btn secondary" type="button" data-nav="mainmenu">Hauptmenue</button>
+        <button class="btn secondary" type="button" data-nav="home">Legacy</button>
+      </div>
+    </section>
+    <div id="roadmapRoot"></div>
+    <div id="roadmapRunner" class="mission-runner" hidden></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-view="settings">
+    <div class="panel" style="display:grid;gap:1rem">
+      <div class="controls" style="grid-template-columns:1fr auto">
+        <div><label for="playerName">Spielername</label><input id="playerName" type="text" placeholder="z.B. Alex"></div>
+        <div class="cta"><button class="btn" id="saveSettings" data-sfx>Speichern</button></div>
+      </div>
+
+      <div style="display:grid;gap:.6rem">
+        <label>App</label>
+        <label class="checkbox-container">
+          <input id="sfxToggle" class="custom-checkbox" type="checkbox">
+          <span class="label">Soundeffekte</span>
+        </label>
+        <label class="checkbox-container">
+          <input id="motionToggle" class="custom-checkbox" type="checkbox">
+          <span class="label">Bewegung reduzieren</span>
+        </label>
+        <div class="faded" id="scriptStats">Skript: —</div>
+      </div>
+
+      <div style="display:grid;gap:.6rem">
+        <label>Aktuelles Skript</label>
+        <div class="faded">Aktuell: <code id="currentScriptLabel">—</code></div>
+        <div class="review-note" id="reviewSettingsNote" hidden></div>
+        <div class="script-row">
+          <button class="btn secondary" data-nav="script">Skript ändern</button>
+          <a class="btn secondary" id="importStudioLinkSettings" href="./importer.html" target="_blank" rel="noopener">Import Studio</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="bottom">
+  <div class="bottom-nav">
+    <button class="navbtn" data-nav="mainmenu" >⌂</button>
+    <button class="navbtn" data-nav="home" >🏠</button>
+  </div>
+</div>
+
+<!-- App scripts -->
+<script defer src="./script-model.js?v=roadmap-beta-1"></script>
+<script defer src="./roadmap-model.js?v=roadmap-beta-1"></script>
+<script defer src="./profile-store.js?v=roadmap-beta-1"></script>
+<script defer src="./roadmap-ui.js?v=roadmap-beta-1"></script>
+<script defer src="./app.js?v=roadmap-beta-1"></script>
+</body>
+</html>
