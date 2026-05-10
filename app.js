@@ -1,7 +1,8 @@
 /* =================== BaseDir & Pfade =================== */
 const CURRENT_DIR = (() => {
   const p = location.pathname;
-  return p.endsWith('/') ? p : p.replace(/[^/]+$/, '/');
+  if (p.endsWith('/')) return p;
+  return p.slice(0, p.lastIndexOf('/') + 1) || '/';
 })();
 
 /* CodePen-Fallback: JSONs vom Repo via jsDelivr holen */
