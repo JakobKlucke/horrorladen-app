@@ -26,6 +26,11 @@
     return String(value || '').trim();
   }
 
+  function scopedKey(namespace, key){
+    const scope = clean(namespace);
+    return scope ? `${scope}:${key}` : key;
+  }
+
   function safeJsonParse(value, fallback){
     try{
       return value ? JSON.parse(value) : fallback;
@@ -38,13 +43,14 @@
     return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
-  function createDefaultProfile({ displayName = 'Local Player', scriptId = '', roleId = '' } = {}){
+  function createDefaultProfile({ displayName = 'Local Player', scriptId = '', roleId = '', userId = '' } = {}){
     const index = Math.abs(clean(displayName).split('').reduce((sum, char) => sum + char.charCodeAt(0), 0));
     return {
       id: makeId('profile'),
       displayName: clean(displayName) || 'Local Player',
       avatar: AVATARS[index % AVATARS.length],
       color: COLORS[index % COLORS.length],
+      userId: clean(userId),
       scriptId: clean(scriptId),
       roleId: clean(roleId),
       createdAt: new Date().toISOString(),
@@ -93,20 +99,20 @@
     });
   }
 
-  function readLocal(localStorageRef){
+  function readLocal(localStorageRef, keys = KEYS){
     if(!localStorageRef) return createEmptyState();
     return {
-      profiles: safeJsonParse(localStorageRef.getItem(KEYS.profiles), []),
-      activeProfileId: localStorageRef.getItem(KEYS.activeProfileId) || '',
-      progress: safeJsonParse(localStorageRef.getItem(KEYS.progress), {})
+      profiles: safeJsonParse(localStorageRef.getItem(keys.profiles), []),
+      activeProfileId: localStorageRef.getItem(keys.activeProfileId) || '',
+      progress: safeJsonParse(localStorageRef.getItem(keys.progress), {})
     };
   }
 
-  function writeLocal(localStorageRef, state){
+  function writeLocal(localStorageRef, state, keys = KEYS){
     if(!localStorageRef) return;
-    localStorageRef.setItem(KEYS.profiles, JSON.stringify(state.profiles || []));
-    localStorageRef.setItem(KEYS.activeProfileId, state.activeProfileId || '');
-    localStorageRef.setItem(KEYS.progress, JSON.stringify(state.progress || {}));
+    localStorageRef.setItem(keys.profiles, JSON.stringify(state.profiles || []));
+    localStorageRef.setItem(keys.activeProfileId, state.activeProfileId || '');
+    localStorageRef.setItem(keys.progress, JSON.stringify(state.progress || {}));
   }
 
   function normalizeState(state){
@@ -124,18 +130,24 @@
     return [profileId, scriptId, roleId].map(clean).join('::');
   }
 
-  function createStore({ indexedDB: indexedDBRef, localStorage: localStorageRef } = {}){
+  function createStore({ indexedDB: indexedDBRef, localStorage: localStorageRef, namespace = '' } = {}){
     let dbPromise = openDatabase(indexedDBRef);
     let cachedState = null;
+    const keys = {
+      profiles: scopedKey(namespace, KEYS.profiles),
+      activeProfileId: scopedKey(namespace, KEYS.activeProfileId),
+      progress: scopedKey(namespace, KEYS.progress)
+    };
+    const dbStateKey = scopedKey(namespace, 'state');
 
     async function loadState(){
       if(cachedState) return clone(cachedState);
       const db = await dbPromise;
-      const fromDb = db ? await dbGet(db, 'state') : null;
-      const state = normalizeState(fromDb || readLocal(localStorageRef));
+      const fromDb = db ? await dbGet(db, dbStateKey) : null;
+      const state = normalizeState(fromDb || readLocal(localStorageRef, keys));
       cachedState = state;
-      if(!fromDb && db) await dbSet(db, 'state', state);
-      writeLocal(localStorageRef, state);
+      if(!fromDb && db) await dbSet(db, dbStateKey, state);
+      writeLocal(localStorageRef, state, keys);
       return clone(state);
     }
 
@@ -144,8 +156,8 @@
       next.profiles = next.profiles.map(profile => Object.assign({}, profile, { updatedAt:new Date().toISOString() }));
       cachedState = next;
       const db = await dbPromise;
-      if(db) await dbSet(db, 'state', next);
-      writeLocal(localStorageRef, next);
+      if(db) await dbSet(db, dbStateKey, next);
+      writeLocal(localStorageRef, next, keys);
       return clone(next);
     }
 
@@ -201,7 +213,7 @@
     }
 
     return {
-      keys: KEYS,
+      keys,
       loadState,
       saveState,
       ensureProfile,

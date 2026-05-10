@@ -5,12 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#050807" />
   <title>StageCue</title>
+  <style>
+    html,body,#root{min-height:100%;margin:0}
+    body{background:#050807;color:#F3F5EF;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    .boot-fallback{min-height:100dvh;display:grid;place-items:center;padding:1.25rem;text-align:center}
+    .boot-card{max-width:390px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:#0D1110;padding:1.25rem;box-shadow:0 24px 80px rgba(0,0,0,.4)}
+    .boot-card h1{margin:.2rem 0 .7rem;font-size:2rem;letter-spacing:-.04em}
+    .boot-card h1 strong{color:#A7E34A}
+    .boot-card p{color:#9AA096;line-height:1.5}
+    .boot-card code{display:block;margin:.8rem 0;padding:.75rem;border-radius:14px;background:#141A18;color:#A7E34A;text-align:left;white-space:pre-wrap}
+  </style>
   <script defer src="./script-model.js"></script>
   <script defer src="./roadmap-model.js"></script>
   <script defer src="./profile-store.js"></script>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="boot-fallback">
+      <section class="boot-card">
+        <h1>Stage<strong>Cue</strong></h1>
+        <p>Die React-Version muss ueber den lokalen Vite-Server geoeffnet werden. Direktes Oeffnen per <code>file://</code> zeigt sonst nur eine leere Seite.</p>
+        <code>cd /Users/jakobklucke/git_horrorladen_app
+npm run dev</code>
+        <p>Danach im Browser oeffnen: <strong>http://127.0.0.1:5173/</strong></p>
+      </section>
+    </div>
+  </div>
   <script type="module" src="./src/main.jsx"></script>
 </body>
 </html>

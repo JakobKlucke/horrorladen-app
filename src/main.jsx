@@ -1,4 +1,5 @@
 import React, { startTransition, useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { createRoot } from 'react-dom/client';
 import {
   LEGACY_MODES,
@@ -21,6 +22,7 @@ import {
   scriptIdFromSource,
   stars
 } from './stagecue-core.mjs';
+import { createSecureScriptClient, getSupabaseConfig } from './secure-script-client.mjs';
 import './styles.css';
 
 const initialAppState = {
@@ -38,6 +40,14 @@ const initialAppState = {
   error: ''
 };
 
+const initialAuthState = {
+  loading: true,
+  error: '',
+  secureClient: null,
+  session: null,
+  user: null
+};
+
 function getGlobals(){
   return {
     ScriptModel: window.ScriptModel,
@@ -46,10 +56,8 @@ function getGlobals(){
   };
 }
 
-async function fetchJson(path){
-  const response = await fetch(path, { cache: 'no-cache' });
-  if(!response.ok) throw new Error(`${path} konnte nicht geladen werden.`);
-  return response.json();
+function authStorageKey(userId, key){
+  return `auth:${userId}:${key}`;
 }
 
 function Icon({ name }){
@@ -73,48 +81,104 @@ function Icon({ name }){
 
 function App(){
   const [app, setApp] = useState(initialAppState);
+  const [auth, setAuth] = useState(initialAuthState);
   const [tab, setTab] = useState('start');
   const [selectedChapterId, setSelectedChapterId] = useState('');
   const [runner, setRunner] = useState(null);
 
   useEffect(() => {
     let alive = true;
-    boot().then(next => {
-      if(alive) setApp(next);
-    }).catch(error => {
-      if(alive) setApp(prev => ({ ...prev, loading:false, error:error.message || String(error) }));
+    const config = getSupabaseConfig(import.meta.env);
+    if(!config.isConfigured){
+      setAuth({ ...initialAuthState, loading:false, error:'Supabase ist nicht konfiguriert. Setze VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY.' });
+      setApp(prev => ({ ...prev, loading:false }));
+      return () => { alive = false; };
+    }
+
+    const supabase = createClient(config.url, config.anonKey, {
+      auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
     });
-    return () => { alive = false; };
+    const secureClient = createSecureScriptClient({ supabase });
+
+    secureClient.getSession().then(session => {
+      if(!alive) return;
+      setAuth({ loading:false, error:'', secureClient, session, user:session?.user || null });
+      if(session) loadAuthenticatedApp(secureClient, session);
+      else setApp(prev => ({ ...prev, loading:false }));
+    }).catch(error => {
+      if(!alive) return;
+      setAuth({ ...initialAuthState, loading:false, secureClient, error:error.message || String(error) });
+      setApp(prev => ({ ...prev, loading:false }));
+    });
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if(!alive) return;
+      setAuth(prev => ({ ...prev, loading:false, error:'', secureClient, session, user:session?.user || null }));
+      if(event === 'SIGNED_OUT'){
+        setSelectedChapterId('');
+        setRunner(null);
+        setApp({ ...initialAppState, loading:false });
+      }
+    });
+
+    return () => {
+      alive = false;
+      data?.subscription?.unsubscribe?.();
+    };
   }, []);
 
-  async function boot(sourceOverride){
+  function createUserStore(ProfileStore, userId){
+    return ProfileStore.createStore({
+      indexedDB: window.indexedDB,
+      localStorage: window.localStorage,
+      namespace: `auth:${userId}`
+    });
+  }
+
+  async function loadAuthenticatedApp(secureClient, session, sourceOverride){
+    setApp(prev => ({ ...prev, loading:true, error:'' }));
+    try{
+      const next = await boot(secureClient, session, sourceOverride);
+      setSelectedChapterId('');
+      setRunner(null);
+      startTransition(() => setApp(next));
+    }catch(error){
+      setApp(prev => ({ ...prev, loading:false, error:error.message || String(error) }));
+    }
+  }
+
+  async function boot(secureClient, session, sourceOverride){
     const { ScriptModel, RoadmapModel, ProfileStore } = getGlobals();
     if(!ScriptModel || !RoadmapModel || !ProfileStore) throw new Error('StageCue-Modelle wurden nicht geladen.');
 
-    const manifest = await fetchJson('./scripts.json');
-    const storedSource = sourceOverride || localStorage.getItem('hl_json_src') || '';
+    const manifest = await secureClient.listScripts();
+    const userId = session.user.id;
+    const storedSource = sourceOverride || localStorage.getItem(authStorageKey(userId, 'hl_json_src')) || '';
     const scriptSrc = resolveScriptSource(manifest, storedSource);
-    if(!scriptSrc) return { ...initialAppState, manifest, loading:false, error:'Keine Skripte in scripts.json gefunden.' };
+    if(!scriptSrc) return { ...initialAppState, manifest, loading:false, error:'Keine freigegebenen Skripte gefunden. Loese zuerst einen Invite-Code ein.' };
 
-    const scriptData = await fetchJson(scriptSrc);
+    const scriptData = await secureClient.loadScript(scriptSrc);
     const normalized = ScriptModel.normalizeScriptData(scriptData);
     const runtime = ScriptModel.buildRuntimeModel(normalized);
     const scriptId = scriptIdFromSource(scriptSrc);
     const roadmap = RoadmapModel.validateRoadmap(RoadmapModel.buildRoadmap(runtime, { scriptId }), runtime).roadmap;
-    const store = ProfileStore.createStore({ indexedDB: window.indexedDB, localStorage: window.localStorage });
+    const store = createUserStore(ProfileStore, userId);
+    const displayName = session.user.user_metadata?.display_name || session.user.email || 'StageCue User';
 
     await store.ensureProfile({
-      displayName: localStorage.getItem('hl_player_name') || 'Local Player',
+      displayName,
+      userId,
       scriptId,
       roleId: roadmap.roles[0]?.roleId || ''
     });
 
     let profileState = await store.loadState();
+
     let profile = profileState.profiles.find(item => item.id === profileState.activeProfileId) || profileState.profiles[0] || null;
     let roleRoadmap = RoadmapModel.getRoleRoadmap(roadmap, profile?.roleId) || roadmap.roles[0] || null;
 
     if(profile && roleRoadmap && profile.roleId !== roleRoadmap.roleId){
-      profile = { ...profile, scriptId, roleId: roleRoadmap.roleId, updatedAt: new Date().toISOString() };
+      profile = { ...profile, userId, scriptId, roleId: roleRoadmap.roleId, updatedAt: new Date().toISOString() };
       await store.upsertProfile(profile);
       profileState = await store.loadState();
       profile = profileState.profiles.find(item => item.id === profile.id) || profile;
@@ -128,8 +192,8 @@ function App(){
         }))
       : null;
 
-    localStorage.setItem('hl_script_chosen', '1');
-    localStorage.setItem('hl_json_src', scriptSrc);
+    localStorage.setItem(authStorageKey(userId, 'hl_script_chosen'), '1');
+    localStorage.setItem(authStorageKey(userId, 'hl_json_src'), scriptSrc);
 
     return {
       manifest,
@@ -148,16 +212,12 @@ function App(){
   }
 
   async function reloadScript(nextSource){
-    setApp(prev => ({ ...prev, loading:true, error:'' }));
-    const next = await boot(nextSource);
-    setSelectedChapterId('');
-    setRunner(null);
-    startTransition(() => setApp(next));
+    if(auth.secureClient && auth.session) await loadAuthenticatedApp(auth.secureClient, auth.session, nextSource);
   }
 
   async function selectRole(roleId){
     const { RoadmapModel, ProfileStore } = getGlobals();
-    const store = ProfileStore.createStore({ indexedDB: window.indexedDB, localStorage: window.localStorage });
+    const store = createUserStore(ProfileStore, auth.user.id);
     const roleRoadmap = RoadmapModel.getRoleRoadmap(app.roadmap, roleId) || app.roadmap.roles[0] || null;
     const profile = { ...app.profile, roleId: roleRoadmap.roleId, scriptId: app.scriptId, updatedAt: new Date().toISOString() };
     await store.upsertProfile(profile);
@@ -171,25 +231,36 @@ function App(){
     setApp(prev => ({ ...prev, profileState, profile, roleRoadmap, progress }));
   }
 
-  async function createProfile(displayName){
+  async function createProfile(displayName, options = {}){
     const { ProfileStore } = getGlobals();
-    const store = ProfileStore.createStore({ indexedDB: window.indexedDB, localStorage: window.localStorage });
+    const store = createUserStore(ProfileStore, auth.user.id);
     const roleId = app.roleRoadmap?.roleId || app.roadmap?.roles?.[0]?.roleId || '';
-    const profile = ProfileStore.createDefaultProfile({ displayName, scriptId: app.scriptId, roleId });
+    const profile = ProfileStore.createDefaultProfile({ displayName, userId: auth.user.id, scriptId: app.scriptId, roleId });
     await store.upsertProfile(profile);
     await store.setActiveProfile(profile.id);
-    const profileState = await store.loadState();
-    const next = await boot(app.scriptSrc);
-    setApp({ ...next, profileState });
+    const next = await boot(auth.secureClient, auth.session, app.scriptSrc);
+    setSelectedChapterId('');
+    setRunner(null);
+    setTab('start');
+    setApp(next);
   }
 
   async function selectProfile(profileId){
     const { ProfileStore } = getGlobals();
-    const store = ProfileStore.createStore({ indexedDB: window.indexedDB, localStorage: window.localStorage });
+    const store = createUserStore(ProfileStore, auth.user.id);
     await store.setActiveProfile(profileId);
-    const next = await boot(app.scriptSrc);
+    const next = await boot(auth.secureClient, auth.session, app.scriptSrc);
     setSelectedChapterId('');
+    setRunner(null);
+    setTab('start');
     setApp(next);
+  }
+
+  async function signOut(){
+    if(auth.secureClient) await auth.secureClient.signOut();
+    setSelectedChapterId('');
+    setRunner(null);
+    setApp({ ...initialAppState, loading:false });
   }
 
   function startMission(mission){
@@ -200,14 +271,26 @@ function App(){
 
   async function finishMission(result){
     const { RoadmapModel, ProfileStore } = getGlobals();
-    const store = ProfileStore.createStore({ indexedDB: window.indexedDB, localStorage: window.localStorage });
+    const store = createUserStore(ProfileStore, auth.user.id);
     const progress = RoadmapModel.completeMission(app.progress, runner.mission, result);
     await store.saveProgress(progress);
     setApp(prev => ({ ...prev, progress }));
     setRunner(prev => ({ ...prev, done:true, result, stars: progress.missions[prev.mission.id].stars, totalXp: progress.xp }));
   }
 
-  if(app.loading) return <LoadingScreen />;
+  async function handleAuthenticated(session){
+    setAuth(prev => ({ ...prev, session, user:session?.user || null, error:'' }));
+    if(session && auth.secureClient) await loadAuthenticatedApp(auth.secureClient, session);
+  }
+
+  if(auth.loading || app.loading) return <LoadingScreen />;
+  if(auth.error || !auth.session) return <AuthScreen auth={auth} onAuthenticated={handleAuthenticated} />;
+  if(app.error && app.error.includes('Keine freigegebenen Skripte')){
+    return <InviteUnlockScreen message={app.error} onRedeem={async code => {
+      await auth.secureClient.redeemInvite(code);
+      await loadAuthenticatedApp(auth.secureClient, auth.session);
+    }} onSignOut={signOut} />;
+  }
   if(app.error) return <ErrorScreen message={app.error} onRetry={() => reloadScript(app.scriptSrc)} />;
   if(!app.runtime) return <ScriptPicker app={app} onLoad={reloadScript} />;
 
@@ -219,7 +302,7 @@ function App(){
     <div className="stagecue-shell">
       <main className="phone-frame">
         <AppHeader activeTab={tab} />
-        <section className="screen-scroll">
+        <section key={`${tab}:${selectedChapterId}`} className="screen-scroll">
           {tab === 'start' && <StartScreen app={app} onTab={setTab} onStartMission={startMission} />}
           {tab === 'journey' && (
             selectedChapter
@@ -228,7 +311,7 @@ function App(){
           )}
           {tab === 'library' && <LibraryScreen app={app} onLoadScript={reloadScript} onSelectRole={selectRole} />}
           {tab === 'stats' && <StatsScreen app={app} />}
-          {tab === 'profile' && <ProfileScreen app={app} onCreateProfile={createProfile} onSelectProfile={selectProfile} onSelectRole={selectRole} />}
+          {tab === 'profile' && <ProfileScreen app={app} auth={auth} onCreateProfile={createProfile} onSelectProfile={selectProfile} onSelectRole={selectRole} onSignOut={signOut} />}
         </section>
         <BottomNav active={tab} onChange={next => {
           setSelectedChapterId('');
@@ -273,7 +356,7 @@ function ErrorScreen({ message, onRetry }){
 
 function ScriptPicker({ app, onLoad }){
   const scripts = app.manifest?.scripts || [];
-  const [value, setValue] = useState(scripts[0]?.src || '');
+  const [value, setValue] = useState(scriptOptionSource(scripts[0]) || '');
   return (
     <div className="stagecue-shell">
       <main className="phone-frame center-screen">
@@ -286,6 +369,138 @@ function ScriptPicker({ app, onLoad }){
           </select>
           <button className="primary-button" type="button" onClick={() => onLoad(value)}>StageCue starten</button>
         </div>
+      </main>
+    </div>
+  );
+}
+
+function InviteUnlockScreen({ message, onRedeem, onSignOut }){
+  const [inviteCode, setInviteCode] = useState('');
+  const [feedback, setFeedback] = useState(message);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event){
+    event.preventDefault();
+    setFeedback('');
+    if(!clean(inviteCode)){
+      setFeedback('Bitte gib deinen Invite-Code ein.');
+      return;
+    }
+    setBusy(true);
+    try{
+      await onRedeem(inviteCode);
+    }catch(error){
+      setFeedback(error.message || String(error));
+    }finally{
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="stagecue-shell">
+      <main className="phone-frame auth-frame">
+        <section className="auth-screen">
+          <div className="auth-brand">
+            <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+            <p>Dein Konto ist angemeldet, aber noch fuer kein Regiebuch freigeschaltet.</p>
+          </div>
+          <form className="auth-card card" onSubmit={submit}>
+            <h1>Invite-Code einloesen</h1>
+            <p className="muted">Nach erfolgreicher Freischaltung laedt StageCue die Skriptliste neu.</p>
+            <label>Invite-Code</label>
+            <input value={inviteCode} onChange={event => setInviteCode(event.target.value)} autoComplete="one-time-code" placeholder="Code" />
+            {feedback && <p className="auth-message">{feedback}</p>}
+            <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Bitte warten...' : 'Freischalten'}</button>
+            <button className="secondary-button" type="button" onClick={onSignOut}>Anderen Account nutzen</button>
+          </form>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function AuthScreen({ auth, onAuthenticated }){
+  const [mode, setMode] = useState('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [message, setMessage] = useState(auth.error || '');
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event){
+    event.preventDefault();
+    setMessage('');
+    if(auth.error){
+      setMessage(auth.error);
+      return;
+    }
+    if(!auth.secureClient){
+      setMessage('Supabase ist noch nicht bereit.');
+      return;
+    }
+    if(!clean(email) || !password){
+      setMessage('Bitte E-Mail und Passwort eingeben.');
+      return;
+    }
+    if(mode === 'register' && !clean(inviteCode)){
+      setMessage('Bitte gib deinen Invite-Code ein.');
+      return;
+    }
+    setBusy(true);
+    try{
+      const session = mode === 'login'
+        ? await auth.secureClient.signIn({ email, password })
+        : await auth.secureClient.signUp({ email, password, displayName });
+      if(!session){
+        setMessage('Pruefe bitte deine E-Mails und bestaetige den Account, bevor du dich einloggst.');
+        return;
+      }
+      if(clean(inviteCode)) await auth.secureClient.redeemInvite(inviteCode);
+      await onAuthenticated(session);
+    }catch(error){
+      setMessage(error.message || String(error));
+    }finally{
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="stagecue-shell">
+      <main className="phone-frame auth-frame">
+        <section className="auth-screen">
+          <div className="auth-brand">
+            <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+            <p>Regiebuecher werden erst nach Login und Invite-Code ueber die gesicherte Supabase-Funktion geladen.</p>
+          </div>
+          <form className="auth-card card" onSubmit={submit}>
+            <div className="auth-toggle" role="tablist" aria-label="Anmeldemodus">
+              <button className={mode === 'login' ? 'active' : ''} type="button" onClick={() => setMode('login')}>Einloggen</button>
+              <button className={mode === 'register' ? 'active' : ''} type="button" onClick={() => setMode('register')}>Registrieren</button>
+            </div>
+            {mode === 'login' ? (
+              <>
+                <h1>Willkommen zurück</h1>
+                <p className="muted">Melde dich mit deinem freigeschalteten Konto an.</p>
+              </>
+            ) : (
+              <>
+                <h1>Konto erstellen</h1>
+                <p className="muted">Der Invite-Code schaltet dein Konto fuer die hinterlegten Regiebuecher frei.</p>
+                <label>Name</label>
+                <input value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="Dein Name" autoComplete="nickname" />
+              </>
+            )}
+            <label>E-Mail</label>
+            <input value={email} onChange={event => setEmail(event.target.value)} type="email" autoComplete="email" placeholder="name@example.com" />
+            <label>Passwort</label>
+            <input value={password} onChange={event => setPassword(event.target.value)} type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="Passwort" />
+            <label>Invite-Code {mode === 'login' ? 'optional' : ''}</label>
+            <input value={inviteCode} onChange={event => setInviteCode(event.target.value)} autoComplete="one-time-code" placeholder="Code" />
+            {message && <p className="auth-message">{message}</p>}
+            <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Bitte warten...' : (mode === 'login' ? 'Einloggen' : 'Registrieren')}</button>
+          </form>
+        </section>
       </main>
     </div>
   );
@@ -304,7 +519,7 @@ function BottomNav({ active, onChange }){
   return (
     <nav className="bottom-tabs" aria-label="Hauptnavigation">
       {TAB_ITEMS.map(item => (
-        <button key={item.id} className={item.id === active ? 'active' : ''} type="button" onClick={() => onChange(item.id)}>
+        <button key={item.id} className={`${item.id === active ? 'active' : ''} ${item.primary ? 'primary-tab' : ''}`} type="button" onClick={() => onChange(item.id)}>
           <Icon name={item.id === 'library' ? 'library' : item.id} />
           <span>{item.label}</span>
         </button>
@@ -484,7 +699,17 @@ function StatsScreen({ app }){
       <section className="card mastery-graph">
         <p>Gesamtmeisterschaft</p>
         <strong>{summary.percent}%</strong>
-        <div className="fake-line" />
+        <svg className="mastery-sparkline" viewBox="0 0 180 72" aria-hidden="true">
+          <defs>
+            <linearGradient id="sparkGradient" x1="0" x2="1">
+              <stop offset="0%" stopColor="#6FAE26" />
+              <stop offset="100%" stopColor="#A7E34A" />
+            </linearGradient>
+          </defs>
+          <path className="sparkline-shadow" d="M6 58 C24 50 36 55 52 44 S82 38 98 30 124 34 142 20 160 18 174 8" />
+          <path className="sparkline-line" d="M6 58 C24 50 36 55 52 44 S82 38 98 30 124 34 142 20 160 18 174 8" />
+          <circle cx="174" cy="8" r="4" />
+        </svg>
       </section>
       <section className="stats-grid">
         <MetricCard label="Streak" value={app.progress?.streakDays || 0} suffix="Tage" />
@@ -517,7 +742,7 @@ function StatsScreen({ app }){
   );
 }
 
-function ProfileScreen({ app, onCreateProfile, onSelectProfile, onSelectRole }){
+function ProfileScreen({ app, auth, onCreateProfile, onSelectProfile, onSelectRole, onSignOut }){
   const [name, setName] = useState('');
   return (
     <div className="screen-stack">
@@ -525,7 +750,7 @@ function ProfileScreen({ app, onCreateProfile, onSelectProfile, onSelectRole }){
         <div className="portrait-orb">{initials(app.roleRoadmap?.label)}</div>
         <div>
           <h1>{app.profile?.displayName || 'Local Player'}</h1>
-          <p>{app.roleRoadmap?.label || 'Rolle'} · {app.scriptTitle}</p>
+          <p>{auth.user?.email || 'Supabase Account'} · {app.roleRoadmap?.label || 'Rolle'} · {app.scriptTitle}</p>
         </div>
       </section>
       <section className="card">
@@ -546,6 +771,7 @@ function ProfileScreen({ app, onCreateProfile, onSelectProfile, onSelectRole }){
           {app.roadmap?.roles?.map(role => <option key={role.roleId} value={role.roleId}>{role.label}</option>)}
         </select>
       </section>
+      <button className="secondary-button" type="button" onClick={onSignOut}>Supabase-Account abmelden</button>
       <a className="primary-button legacy-link" href="./legacy.html">Legacy-App öffnen</a>
     </div>
   );

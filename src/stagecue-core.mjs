@@ -1,10 +1,15 @@
 export const TAB_ITEMS = [
-  { id: 'start', label: 'Start' },
   { id: 'journey', label: 'Journey' },
   { id: 'library', label: 'Bibliothek' },
+  { id: 'start', label: 'Start', primary: true },
   { id: 'stats', label: 'Statistiken' },
   { id: 'profile', label: 'Profil' }
 ];
+
+export function isStartCenteredTabOrder(items = TAB_ITEMS){
+  const middleIndex = Math.floor(items.length / 2);
+  return items[middleIndex]?.id === 'start';
+}
 
 export const LEGACY_MODES = [
   { id: 'classic', label: 'Classic', description: 'Zeilen mit Kontext ueben' },
@@ -16,6 +21,31 @@ export const LEGACY_MODES = [
 
 export function clean(value){
   return String(value || '').trim();
+}
+
+export function isAuthGateRequired(profileState){
+  return !Array.isArray(profileState?.profiles) || profileState.profiles.length === 0;
+}
+
+export function createLocalAuthProfile(ProfileStore, {
+  displayName = '',
+  pin = '',
+  scriptId = '',
+  roleId = '',
+  userId = '',
+  guest = false
+} = {}){
+  if(!ProfileStore?.createDefaultProfile) throw new Error('ProfileStore fehlt.');
+  const safeName = clean(displayName) || (guest ? 'Gast' : 'Local Player');
+  return {
+    ...ProfileStore.createDefaultProfile({ displayName: safeName, scriptId, roleId, userId }),
+    localAuth: {
+      type: guest ? 'guest' : 'local',
+      hasPin: Boolean(clean(pin)),
+      pin: clean(pin),
+      version: 1
+    }
+  };
 }
 
 export function percent(value, max){
@@ -118,7 +148,7 @@ export function resolveScriptSource(manifest, storedSource){
 }
 
 export function scriptOptionSource(item){
-  return clean(item?.src || item?.file || item?.path);
+  return clean(item?.src || item?.file || item?.path || item?.id);
 }
 
 export function scriptOptionLabel(item){
