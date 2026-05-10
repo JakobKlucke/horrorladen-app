@@ -16,6 +16,7 @@ const supa = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 const ScriptModel = window.ScriptModel;
+const RoadmapUI = window.RoadmapUI;
 
 function normalizeScriptPath(p){
   if (!p) return p;
@@ -203,6 +204,7 @@ const loadScriptBtn=document.getElementById('loadScriptBtn');
 const currentScriptLabel=document.getElementById('currentScriptLabel');
 const reviewNotice=document.getElementById('reviewNotice');
 const reviewSettingsNote=document.getElementById('reviewSettingsNote');
+const importStudioLinkGate=document.getElementById('importStudioLinkGate');
 const importStudioLinkHome=document.getElementById('importStudioLinkHome');
 const importStudioLinkSettings=document.getElementById('importStudioLinkSettings');
 const playerNameInput=document.getElementById('playerName');
@@ -279,6 +281,7 @@ function updateScriptLabels(){
   if(jsonLabel) jsonLabel.textContent = jsonSrc || '—';
   if(currentScriptLabel) currentScriptLabel.textContent = jsonSrc || '—';
   const target = `./importer.html?src=${encodeURIComponent(jsonSrc || '')}`;
+  if(importStudioLinkGate) importStudioLinkGate.href = target;
   if(importStudioLinkHome) importStudioLinkHome.href = target;
   if(importStudioLinkSettings) importStudioLinkSettings.href = target;
 }
@@ -368,6 +371,9 @@ async function loadJSON(){
   populateFilters();
   updateScriptStats();
   updateReviewNotes();
+  if(RoadmapUI){
+    await RoadmapUI.setRuntime(runtime, { scriptSrc:jsonSrc, scriptId:jsonSrc.split('/').pop()?.replace(/\.[^.]+$/, '') || 'script' });
+  }
 }
 
 /* =================== Errorbox =================== */
@@ -397,13 +403,16 @@ function switchViewImmediate(name){
 
   // Header-UI aktualisieren (falls vorhanden)
   const hdr = document.getElementById('hdr');
-  if (hdr) hdr.classList.toggle('compact', name !== 'home');
+  if (hdr) hdr.classList.toggle('compact', name !== 'home' && name !== 'mainmenu');
 
   const sub = document.getElementById('subtitle');
-  if (sub) sub.textContent = (name === 'home' ? 'made by Jakob with ❤️' : name[0].toUpperCase() + name.slice(1));
+  if (sub) {
+    const labels = { mainmenu:'Modus waehlen', home:'Legacy', roadmap:'Game Roadmap' };
+    sub.textContent = labels[name] || (name[0].toUpperCase() + name.slice(1));
+  }
 
   // Body-Flag (z.B. für .home-only CSS)
-  document.body.classList.toggle('show-home', name === 'home');
+  document.body.classList.toggle('show-home', name === 'home' || name === 'mainmenu');
 
   // Nach oben scrollen
   window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
@@ -444,7 +453,7 @@ document.querySelectorAll('[data-goto-learn]').forEach(el=>{
 // Brand/Logo oben: zurück zur Startseite
 const brand = document.getElementById('brand');
 if (brand){
-  brand.addEventListener('click', ()=> switchViewImmediate('home'));
+  brand.addEventListener('click', ()=> switchViewImmediate('mainmenu'));
   brand.style.cursor = 'pointer';
 }
 
@@ -858,7 +867,10 @@ async function renderBoard(){
   );
 }
 /* Achtung: deine View heißt "scores" → hier rendern */
-function onViewChanged(name){ if(name==='scores') renderBoard(); }
+function onViewChanged(name){
+  if(name==='scores') renderBoard();
+  if(name==='roadmap' && RoadmapUI) RoadmapUI.render();
+}
 
 /* =================== Settings =================== */
 if(playerNameInput){
@@ -923,7 +935,7 @@ if(scriptContinue){
     const src=getScriptFromUI();
     if(!src){ showError('Keine Quelle', 'Bitte eine JSON-Datei wählen oder manuell eingeben.'); return; }
     await applyScriptSelection(src,{markChosen:true});
-    switchViewImmediate('home');
+    switchViewImmediate('mainmenu');
   });
 }
 
@@ -936,13 +948,14 @@ async function boot(){
     showError('Script-Modul fehlt', 'script-model.js konnte nicht geladen werden.');
     return;
   }
+  if(RoadmapUI) RoadmapUI.init();
   applySfxSetting();
   applyMotionSetting();
   await loadScriptsIndex();
   updateScriptLabels();
   const chosenFlag = localStorage.getItem(LS.scriptChosen)==='1';
   const shouldPrompt = !chosenFlag && (state.indexFromScriptsJson.length>1 || !state.indexFromScriptsJson.length);
-  const startView = shouldPrompt ? 'script' : 'home';
+  const startView = shouldPrompt ? 'script' : 'mainmenu';
   switchViewImmediate(startView);
   await loadJSON();
   renderViewer(); // Learn erst nach Klick auf „Start“
