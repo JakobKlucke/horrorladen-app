@@ -17,6 +17,9 @@ The database schema and Edge Functions live in `supabase/`. Regiebuch JSON files
 
 Create/import the Vercel project from GitHub repository `JakobKlucke/horrorladen-app`.
 
+- Project: `horrorladen-app`
+- Project ID: `prj_idjrKRs3m6ryH14pbLrQYwYj79Gd`
+- Production URL: `https://horrorladen-app.vercel.app`
 - Framework preset: Vite
 - Build command: `npm run build`
 - Output directory: `dist`
