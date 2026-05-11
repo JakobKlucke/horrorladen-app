@@ -8,6 +8,26 @@ export function getSupabaseConfig(env = {}){
   };
 }
 
+const PRODUCTION_ADMIN_URL = 'https://horrorladen-app.vercel.app/admin';
+
+export function getAdminRedirectUrl(env = {}, locationLike = globalThis.location){
+  const configured = cleanValue(env.VITE_ADMIN_REDIRECT_URL);
+  if(configured) return configured;
+
+  const origin = cleanValue(locationLike?.origin);
+  if(!origin) return PRODUCTION_ADMIN_URL;
+
+  let hostname = '';
+  try{
+    hostname = new URL(origin).hostname;
+  }catch{
+    return PRODUCTION_ADMIN_URL;
+  }
+
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]' || hostname === '::1';
+  return isLocal ? PRODUCTION_ADMIN_URL : `${origin}/admin`;
+}
+
 export function normalizeFunctionError(error, fallback = 'Supabase-Funktion fehlgeschlagen.'){
   if(!error) return fallback;
   if(typeof error === 'string') return error;

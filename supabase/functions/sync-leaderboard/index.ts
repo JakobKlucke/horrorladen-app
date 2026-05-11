@@ -27,12 +27,12 @@ Deno.serve(async req => {
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const displayName = clean(profile?.display_name || body.displayName || user.user_metadata?.display_name || 'StageCue User').slice(0, 40);
+    const displayName = clean(profile?.display_name || body.displayName || user.user_metadata?.display_name || 'RoleQuest User').slice(0, 40);
     const payload = {
       user_id: user.id,
       script_id: scriptId,
       role_id: roleId,
-      display_name: displayName || 'StageCue User',
+      display_name: displayName || 'RoleQuest User',
       xp: nonnegativeInteger(body.xp),
       stars: nonnegativeInteger(body.stars),
       completed_missions: nonnegativeInteger(body.completedMissions),

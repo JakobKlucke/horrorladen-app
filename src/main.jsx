@@ -2,6 +2,7 @@ import React, { startTransition, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { createRoot } from 'react-dom/client';
 import {
+  APP_BRAND,
   LEGACY_MODES,
   TAB_ITEMS,
   ADMIN_EMAIL,
@@ -25,7 +26,7 @@ import {
   scriptIdFromSource,
   stars
 } from './stagecue-core.mjs';
-import { createSecureScriptClient, getSupabaseConfig } from './secure-script-client.mjs';
+import { createSecureScriptClient, getAdminRedirectUrl, getSupabaseConfig } from './secure-script-client.mjs';
 import './styles.css';
 
 const initialAppState = {
@@ -79,6 +80,15 @@ function Icon({ name }){
     <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d={paths[name] || paths.start} />
     </svg>
+  );
+}
+
+function BrandMark({ className = 'brand-large', showSlogan = false }){
+  return (
+    <div className="brand-lockup">
+      <div className={className}><span>Role</span><strong>Quest</strong></div>
+      {showSlogan && <div className="brand-slogan">{APP_BRAND.slogan}</div>}
+    </div>
   );
 }
 
@@ -153,7 +163,7 @@ function App(){
 
   async function boot(secureClient, session, sourceOverride){
     const { ScriptModel, RoadmapModel, ProfileStore } = getGlobals();
-    if(!ScriptModel || !RoadmapModel || !ProfileStore) throw new Error('StageCue-Modelle wurden nicht geladen.');
+    if(!ScriptModel || !RoadmapModel || !ProfileStore) throw new Error('RoleQuest-Modelle wurden nicht geladen.');
 
     const manifest = await secureClient.listScripts();
     const userId = session.user.id;
@@ -167,7 +177,7 @@ function App(){
     const scriptId = scriptIdFromSource(scriptSrc);
     const roadmap = RoadmapModel.validateRoadmap(RoadmapModel.buildRoadmap(runtime, { scriptId }), runtime).roadmap;
     const store = createUserStore(ProfileStore, userId);
-    const displayName = session.user.user_metadata?.display_name || session.user.email || 'StageCue User';
+    const displayName = session.user.user_metadata?.display_name || session.user.email || APP_BRAND.defaultDisplayName;
 
     await store.ensureProfile({
       displayName,
@@ -352,7 +362,7 @@ function LoadingScreen(){
   return (
     <div className="stagecue-shell">
       <main className="phone-frame center-screen">
-        <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+        <BrandMark showSlogan />
         <p>Lade deine Rollenreise...</p>
       </main>
     </div>
@@ -363,7 +373,7 @@ function ErrorScreen({ message, onRetry }){
   return (
     <div className="stagecue-shell">
       <main className="phone-frame center-screen">
-        <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+        <BrandMark />
         <p>{message}</p>
         <button className="primary-button" type="button" onClick={onRetry}>Neu laden</button>
       </main>
@@ -377,14 +387,14 @@ function ScriptPicker({ app, onLoad }){
   return (
     <div className="stagecue-shell">
       <main className="phone-frame center-screen">
-        <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+        <BrandMark showSlogan />
         <div className="panel-card">
           <h1>Skript auswählen</h1>
           <p>Wähle ein lokales Musical-Skript als Grundlage für deine Rollenreise.</p>
           <select value={value} onChange={event => setValue(event.target.value)}>
             {scripts.map(item => <option key={scriptOptionSource(item)} value={scriptOptionSource(item)}>{scriptOptionLabel(item)}</option>)}
           </select>
-          <button className="primary-button" type="button" onClick={() => onLoad(value)}>StageCue starten</button>
+          <button className="primary-button" type="button" onClick={() => onLoad(value)}>RoleQuest starten</button>
         </div>
       </main>
     </div>
@@ -418,12 +428,12 @@ function InviteUnlockScreen({ message, onRedeem, onSignOut }){
       <main className="phone-frame auth-frame">
         <section className="auth-screen">
           <div className="auth-brand">
-            <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+            <BrandMark showSlogan />
             <p>Dein Konto ist angemeldet, aber noch fuer kein Regiebuch freigeschaltet.</p>
           </div>
           <form className="auth-card card" onSubmit={submit}>
             <h1>Invite-Code einloesen</h1>
-            <p className="muted">Nach erfolgreicher Freischaltung laedt StageCue die Skriptliste neu.</p>
+            <p className="muted">Nach erfolgreicher Freischaltung laedt RoleQuest die Skriptliste neu.</p>
             <label>Invite-Code</label>
             <input value={inviteCode} onChange={event => setInviteCode(event.target.value)} autoComplete="one-time-code" placeholder="Code" />
             {feedback && <p className="auth-message">{feedback}</p>}
@@ -477,7 +487,7 @@ function AuthScreen({ auth, onAuthenticated }){
       <main className="phone-frame auth-frame">
         <section className="auth-screen">
           <div className="auth-brand">
-            <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+            <BrandMark showSlogan />
             <p>Gib deinen Invite-Code ein, waehle einen Namen und starte direkt mit deinem freigeschalteten Regiebuch.</p>
           </div>
           <form className="auth-card card" onSubmit={submit}>
@@ -533,7 +543,7 @@ function AdminScreen({ auth, onSignOut }){
     try{
       await auth.secureClient.sendAdminMagicLink({
         email,
-        redirectTo: `${window.location.origin}/admin`
+        redirectTo: getAdminRedirectUrl(import.meta.env, window.location)
       });
       setMessage('Magic Link wurde an die Admin-E-Mail gesendet.');
     }catch(error){
@@ -567,7 +577,7 @@ function AdminScreen({ auth, onSignOut }){
         <main className="phone-frame auth-frame admin-frame">
           <section className="auth-screen">
             <div className="auth-brand">
-              <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+              <BrandMark showSlogan />
               <p>Admin-Zugang fuer Invite-Codes und Nutzung.</p>
             </div>
             <form className="auth-card card" onSubmit={sendLink}>
@@ -589,7 +599,7 @@ function AdminScreen({ auth, onSignOut }){
     return (
       <div className="stagecue-shell">
         <main className="phone-frame center-screen admin-frame">
-          <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+          <BrandMark showSlogan />
           <p>Dieser Account ist nicht als Admin zugelassen.</p>
           <button className="secondary-button" type="button" onClick={onSignOut}>Abmelden</button>
         </main>
@@ -606,7 +616,7 @@ function AdminScreen({ auth, onSignOut }){
     <div className="stagecue-shell">
       <main className="phone-frame admin-frame">
         <header className="app-header">
-          <div className="wordmark"><span>Stage</span><strong>Cue</strong></div>
+          <BrandMark className="wordmark" showSlogan />
           <div className="header-title">Admin</div>
         </header>
         <section className="screen-scroll admin-screen">
@@ -668,7 +678,7 @@ function AdminScreen({ auth, onSignOut }){
 function AppHeader({ activeTab }){
   return (
     <header className="app-header">
-      <div className="wordmark"><span>Stage</span><strong>Cue</strong></div>
+      <BrandMark className="wordmark" showSlogan />
       <div className="header-title">{TAB_ITEMS.find(item => item.id === activeTab)?.label}</div>
     </header>
   );
@@ -1044,4 +1054,6 @@ function relativeReview(value){
   return 'Morgen';
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+const rootElement = document.getElementById('root');
+rootElement._roleQuestRoot ||= createRoot(rootElement);
+rootElement._roleQuestRoot.render(<App />);

@@ -184,6 +184,17 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{
 .brand-large{font-size:2.4rem}
 .wordmark{font-size:1.38rem}
 .brand-large strong,.wordmark strong{color:var(--color-primary-strong)}
+.brand-lockup{
+  display:grid;
+  gap:.12rem;
+  line-height:1;
+}
+.brand-slogan{
+  color:var(--color-muted);
+  font-size:.72rem;
+  font-weight:650;
+  letter-spacing:0;
+}
 
 .app-header{
   position:relative;

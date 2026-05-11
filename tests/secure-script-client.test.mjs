@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   createSecureScriptClient,
+  getAdminRedirectUrl,
   getSupabaseConfig,
   normalizeFunctionError
 } from '../src/secure-script-client.mjs';
@@ -130,6 +131,21 @@ test('admin magic link is restricted to the configured admin email', async () =>
       shouldCreateUser: true
     }
   }]);
+});
+
+test('admin redirect URL does not use localhost for magic links', () => {
+  assert.equal(
+    getAdminRedirectUrl({}, { origin: 'http://localhost:5173' }),
+    'https://horrorladen-app.vercel.app/admin'
+  );
+  assert.equal(
+    getAdminRedirectUrl({}, { origin: 'http://127.0.0.1:5173' }),
+    'https://horrorladen-app.vercel.app/admin'
+  );
+  assert.equal(
+    getAdminRedirectUrl({}, { origin: 'https://horrorladen-app.vercel.app' }),
+    'https://horrorladen-app.vercel.app/admin'
+  );
 });
 
 test('secure client syncs leaderboard summaries through the protected function', async () => {

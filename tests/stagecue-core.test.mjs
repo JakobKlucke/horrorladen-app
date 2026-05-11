@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import ScriptModel from '../script-model.js';
 import RoadmapModel from '../roadmap-model.js';
 import ProfileStore from '../profile-store.js';
+import * as StageCueCore from '../src/stagecue-core.mjs';
 import {
   createLocalAuthProfile,
   firstAvailableMission,
@@ -65,6 +66,16 @@ test('firstAvailableMission returns an unlocked deterministic mission', () => {
 
 test('mobile navigation keeps Start as centered primary tab', () => {
   assert.equal(isStartCenteredTabOrder(), true);
+});
+
+test('app shell exposes RoleQuest branding', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+
+  assert.equal(StageCueCore.APP_BRAND?.name, 'RoleQuest');
+  assert.equal(StageCueCore.APP_BRAND?.slogan, 'Deine Rolle. Deine Quest.');
+  assert.match(html, /<title>RoleQuest<\/title>/);
+  assert.match(html, /RoleQuest/);
+  assert.match(html, /Deine Rolle\. Deine Quest\./);
 });
 
 test('auth gate only appears when no local profiles exist', () => {

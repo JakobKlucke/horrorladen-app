@@ -1,3 +1,9 @@
+export const APP_BRAND = {
+  name: 'RoleQuest',
+  slogan: 'Deine Rolle. Deine Quest.',
+  defaultDisplayName: 'RoleQuest User'
+};
+
 export const TAB_ITEMS = [
   { id: 'journey', label: 'Journey' },
   { id: 'library', label: 'Bibliothek' },
@@ -95,7 +101,7 @@ export function leaderboardSummary({ profile, progress, roleRoadmap, RoadmapMode
   const completed = missions.filter(mission => Number(getMissionProgress(progress, mission.id)?.stars || 0) > 0);
   const starCount = missions.reduce((sum, mission) => sum + Number(getMissionProgress(progress, mission.id)?.stars || 0), 0);
   return {
-    displayName: clean(profile?.displayName) || 'StageCue User',
+    displayName: clean(profile?.displayName) || APP_BRAND.defaultDisplayName,
     scriptId: clean(progress?.scriptId || profile?.scriptId),
     roleId: clean(progress?.roleId || profile?.roleId || roleRoadmap?.roleId),
     xp: Number(progress?.xp || 0),
