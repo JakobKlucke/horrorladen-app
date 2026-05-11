@@ -26,6 +26,16 @@ export async function requireUser(req: Request){
   return data.user;
 }
 
+export function isAdminEmail(email: string | null | undefined){
+  return String(email || '').trim().toLowerCase() === 'kontakt@jakobklucke.de';
+}
+
+export async function requireAdmin(req: Request){
+  const user = await requireUser(req);
+  if(!isAdminEmail(user.email)) throw new Error('Admin-Zugriff verweigert.');
+  return user;
+}
+
 function base64ToBytes(value: string){
   return Uint8Array.from(atob(value), char => char.charCodeAt(0));
 }

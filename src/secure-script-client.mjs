@@ -21,6 +21,10 @@ function cleanValue(value){
   return String(value || '').trim();
 }
 
+function isAdminEmail(email){
+  return cleanValue(email).toLowerCase() === 'kontakt@jakobklucke.de';
+}
+
 function authHeaders(session){
   const token = cleanValue(session?.access_token);
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -77,6 +81,39 @@ export function createSecureScriptClient({ supabase } = {}){
     return data?.session || null;
   }
 
+  async function signInWithCode({ displayName, inviteCode }){
+    const name = cleanValue(displayName);
+    const code = cleanValue(inviteCode);
+    if(!name) throw new Error('Bitte gib deinen Benutzernamen ein.');
+    if(!code) throw new Error('Bitte gib deinen Invite-Code ein.');
+
+    const { data, error } = await supabase.auth.signInAnonymously({
+      options: { data: { display_name: name } }
+    });
+    if(error) throw new Error(normalizeFunctionError(error, 'Code-Login fehlgeschlagen.'));
+    const session = data?.session || null;
+    if(!session?.access_token) throw new Error('Anonyme Session konnte nicht erstellt werden.');
+
+    await invokeRequired(supabase, 'set-profile-name', {
+      body: { displayName: name }
+    });
+    await redeemInvite(code);
+    return session;
+  }
+
+  async function sendAdminMagicLink({ email, redirectTo }){
+    const cleanEmail = cleanValue(email).toLowerCase();
+    if(!isAdminEmail(cleanEmail)) throw new Error('Diese Admin-E-Mail ist nicht zugelassen.');
+    const { error } = await supabase.auth.signInWithOtp({
+      email: cleanEmail,
+      options: {
+        emailRedirectTo: redirectTo,
+        shouldCreateUser: true
+      }
+    });
+    if(error) throw new Error(normalizeFunctionError(error, 'Magic Link konnte nicht gesendet werden.'));
+  }
+
   async function signOut(){
     const { error } = await supabase.auth.signOut();
     if(error) throw new Error(normalizeFunctionError(error, 'Abmeldung fehlgeschlagen.'));
@@ -87,6 +124,33 @@ export function createSecureScriptClient({ supabase } = {}){
       body: { inviteCode: cleanValue(inviteCode) }
     });
     return data?.access || data;
+  }
+
+  async function setProfileName(displayName){
+    const data = await invokeRequired(supabase, 'set-profile-name', {
+      body: { displayName: cleanValue(displayName) }
+    });
+    return data?.profile || data;
+  }
+
+  async function syncLeaderboard(summary){
+    const data = await invokeRequired(supabase, 'sync-leaderboard', {
+      body: summary || {}
+    });
+    return data?.leaderboard || data;
+  }
+
+  async function adminDashboard(){
+    return invokeRequired(supabase, 'admin-dashboard');
+  }
+
+  async function adminCreateInvite({ scriptId, maxUses } = {}){
+    return invokeRequired(supabase, 'admin-create-invite', {
+      body: {
+        scriptId: cleanValue(scriptId),
+        maxUses: maxUses == null || maxUses === '' ? null : Number(maxUses)
+      }
+    });
   }
 
   async function listScripts(){
@@ -108,9 +172,15 @@ export function createSecureScriptClient({ supabase } = {}){
     getSession,
     signIn,
     signUp,
+    signInWithCode,
+    sendAdminMagicLink,
     signOut,
+    setProfileName,
     redeemInvite,
     listScripts,
-    loadScript
+    loadScript,
+    syncLeaderboard,
+    adminDashboard,
+    adminCreateInvite
   };
 }

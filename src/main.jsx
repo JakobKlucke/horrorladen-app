@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import {
   LEGACY_MODES,
   TAB_ITEMS,
+  ADMIN_EMAIL,
   badgeLabel,
   buildEntryMap,
   clean,
@@ -12,6 +13,8 @@ import {
   flattenMissions,
   formatNumber,
   getMissionProgress,
+  isAdminEmail,
+  leaderboardSummary,
   nextReviews,
   percent,
   progressSummary,
@@ -88,6 +91,7 @@ function App(){
 
   useEffect(() => {
     let alive = true;
+    const isAdminRoute = window.location.pathname.startsWith('/admin');
     const config = getSupabaseConfig(import.meta.env);
     if(!config.isConfigured){
       setAuth({ ...initialAuthState, loading:false, error:'Supabase ist nicht konfiguriert. Setze VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY.' });
@@ -103,7 +107,7 @@ function App(){
     secureClient.getSession().then(session => {
       if(!alive) return;
       setAuth({ loading:false, error:'', secureClient, session, user:session?.user || null });
-      if(session) loadAuthenticatedApp(secureClient, session);
+      if(session && !isAdminRoute) loadAuthenticatedApp(secureClient, session);
       else setApp(prev => ({ ...prev, loading:false }));
     }).catch(error => {
       if(!alive) return;
@@ -274,6 +278,16 @@ function App(){
     const store = createUserStore(ProfileStore, auth.user.id);
     const progress = RoadmapModel.completeMission(app.progress, runner.mission, result);
     await store.saveProgress(progress);
+    try{
+      await auth.secureClient.syncLeaderboard(leaderboardSummary({
+        profile: app.profile,
+        progress,
+        roleRoadmap: app.roleRoadmap,
+        RoadmapModel
+      }));
+    }catch(error){
+      console.warn('Leaderboard sync failed', error);
+    }
     setApp(prev => ({ ...prev, progress }));
     setRunner(prev => ({ ...prev, done:true, result, stars: progress.missions[prev.mission.id].stars, totalXp: progress.xp }));
   }
@@ -283,6 +297,9 @@ function App(){
     if(session && auth.secureClient) await loadAuthenticatedApp(auth.secureClient, session);
   }
 
+  if(window.location.pathname.startsWith('/admin')){
+    return <AdminScreen auth={auth} onSignOut={signOut} />;
+  }
   if(auth.loading || app.loading) return <LoadingScreen />;
   if(auth.error || !auth.session) return <AuthScreen auth={auth} onAuthenticated={handleAuthenticated} />;
   if(app.error && app.error.includes('Keine freigegebenen Skripte')){
@@ -420,9 +437,6 @@ function InviteUnlockScreen({ message, onRedeem, onSignOut }){
 }
 
 function AuthScreen({ auth, onAuthenticated }){
-  const [mode, setMode] = useState('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [message, setMessage] = useState(auth.error || '');
@@ -439,24 +453,17 @@ function AuthScreen({ auth, onAuthenticated }){
       setMessage('Supabase ist noch nicht bereit.');
       return;
     }
-    if(!clean(email) || !password){
-      setMessage('Bitte E-Mail und Passwort eingeben.');
+    if(!clean(displayName)){
+      setMessage('Bitte gib deinen Benutzernamen ein.');
       return;
     }
-    if(mode === 'register' && !clean(inviteCode)){
+    if(!clean(inviteCode)){
       setMessage('Bitte gib deinen Invite-Code ein.');
       return;
     }
     setBusy(true);
     try{
-      const session = mode === 'login'
-        ? await auth.secureClient.signIn({ email, password })
-        : await auth.secureClient.signUp({ email, password, displayName });
-      if(!session){
-        setMessage('Pruefe bitte deine E-Mails und bestaetige den Account, bevor du dich einloggst.');
-        return;
-      }
-      if(clean(inviteCode)) await auth.secureClient.redeemInvite(inviteCode);
+      const session = await auth.secureClient.signInWithCode({ displayName, inviteCode });
       await onAuthenticated(session);
     }catch(error){
       setMessage(error.message || String(error));
@@ -471,35 +478,187 @@ function AuthScreen({ auth, onAuthenticated }){
         <section className="auth-screen">
           <div className="auth-brand">
             <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
-            <p>Regiebuecher werden erst nach Login und Invite-Code ueber die gesicherte Supabase-Funktion geladen.</p>
+            <p>Gib deinen Invite-Code ein, waehle einen Namen und starte direkt mit deinem freigeschalteten Regiebuch.</p>
           </div>
           <form className="auth-card card" onSubmit={submit}>
-            <div className="auth-toggle" role="tablist" aria-label="Anmeldemodus">
-              <button className={mode === 'login' ? 'active' : ''} type="button" onClick={() => setMode('login')}>Einloggen</button>
-              <button className={mode === 'register' ? 'active' : ''} type="button" onClick={() => setMode('register')}>Registrieren</button>
-            </div>
-            {mode === 'login' ? (
-              <>
-                <h1>Willkommen zurück</h1>
-                <p className="muted">Melde dich mit deinem freigeschalteten Konto an.</p>
-              </>
-            ) : (
-              <>
-                <h1>Konto erstellen</h1>
-                <p className="muted">Der Invite-Code schaltet dein Konto fuer die hinterlegten Regiebuecher frei.</p>
-                <label>Name</label>
-                <input value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="Dein Name" autoComplete="nickname" />
-              </>
-            )}
-            <label>E-Mail</label>
-            <input value={email} onChange={event => setEmail(event.target.value)} type="email" autoComplete="email" placeholder="name@example.com" />
-            <label>Passwort</label>
-            <input value={password} onChange={event => setPassword(event.target.value)} type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="Passwort" />
-            <label>Invite-Code {mode === 'login' ? 'optional' : ''}</label>
+            <h1>Mit Code starten</h1>
+            <p className="muted">Dein Login bleibt in diesem Browser gespeichert.</p>
+            <label>Benutzername</label>
+            <input value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="Dein Name" autoComplete="nickname" />
+            <label>Invite-Code</label>
             <input value={inviteCode} onChange={event => setInviteCode(event.target.value)} autoComplete="one-time-code" placeholder="Code" />
             {message && <p className="auth-message">{message}</p>}
-            <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Bitte warten...' : (mode === 'login' ? 'Einloggen' : 'Registrieren')}</button>
+            <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Bitte warten...' : 'Einloggen'}</button>
           </form>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function AdminScreen({ auth, onSignOut }){
+  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [message, setMessage] = useState(auth.error || '');
+  const [dashboard, setDashboard] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [selectedScript, setSelectedScript] = useState('');
+  const [newCode, setNewCode] = useState(null);
+
+  const sessionEmail = auth.user?.email || '';
+  const isAdmin = Boolean(auth.session && isAdminEmail(sessionEmail));
+
+  useEffect(() => {
+    if(!isAdmin || !auth.secureClient) return;
+    let alive = true;
+    setBusy(true);
+    auth.secureClient.adminDashboard()
+      .then(data => {
+        if(!alive) return;
+        setDashboard(data);
+        setSelectedScript(prev => prev || data?.scripts?.[0]?.id || '');
+      })
+      .catch(error => alive && setMessage(error.message || String(error)))
+      .finally(() => alive && setBusy(false));
+    return () => { alive = false; };
+  }, [isAdmin, auth.secureClient]);
+
+  async function sendLink(event){
+    event.preventDefault();
+    setMessage('');
+    if(!auth.secureClient){
+      setMessage('Supabase ist noch nicht bereit.');
+      return;
+    }
+    setBusy(true);
+    try{
+      await auth.secureClient.sendAdminMagicLink({
+        email,
+        redirectTo: `${window.location.origin}/admin`
+      });
+      setMessage('Magic Link wurde an die Admin-E-Mail gesendet.');
+    }catch(error){
+      setMessage(error.message || String(error));
+    }finally{
+      setBusy(false);
+    }
+  }
+
+  async function createInvite(event){
+    event.preventDefault();
+    setMessage('');
+    setNewCode(null);
+    setBusy(true);
+    try{
+      const data = await auth.secureClient.adminCreateInvite({ scriptId: selectedScript });
+      setNewCode(data?.invite || data);
+      const next = await auth.secureClient.adminDashboard();
+      setDashboard(next);
+    }catch(error){
+      setMessage(error.message || String(error));
+    }finally{
+      setBusy(false);
+    }
+  }
+
+  if(auth.loading) return <LoadingScreen />;
+  if(!auth.session){
+    return (
+      <div className="stagecue-shell">
+        <main className="phone-frame auth-frame admin-frame">
+          <section className="auth-screen">
+            <div className="auth-brand">
+              <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+              <p>Admin-Zugang fuer Invite-Codes und Nutzung.</p>
+            </div>
+            <form className="auth-card card" onSubmit={sendLink}>
+              <h1>Admin Login</h1>
+              <p className="muted">Du erhaeltst einen Magic Link per E-Mail.</p>
+              <label>Admin-E-Mail</label>
+              <input value={email} onChange={event => setEmail(event.target.value)} type="email" autoComplete="email" />
+              {message && <p className="auth-message">{message}</p>}
+              <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Bitte warten...' : 'Magic Link senden'}</button>
+              <a className="secondary-button text-center" href="/">Zur App</a>
+            </form>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  if(!isAdmin){
+    return (
+      <div className="stagecue-shell">
+        <main className="phone-frame center-screen admin-frame">
+          <div className="brand-large"><span>Stage</span><strong>Cue</strong></div>
+          <p>Dieser Account ist nicht als Admin zugelassen.</p>
+          <button className="secondary-button" type="button" onClick={onSignOut}>Abmelden</button>
+        </main>
+      </div>
+    );
+  }
+
+  const scripts = dashboard?.scripts || [];
+  const invites = dashboard?.invites || [];
+  const users = dashboard?.users || [];
+  const leaderboard = dashboard?.leaderboard || [];
+
+  return (
+    <div className="stagecue-shell">
+      <main className="phone-frame admin-frame">
+        <header className="app-header">
+          <div className="wordmark"><span>Stage</span><strong>Cue</strong></div>
+          <div className="header-title">Admin</div>
+        </header>
+        <section className="screen-scroll admin-screen">
+          <section className="card">
+            <h1>Invite-Codes</h1>
+            <p className="muted">Neue Codes werden nur einmal im Klartext angezeigt.</p>
+            <form className="inline-form" onSubmit={createInvite}>
+              <select value={selectedScript} onChange={event => setSelectedScript(event.target.value)}>
+                {scripts.map(script => <option key={script.id} value={script.id}>{script.label || script.title}</option>)}
+              </select>
+              <button type="submit" disabled={busy || !selectedScript}>Code erzeugen</button>
+            </form>
+            {newCode?.code && <code className="copy-code">{newCode.code}</code>}
+            {message && <p className="auth-message">{message}</p>}
+          </section>
+          <section className="admin-grid">
+            {scripts.map(script => {
+              const scriptInvites = invites.filter(invite => invite.script_id === script.id);
+              const scriptUsers = users.filter(user => user.script_id === script.id);
+              return (
+                <article className="card admin-card" key={script.id}>
+                  <h2>{script.label || script.title}</h2>
+                  <p>{scriptUsers.length} Nutzer · {scriptInvites.reduce((sum, invite) => sum + Number(invite.uses || 0), 0)} Einloesungen</p>
+                  {scriptInvites.map(invite => (
+                    <div className="admin-row" key={invite.code_hash_prefix}>
+                      <span>{invite.code_hash_prefix}</span>
+                      <strong>{invite.uses}{invite.max_uses ? `/${invite.max_uses}` : ''}</strong>
+                    </div>
+                  ))}
+                </article>
+              );
+            })}
+          </section>
+          <section className="card">
+            <h2>Nutzer</h2>
+            {users.length ? users.map(user => (
+              <div className="admin-row" key={`${user.user_id}:${user.script_id}`}>
+                <span>{user.display_name || 'Ohne Namen'} · {user.script_id}</span>
+                <strong>{new Date(user.granted_at).toLocaleDateString('de-DE')}</strong>
+              </div>
+            )) : <p className="muted">Noch keine freigeschalteten Nutzer.</p>}
+          </section>
+          <section className="card">
+            <h2>Leaderboard</h2>
+            {leaderboard.length ? leaderboard.map((entry, index) => (
+              <div className="admin-row" key={`${entry.user_id}:${entry.script_id}:${entry.role_id}`}>
+                <span>{index + 1}. {entry.display_name} · {entry.script_id}</span>
+                <strong>{entry.xp} XP · {entry.stars} ★</strong>
+              </div>
+            )) : <p className="muted">Noch keine Leaderboard-Daten.</p>}
+          </section>
+          <button className="secondary-button" type="button" onClick={onSignOut}>Admin abmelden</button>
         </section>
       </main>
     </div>

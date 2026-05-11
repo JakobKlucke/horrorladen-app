@@ -9,6 +9,14 @@ import {
 function fakeSupabase({ session = null, invoke } = {}){
   return {
     auth: {
+      async signInAnonymously(options){
+        fakeSupabase.signInAnonymouslyCalls.push(options);
+        return { data: { session: { access_token: 'anon-token', user: { id: 'user-anon', is_anonymous: true } } }, error: null };
+      },
+      async signInWithOtp(options){
+        fakeSupabase.signInWithOtpCalls.push(options);
+        return { data: {}, error: null };
+      },
       async getSession(){
         return { data: { session } };
       }
@@ -18,6 +26,8 @@ function fakeSupabase({ session = null, invoke } = {}){
     }
   };
 }
+fakeSupabase.signInAnonymouslyCalls = [];
+fakeSupabase.signInWithOtpCalls = [];
 
 test('secure script client requires an authenticated session before invoking functions', async () => {
   let invoked = false;
@@ -79,4 +89,66 @@ test('Supabase config is read from Vite env names only', () => {
 
 test('normalizeFunctionError falls back to the provided default message', () => {
   assert.equal(normalizeFunctionError(null, 'Fallback'), 'Fallback');
+});
+
+test('code login creates an anonymous session then stores profile name and redeems invite', async () => {
+  fakeSupabase.signInAnonymouslyCalls = [];
+  const calls = [];
+  const client = createSecureScriptClient({
+    supabase: fakeSupabase({
+      session: { access_token: 'anon-token', user: { id: 'user-anon' } },
+      invoke: async (name, options) => {
+        calls.push([name, options.body]);
+        return { data: name === 'redeem-invite' ? { access: { script_id: 'horrorladen-final' } } : { profile: { display_name: 'Jakob' } }, error: null };
+      }
+    })
+  });
+
+  const session = await client.signInWithCode({ displayName: ' Jakob ', inviteCode: ' STAGECUE-1 ' });
+
+  assert.equal(session.access_token, 'anon-token');
+  assert.deepEqual(fakeSupabase.signInAnonymouslyCalls, [{ options: { data: { display_name: 'Jakob' } } }]);
+  assert.deepEqual(calls, [
+    ['set-profile-name', { displayName: 'Jakob' }],
+    ['redeem-invite', { inviteCode: 'STAGECUE-1' }]
+  ]);
+});
+
+test('admin magic link is restricted to the configured admin email', async () => {
+  fakeSupabase.signInWithOtpCalls = [];
+  const client = createSecureScriptClient({
+    supabase: fakeSupabase()
+  });
+
+  await assert.rejects(() => client.sendAdminMagicLink({ email: 'not-admin@example.com' }), /Admin-E-Mail/);
+  await client.sendAdminMagicLink({ email: 'kontakt@jakobklucke.de', redirectTo: 'https://example.com/admin' });
+
+  assert.deepEqual(fakeSupabase.signInWithOtpCalls, [{
+    email: 'kontakt@jakobklucke.de',
+    options: {
+      emailRedirectTo: 'https://example.com/admin',
+      shouldCreateUser: true
+    }
+  }]);
+});
+
+test('secure client syncs leaderboard summaries through the protected function', async () => {
+  const calls = [];
+  const client = createSecureScriptClient({
+    supabase: fakeSupabase({
+      session: { access_token: 'token-1' },
+      invoke: async (name, options) => {
+        calls.push([name, options]);
+        return { data: { leaderboard: { rank: 1 } }, error: null };
+      }
+    })
+  });
+
+  const leaderboard = await client.syncLeaderboard({ scriptId: 'horrorladen-final', xp: 120 });
+
+  assert.deepEqual(leaderboard, { rank: 1 });
+  assert.deepEqual(calls, [['sync-leaderboard', {
+    body: { scriptId: 'horrorladen-final', xp: 120 },
+    headers: { Authorization: 'Bearer token-1' }
+  }]]);
 });

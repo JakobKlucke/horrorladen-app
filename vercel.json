@@ -1,5 +1,26 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "routes": [
+    {
+      "src": "/scripts\\.json",
+      "status": 404
+    },
+    {
+      "src": "/private/(.*)",
+      "status": 404
+    },
+    {
+      "src": "/supabase/(.*)",
+      "status": 404
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
+    }
+  ]
 }

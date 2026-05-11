@@ -117,6 +117,66 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{
   color:var(--color-danger);
   font-size:.82rem;
 }
+
+.admin-frame{
+  max-width:720px;
+}
+
+.admin-screen{
+  display:grid;
+  gap:1rem;
+}
+
+.admin-grid{
+  display:grid;
+  gap:.85rem;
+}
+
+.admin-card h2{
+  margin:.15rem 0 .35rem;
+  font-size:1.05rem;
+}
+
+.admin-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  padding:.65rem 0;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#D6DCD1;
+  font-size:.88rem;
+}
+
+.admin-row span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.admin-row strong{
+  color:var(--color-text);
+  white-space:nowrap;
+}
+
+.copy-code{
+  display:block;
+  margin-top:.85rem;
+  padding:.85rem;
+  border-radius:12px;
+  border:1px solid rgba(167,227,74,.35);
+  background:rgba(167,227,74,.12);
+  color:var(--color-primary-strong);
+  font-weight:800;
+  white-space:normal;
+  word-break:break-all;
+}
+
+.text-center{
+  text-align:center;
+  text-decoration:none;
+}
 .brand-large,.wordmark{
   font-weight:780;
   letter-spacing:-.04em;

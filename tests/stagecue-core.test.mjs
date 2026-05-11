@@ -7,8 +7,10 @@ import ProfileStore from '../profile-store.js';
 import {
   createLocalAuthProfile,
   firstAvailableMission,
+  isAdminEmail,
   isAuthGateRequired,
   isStartCenteredTabOrder,
+  leaderboardSummary,
   progressSummary,
   resolveScriptSource,
   sceneProgress,
@@ -84,4 +86,37 @@ test('local auth profile preserves profile compatibility and optional pin marker
   assert.equal(profile.localAuth.type, 'local');
   assert.equal(profile.localAuth.hasPin, true);
   assert.equal(profile.localAuth.pin, '1234');
+});
+
+test('admin email gate accepts only the configured admin address', () => {
+  assert.equal(isAdminEmail('kontakt@jakobklucke.de'), true);
+  assert.equal(isAdminEmail(' Kontakt@JakobKlucke.de '), true);
+  assert.equal(isAdminEmail('jakob@example.com'), false);
+  assert.equal(isAdminEmail(''), false);
+});
+
+test('leaderboardSummary derives aggregated ranking fields from local progress', () => {
+  const { role, progress } = buildAddamsRole();
+  const firstMission = firstAvailableMission(role, progress, RoadmapModel);
+  const completed = RoadmapModel.completeMission(
+    progress,
+    firstMission,
+    { accuracy: 0.99, hintsUsed: 0 },
+    new Date('2026-05-11T10:00:00.000Z')
+  );
+
+  const summary = leaderboardSummary({
+    profile: { displayName: 'Jakob' },
+    progress: completed,
+    roleRoadmap: role,
+    RoadmapModel
+  });
+
+  assert.equal(summary.displayName, 'Jakob');
+  assert.equal(summary.scriptId, completed.scriptId);
+  assert.equal(summary.roleId, completed.roleId);
+  assert.equal(summary.xp, completed.xp);
+  assert.equal(summary.streakDays, completed.streakDays);
+  assert.equal(summary.completedMissions, 1);
+  assert.equal(summary.stars, completed.missions[firstMission.id].stars);
 });

@@ -6,6 +6,8 @@ export const TAB_ITEMS = [
   { id: 'profile', label: 'Profil' }
 ];
 
+export const ADMIN_EMAIL = 'kontakt@jakobklucke.de';
+
 export function isStartCenteredTabOrder(items = TAB_ITEMS){
   const middleIndex = Math.floor(items.length / 2);
   return items[middleIndex]?.id === 'start';
@@ -21,6 +23,10 @@ export const LEGACY_MODES = [
 
 export function clean(value){
   return String(value || '').trim();
+}
+
+export function isAdminEmail(email, adminEmail = ADMIN_EMAIL){
+  return clean(email).toLowerCase() === clean(adminEmail).toLowerCase();
 }
 
 export function isAuthGateRequired(profileState){
@@ -81,6 +87,21 @@ export function progressSummary(roleRoadmap, progress, RoadmapModel){
     percent: percent(completed.length, missions.length),
     stars: starCount,
     maxStars: missions.length * 3
+  };
+}
+
+export function leaderboardSummary({ profile, progress, roleRoadmap, RoadmapModel } = {}){
+  const missions = flattenMissions(roleRoadmap, RoadmapModel);
+  const completed = missions.filter(mission => Number(getMissionProgress(progress, mission.id)?.stars || 0) > 0);
+  const starCount = missions.reduce((sum, mission) => sum + Number(getMissionProgress(progress, mission.id)?.stars || 0), 0);
+  return {
+    displayName: clean(profile?.displayName) || 'StageCue User',
+    scriptId: clean(progress?.scriptId || profile?.scriptId),
+    roleId: clean(progress?.roleId || profile?.roleId || roleRoadmap?.roleId),
+    xp: Number(progress?.xp || 0),
+    stars: starCount,
+    completedMissions: completed.length,
+    streakDays: Number(progress?.streakDays || 0)
   };
 }
 
