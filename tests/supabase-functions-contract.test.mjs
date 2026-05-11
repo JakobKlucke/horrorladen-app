@@ -15,6 +15,13 @@ test('Supabase migration defines profile and leaderboard tables', async () => {
   assert.match(migration, /enable row level security/);
 });
 
+test('redeem invite migration avoids ambiguous script_id conflict target', async () => {
+  const migration = await read('supabase/migrations/202605110003_fix_redeem_invite_ambiguity.sql');
+
+  assert.match(migration, /on conflict on constraint user_script_access_pkey do update/);
+  assert.match(migration, /set uses = invite_codes\.uses \+ 1/);
+});
+
 test('new Edge Functions exist for profile, leaderboard and admin dashboard flows', async () => {
   const files = await Promise.all([
     read('supabase/functions/set-profile-name/index.ts'),
