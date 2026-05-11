@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.vercel/
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+supabase/functions/.env.*
+private/scripts/*.json
+private/scripts/*.sql
+supabase/seed/encrypted_scripts.sql
+supabase/seed/*.json

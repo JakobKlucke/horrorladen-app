@@ -1,0 +1,10 @@
+project_id = "cqtavgzldzgdprcigotc"
+
+[functions.redeem-invite]
+verify_jwt = true
+
+[functions.get-scripts]
+verify_jwt = true
+
+[functions.get-script]
+verify_jwt = true
